@@ -50,6 +50,18 @@ Run only the cases you are actively tuning, and parallelize Codex/Claude per cas
   --max-workers 2
 ```
 
+Compare model tiers within a runtime:
+
+```bash
+./bin/agent.sh \
+  --claude \
+  --journeys pygraphistry_persona_journeys_v1 \
+  --case-ids persona_novice_fraud_table_to_viz_algo \
+  --skills-mode both \
+  --claude-models sonnet,opus \
+  --max-workers 2
+```
+
 ## Repository Layout
 
 ```text

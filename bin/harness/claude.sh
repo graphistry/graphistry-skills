@@ -8,6 +8,7 @@ RAW_OUT=""
 TRACEPARENT=""
 TIMEOUT_S="${AGENT_HARNESS_TIMEOUT_S:-240}"
 WORKDIR="${AGENT_HARNESS_WORKDIR:-$PWD}"
+MODEL=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -29,6 +30,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --traceparent)
       TRACEPARENT="$2"
+      shift 2
+      ;;
+    --model)
+      MODEL="$2"
       shift 2
       ;;
     --timeout-s)
@@ -85,7 +90,12 @@ fi
 
 start_ms=$(date +%s%3N)
 set +e
-(cd "$WORKDIR" && timeout "$TIMEOUT_S" claude --verbose -p --output-format stream-json "$FINAL_PROMPT") > "$RAW_OUT" 2>&1
+CLAUDE_CMD=(claude --verbose -p --output-format stream-json)
+if [[ -n "$MODEL" ]]; then
+  CLAUDE_CMD+=(--model "$MODEL")
+fi
+CLAUDE_CMD+=("$FINAL_PROMPT")
+(cd "$WORKDIR" && timeout "$TIMEOUT_S" "${CLAUDE_CMD[@]}") > "$RAW_OUT" 2>&1
 exit_code=$?
 set -e
 end_ms=$(date +%s%3N)

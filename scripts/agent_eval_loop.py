@@ -59,6 +59,34 @@ def parse_csv(value: str) -> list[str]:
     return [p.strip() for p in value.split(",") if p.strip()]
 
 
+def variant_key(harness: str, model: str = "") -> str:
+    model_token = model if model else "default"
+    return f"{harness}::{model_token}"
+
+
+def resolve_harness_variants(
+    harnesses: list[str],
+    claude_models_csv: str,
+    codex_models_csv: str,
+) -> list[dict[str, str]]:
+    claude_models = parse_csv(claude_models_csv)
+    codex_models = parse_csv(codex_models_csv)
+    variants: list[dict[str, str]] = []
+
+    for harness in harnesses:
+        if harness == "claude" and claude_models:
+            for model in claude_models:
+                variants.append({"harness": harness, "model": model})
+            continue
+        if harness == "codex" and codex_models:
+            for model in codex_models:
+                variants.append({"harness": harness, "model": model})
+            continue
+        variants.append({"harness": harness, "model": ""})
+
+    return variants
+
+
 def parse_skills_modes(value: str) -> list[str]:
     val = value.strip().lower()
     if val == "both":
@@ -268,6 +296,7 @@ def run_harness(
     timeout_s: int,
     louie_url: str,
     skills_text: str,
+    model: str = "",
     harness_cwd: str = "",
 ) -> dict[str, Any]:
     harness_script = ROOT / "bin" / "harness" / f"{harness}.sh"
@@ -307,6 +336,8 @@ def run_harness(
     ]
     if harness_cwd and harness in {"claude", "codex"}:
         cmd.extend(["--cd", harness_cwd])
+    if model and harness in {"claude", "codex"}:
+        cmd.extend(["--model", model])
 
     started = time.time()
     try:
@@ -485,11 +516,14 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
 
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     by_harness: dict[str, dict[str, Any]] = {}
+    by_harness_and_model: dict[str, dict[str, Any]] = {}
     by_skills_mode: dict[str, dict[str, Any]] = {}
     by_harness_and_mode: dict[str, dict[str, Any]] = {}
+    by_harness_model_and_mode: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         harness = str(row.get("harness"))
+        model = str(row.get("model") or "")
         skills_mode = str(row.get("skills_mode"))
 
         if harness not in by_harness:
@@ -510,10 +544,35 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "harness_ok": 0,
             }
 
+        harness_model_key = variant_key(harness, model)
+        if harness_model_key not in by_harness_and_model:
+            by_harness_and_model[harness_model_key] = {
+                "harness": harness,
+                "model": model if model else "default",
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
         harness_mode_key = f"{harness}::{skills_mode}"
         if harness_mode_key not in by_harness_and_mode:
             by_harness_and_mode[harness_mode_key] = {
                 "harness": harness,
+                "skills_mode": skills_mode,
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
+        harness_model_mode_key = f"{variant_key(harness, model)}::{skills_mode}"
+        if harness_model_mode_key not in by_harness_model_and_mode:
+            by_harness_model_and_mode[harness_model_mode_key] = {
+                "harness": harness,
+                "model": model if model else "default",
                 "skills_mode": skills_mode,
                 "total": 0,
                 "passed": 0,
@@ -540,6 +599,15 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         bucket_mode["scores"].append(float(row.get("score", 0.0)))
         bucket_mode["latency_ms"].append(int(row.get("latency_ms", 0)))
 
+        bucket_hm_model = by_harness_and_model[harness_model_key]
+        bucket_hm_model["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_hm_model["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_hm_model["harness_ok"] += 1
+        bucket_hm_model["scores"].append(float(row.get("score", 0.0)))
+        bucket_hm_model["latency_ms"].append(int(row.get("latency_ms", 0)))
+
         bucket_hm = by_harness_and_mode[harness_mode_key]
         bucket_hm["total"] += 1
         if bool(row.get("pass_bool")):
@@ -548,6 +616,15 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
             bucket_hm["harness_ok"] += 1
         bucket_hm["scores"].append(float(row.get("score", 0.0)))
         bucket_hm["latency_ms"].append(int(row.get("latency_ms", 0)))
+
+        bucket_hmm = by_harness_model_and_mode[harness_model_mode_key]
+        bucket_hmm["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_hmm["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_hmm["harness_ok"] += 1
+        bucket_hmm["scores"].append(float(row.get("score", 0.0)))
+        bucket_hmm["latency_ms"].append(int(row.get("latency_ms", 0)))
 
     def finalize_bucket(bucket: dict[str, Any]) -> None:
         total = bucket["total"]
@@ -564,7 +641,13 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for bucket in by_skills_mode.values():
         finalize_bucket(bucket)
 
+    for bucket in by_harness_and_model.values():
+        finalize_bucket(bucket)
+
     for bucket in by_harness_and_mode.values():
+        finalize_bucket(bucket)
+
+    for bucket in by_harness_model_and_mode.values():
         finalize_bucket(bucket)
 
     total_all = len(rows)
@@ -575,8 +658,10 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "passed_rows": passed_all,
         "overall_pass_rate": (passed_all / total_all) if total_all else 0.0,
         "by_harness": by_harness,
+        "by_harness_and_model": by_harness_and_model,
         "by_skills_mode": by_skills_mode,
         "by_harness_and_mode": by_harness_and_mode,
+        "by_harness_model_and_mode": by_harness_model_and_mode,
     }
 
 
@@ -597,6 +682,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--louie-url", default=os.environ.get("LOUIE_URL", "http://localhost:8501"), help="Louie server URL")
     parser.add_argument("--claude-cwd", default="", help="Working directory for claude harness (for native .claude/skills env tests)")
     parser.add_argument("--codex-cwd", default="", help="Working directory for codex harness (for native .codex/skills env tests)")
+    parser.add_argument("--claude-models", default="", help="CSV model list for claude harness (optional)")
+    parser.add_argument("--codex-models", default="", help="CSV model list for codex harness (optional)")
     parser.add_argument(
         "--skills-delivery",
         default="native",
@@ -614,6 +701,11 @@ def main() -> int:
     harnesses = parse_csv(args.harnesses)
     if not harnesses:
         raise ValueError("At least one harness is required")
+    harness_variants = resolve_harness_variants(
+        harnesses=harnesses,
+        claude_models_csv=args.claude_models,
+        codex_models_csv=args.codex_models,
+    )
 
     modes = parse_skills_modes(args.skills_mode)
     max_workers = max(1, args.max_workers)
@@ -674,6 +766,7 @@ def main() -> int:
         "git_sha": git_sha,
         "git_branch": git_branch,
         "harnesses": harnesses,
+        "harness_variants": harness_variants,
         "journeys": [j.get("id") for j in journeys],
         "case_ids_filter": sorted(case_filter),
         "skills_mode": modes,
@@ -686,6 +779,8 @@ def main() -> int:
         "louie_url": args.louie_url,
         "claude_cwd": args.claude_cwd,
         "codex_cwd": args.codex_cwd,
+        "claude_models": parse_csv(args.claude_models),
+        "codex_models": parse_csv(args.codex_models),
         "skills_delivery": args.skills_delivery,
         "timeout_s": args.timeout_s,
         "max_workers": max_workers,
@@ -731,7 +826,9 @@ def main() -> int:
             "raw_ref": pre_result.get("raw_ref"),
         }
         if not bool(pre_result.get("ok")):
-            failed_harnesses["louie"] = f"preflight_failed: {pre_result.get('error') or 'unknown error'}"
+            failed_harnesses[variant_key("louie", "")] = (
+                f"preflight_failed: {pre_result.get('error') or 'unknown error'}"
+            )
 
     manifest["preflight"] = preflight_results
 
@@ -741,6 +838,9 @@ def main() -> int:
         attrs={
             "agent_eval.run_id": run_id,
             "agent_eval.harnesses": shell_join(harnesses),
+            "agent_eval.harness_variants": shell_join(
+                [variant_key(str(v.get("harness") or ""), str(v.get("model") or "")) for v in harness_variants]
+            ),
             "agent_eval.journeys": shell_join([str(j.get("id")) for j in journeys]),
         },
         service=args.otel_service,
@@ -803,7 +903,10 @@ def main() -> int:
                         endpoint=args.otel_endpoint or None,
                     )
 
-                    def run_case_for_harness(harness_idx: int, harness: str) -> dict[str, Any]:
+                    def run_case_for_harness(harness_idx: int, harness_variant: dict[str, str]) -> dict[str, Any]:
+                        harness = str(harness_variant.get("harness") or "")
+                        model = str(harness_variant.get("model") or "")
+                        hkey = variant_key(harness, model)
                         traceparent, trace_id = make_traceparent()
 
                         emit_otel_event(
@@ -812,6 +915,7 @@ def main() -> int:
                             attrs={
                                 "agent_eval.run_id": run_id,
                                 "agent_eval.harness": harness,
+                                "agent_eval.model": model if model else "default",
                                 "agent_eval.journey_id": journey_id,
                                 "agent_eval.case_id": case_id,
                                 "agent_eval.skills_enabled": skills_cfg.get("skills_enabled"),
@@ -821,11 +925,11 @@ def main() -> int:
                             endpoint=args.otel_endpoint or None,
                         )
 
-                        if args.failfast and harness in failed_harnesses:
+                        if args.failfast and hkey in failed_harnesses:
                             result = {
                                 "ok": False,
                                 "harness": harness,
-                                "error": f"failfast_skip: {failed_harnesses[harness]}",
+                                "error": f"failfast_skip: {failed_harnesses[hkey]}",
                                 "response_text": "",
                                 "latency_ms": 0,
                                 "raw_ref": None,
@@ -861,6 +965,7 @@ def main() -> int:
                                 timeout_s=args.timeout_s,
                                 louie_url=args.louie_url,
                                 skills_text=skills_text_for_harness,
+                                model=model,
                                 harness_cwd=harness_cwd,
                             )
 
@@ -874,6 +979,7 @@ def main() -> int:
                             "case_id": case_id,
                             "case_prompt": prompt,
                             "harness": harness,
+                            "model": model if model else "default",
                             "skills_mode": mode,
                             "skills_enabled": bool(skills_cfg.get("skills_enabled")),
                             "skills_profile": profile_name,
@@ -906,6 +1012,7 @@ def main() -> int:
                             attrs={
                                 "agent_eval.run_id": run_id,
                                 "agent_eval.harness": harness,
+                                "agent_eval.model": model if model else "default",
                                 "agent_eval.journey_id": journey_id,
                                 "agent_eval.case_id": case_id,
                                 "agent_eval.skills_enabled": skills_cfg.get("skills_enabled"),
@@ -921,15 +1028,15 @@ def main() -> int:
                         return row
 
                     case_rows: list[dict[str, Any]] = []
-                    worker_count = min(max_workers, len(harnesses)) if harnesses else 1
-                    if worker_count <= 1 or len(harnesses) <= 1:
-                        for harness_idx, harness in enumerate(harnesses):
-                            case_rows.append(run_case_for_harness(harness_idx, harness))
+                    worker_count = min(max_workers, len(harness_variants)) if harness_variants else 1
+                    if worker_count <= 1 or len(harness_variants) <= 1:
+                        for harness_idx, harness_variant in enumerate(harness_variants):
+                            case_rows.append(run_case_for_harness(harness_idx, harness_variant))
                     else:
                         with ThreadPoolExecutor(max_workers=worker_count) as pool:
                             futures = {
-                                pool.submit(run_case_for_harness, harness_idx, harness): harness_idx
-                                for harness_idx, harness in enumerate(harnesses)
+                                pool.submit(run_case_for_harness, harness_idx, harness_variant): harness_idx
+                                for harness_idx, harness_variant in enumerate(harness_variants)
                             }
                             for fut in as_completed(futures):
                                 case_rows.append(fut.result())
@@ -937,12 +1044,15 @@ def main() -> int:
                     case_rows.sort(key=lambda r: int(r.pop("__harness_idx", 0)))
                     for row in case_rows:
                         harness = str(row.get("harness") or "")
+                        model = str(row.get("model") or "")
                         if (
                             args.failfast
                             and not bool(row.get("harness_ok"))
                             and not str(row.get("harness_error") or "").startswith("failfast_skip:")
                         ):
-                            failed_harnesses[harness] = str(row.get("harness_error") or "unknown error")
+                            failed_harnesses[variant_key(harness, model)] = str(
+                                row.get("harness_error") or "unknown error"
+                            )
 
                         rows.append(row)
                         rows_file.write(json.dumps(row, sort_keys=True) + "\n")
@@ -981,6 +1091,7 @@ def main() -> int:
                 "journey_id": row["journey_id"],
                 "case_id": row["case_id"],
                 "harness": row["harness"],
+                "model": row.get("model"),
                 "skills_mode": row["skills_mode"],
                 "trace_id": row.get("trace_id"),
                 "runtime_ids": row.get("runtime_ids", {}),
