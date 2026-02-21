@@ -1,6 +1,7 @@
 {
   "id": "pygraphistry_skill_pressure_v1",
   "description": "Expanded PyGraphistry skill pressure tests across loading/ETL/shaping/viz/search/analytics/AI/connectors/safety.",
+  "eval_intent": "skill_pressure",
   "tags": ["pygraphistry", "skills", "pressure"],
   "cases": [
     {

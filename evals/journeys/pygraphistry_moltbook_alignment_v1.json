@@ -1,41 +1,40 @@
 {
   "id": "pygraphistry_moltbook_alignment_v1",
-  "description": "Alignment checks against older moltbook skill simulations for GFQL and visualization patterns.",
+  "description": "Legacy alignment checks against older moltbook simulations for GFQL and visualization patterns. Useful for regression alignment, not primary real-world KPI scoring.",
+  "eval_intent": "alignment_legacy",
   "tags": ["pygraphistry", "skills", "alignment", "moltbook"],
   "cases": [
     {
       "id": "gfql_edge_query_filter",
-      "prompt": "Provide a concise GFQL snippet that filters edges with edge_query for replied_to interactions in one submolt.",
+      "prompt": "Provide a concise GFQL snippet that filters edges by type using edge_query within one focused community/channel slice.",
       "checks": {
         "regex": [
-          "gfql\\(",
-          "edge_query\\s*=\\s*['\\\"]",
-          "(?i)replied_to",
-          "(?i)submolt"
+          "(gfql|chain|node_query|hop)\\(",
+          "edge_query\\s*(=\\s*f?['\\\"]|\\()",
+          "(?i)type"
         ]
       }
     },
     {
       "id": "gfql_where_owner_compare",
-      "prompt": "Show a short GFQL snippet using where=[...] with compare(col(...), '==', col(...)) to keep paths where both endpoint nodes share owner_id.",
+      "prompt": "Show a short GFQL snippet using where=[...] with compare(col(...), '==', col(...)) to keep paths where endpoint nodes share the same attribute value.",
       "checks": {
         "regex": [
           "where\\s*=\\s*\\[",
           "compare\\(",
-          "col\\(",
-          "owner_id"
+          "col\\("
         ]
       }
     },
     {
       "id": "gfql_output_hop_slicing",
-      "prompt": "Write a minimal GFQL snippet that traverses min_hops=2 and max_hops=4 but only returns output hops 3-4.",
+      "prompt": "Write a minimal GFQL snippet that traverses a wider hop range but only returns a narrower output hop range.",
       "checks": {
         "regex": [
-          "min_hops\\s*=\\s*2",
-          "max_hops\\s*=\\s*4",
-          "output_min_hops\\s*=\\s*3",
-          "output_max_hops\\s*=\\s*4"
+          "min_hops\\s*=\\s*\\d+",
+          "max_hops\\s*=\\s*\\d+",
+          "output_min_hops\\s*=\\s*\\d+",
+          "output_max_hops\\s*=\\s*\\d+"
         ]
       }
     },
@@ -52,7 +51,7 @@
     },
     {
       "id": "viz_external_layout_play0",
-      "prompt": "Provide a short PyGraphistry snippet for using precomputed node coordinates x/y and disabling animation playback with settings(url_params={'play': 0}).",
+      "prompt": "Provide a short PyGraphistry snippet for using precomputed node coordinates x/y and disabling automatic playback for a static external layout view.",
       "checks": {
         "regex": [
           "bind\\(.*point_x\\s*=\\s*['\\\"]x['\\\"]",

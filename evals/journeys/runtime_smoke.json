@@ -1,6 +1,7 @@
 {
   "id": "runtime_smoke",
   "description": "Cross-runtime smoke checks for codex, claude, and louie harnesses.",
+  "eval_intent": "runtime_smoke",
   "tags": ["smoke", "runtime"],
   "cases": [
     {

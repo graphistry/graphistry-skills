@@ -1,0 +1,92 @@
+{
+  "id": "pygraphistry_execution_grade_v1",
+  "description": "Higher-signal checks that require parseable Python snippets and key API-call semantics for share-safe plotting workflows.",
+  "eval_intent": "execution_grade",
+  "tags": ["pygraphistry", "execution-grade", "quality"],
+  "cases": [
+    {
+      "id": "exec_plot_public_render_false",
+      "prompt": "Return a short Python snippet (code block only) that sets Graphistry public privacy for sharing, disables notifications, uses plot(render=False), and prints the resulting URL variable.",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": [
+          "privacy",
+          "plot",
+          "print"
+        ],
+        "python_ast_call_kwargs": [
+          {
+            "call": "privacy",
+            "kw": "mode",
+            "value": "public"
+          },
+          {
+            "call": "privacy",
+            "kw": "notify",
+            "value": false
+          },
+          {
+            "call": "plot",
+            "kw": "render",
+            "value": false
+          }
+        ],
+        "must_not_contain": [
+          "leotest2",
+          "accountaccount"
+        ]
+      }
+    },
+    {
+      "id": "exec_plot_private_safe",
+      "prompt": "Return a short Python snippet (code block only) for a privacy-safe non-public share flow using Graphistry privacy mode private or organization and plot(render=False).",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": [
+          "privacy",
+          "plot"
+        ],
+        "python_ast_call_kwargs": [
+          {
+            "call": "plot",
+            "kw": "render",
+            "value": false
+          }
+        ],
+        "regex": [
+          "(?i)(private|organization)"
+        ],
+        "must_not_regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]public['\\\"][^\\)]*\\)"
+        ]
+      }
+    },
+    {
+      "id": "exec_schema_type_event_time",
+      "prompt": "Give a compact Python snippet (code block only) that builds tiny nodes/edges pandas DataFrames with both type and event_time fields, shapes a graph with edges+nodes, and calls plot(render=False).",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": [
+          "DataFrame",
+          "nodes",
+          "edges",
+          "plot"
+        ],
+        "python_ast_call_kwargs": [
+          {
+            "call": "plot",
+            "kw": "render",
+            "value": false
+          }
+        ],
+        "regex": [
+          "['\\\"]type['\\\"]",
+          "['\\\"]event_time['\\\"]"
+        ]
+      }
+    }
+  ]
+}

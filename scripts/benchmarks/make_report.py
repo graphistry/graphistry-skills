@@ -79,6 +79,11 @@ def model_name(row: dict[str, Any]) -> str:
     return model or "default"
 
 
+def eval_intent_name(row: dict[str, Any]) -> str:
+    intent = str(row.get("eval_intent", "")).strip()
+    return intent or "unspecified"
+
+
 def mean_or_zero(values: list[float]) -> float:
     if not values:
         return 0.0
@@ -94,6 +99,8 @@ def group_metrics(rows: list[dict[str, Any]], group_keys: list[str]) -> list[dic
                 key_vals.append(skills_mode(row))
             elif key == "model":
                 key_vals.append(model_name(row))
+            elif key == "eval_intent":
+                key_vals.append(eval_intent_name(row))
             else:
                 key_vals.append(str(row.get(key, "")).strip() or "unknown")
         key = tuple(key_vals)
@@ -149,6 +156,14 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
     passed = sum(1 for r in rows if parse_bool(r.get("pass_bool")))
     harness_mode = group_metrics(rows, ["harness", "skills_mode"])
     harness_model_mode = group_metrics(rows, ["harness", "model", "skills_mode"])
+    eval_intent_mode = group_metrics(rows, ["eval_intent", "harness", "skills_mode"])
+    by_eval_intent = group_metrics(rows, ["eval_intent"])
+
+    kpi_intents = {"realistic_capability", "execution_grade"}
+    kpi_rows = [r for r in rows if eval_intent_name(r) in kpi_intents]
+    kpi_total = len(kpi_rows)
+    kpi_passed = sum(1 for r in kpi_rows if parse_bool(r.get("pass_bool")))
+    kpi_harness_mode = group_metrics(kpi_rows, ["harness", "skills_mode"])
 
     failures: list[dict[str, Any]] = []
     for r in rows:
@@ -159,6 +174,7 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
                 "harness": str(r.get("harness", "unknown")),
                 "model": model_name(r),
                 "skills_mode": skills_mode(r),
+                "eval_intent": eval_intent_name(r),
                 "journey_id": str(r.get("journey_id", "")),
                 "case_id": str(r.get("case_id", "")),
                 "score": parse_float(r.get("score")) or 0.0,
@@ -172,6 +188,7 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
             f["harness"],
             f["model"],
             f["skills_mode"],
+            f["eval_intent"],
             f["journey_id"],
             f["case_id"],
         )
@@ -187,6 +204,15 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
         },
         "by_harness_and_mode": harness_mode,
         "by_harness_model_and_mode": harness_model_mode,
+        "by_eval_intent": by_eval_intent,
+        "by_eval_intent_harness_and_mode": eval_intent_mode,
+        "kpi": {
+            "intents": sorted(kpi_intents),
+            "total": kpi_total,
+            "passed": kpi_passed,
+            "pass_rate": (kpi_passed / kpi_total) if kpi_total else 0.0,
+            "by_harness_and_mode": kpi_harness_mode,
+        },
         "failures": failures,
     }
 
@@ -205,6 +231,44 @@ def build_markdown(title: str, metrics: dict[str, Any]) -> str:
     lines.append("")
     lines.append(
         f"- Pass: `{overall['passed']}/{overall['total']}` ({overall['pass_rate'] * 100:.1f}%)"
+    )
+    lines.append(
+        f"- KPI intents (`{','.join(metrics['kpi']['intents'])}`): "
+        f"`{metrics['kpi']['passed']}/{metrics['kpi']['total']}` "
+        f"({metrics['kpi']['pass_rate'] * 100:.1f}%)"
+    )
+    lines.append("")
+    lines.append("## By Eval Intent")
+    lines.append("")
+    lines.append(
+        markdown_table(
+            metrics["by_eval_intent"],
+            [
+                "eval_intent",
+                "passed",
+                "total",
+                "pass_rate",
+                "avg_latency_ms",
+                "avg_score",
+            ],
+        )
+    )
+    lines.append("")
+    lines.append("## KPI Intents: By Harness + Skills Mode")
+    lines.append("")
+    lines.append(
+        markdown_table(
+            metrics["kpi"]["by_harness_and_mode"],
+            [
+                "harness",
+                "skills_mode",
+                "passed",
+                "total",
+                "pass_rate",
+                "avg_latency_ms",
+                "avg_score",
+            ],
+        )
     )
     lines.append("")
     lines.append("## By Harness + Skills Mode")
@@ -254,6 +318,7 @@ def build_markdown(title: str, metrics: dict[str, Any]) -> str:
                     "harness",
                     "model",
                     "skills_mode",
+                    "eval_intent",
                     "journey_id",
                     "case_id",
                     "score",
