@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import datetime as dt
 import hashlib
@@ -201,6 +202,31 @@ def prepare_codex_home(
             cfg_path.write_text(next_text, encoding="utf-8")
 
     return str(codex_home)
+
+
+def spawn_codex_home_instance(
+    base_codex_home: str,
+    out_dir: Path,
+    mode: str,
+    instance_id: str,
+) -> str:
+    base = Path(base_codex_home)
+    suffix = re.sub(r"[^A-Za-z0-9._-]", "_", instance_id)[:48] or uuid.uuid4().hex[:12]
+    target = out_dir / "codex_home_instances" / f"{mode}-{suffix}"
+    target.mkdir(parents=True, exist_ok=True)
+
+    for name in ("auth.json", "config.toml", "version.json"):
+        src = base / name
+        dst = target / name
+        if src.exists():
+            shutil.copy2(src, dst)
+
+    src_skills = base / "skills"
+    dst_skills = target / "skills"
+    if src_skills.exists():
+        shutil.copytree(src_skills, dst_skills, dirs_exist_ok=True, symlinks=True)
+
+    return str(target)
 
 
 def materialize_skills(
@@ -453,6 +479,10 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
         "must_not_regex": [],
         "max_lines": [],
         "min_lines": [],
+        "python_block": [],
+        "python_ast_parse": [],
+        "python_ast_calls": [],
+        "python_ast_call_kwargs": [],
     }
 
     total = 0
@@ -469,6 +499,58 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
                 continue
             lines.append(line)
         return len(lines)
+
+    def extract_code_blocks(text: str, language: str | None = None) -> list[str]:
+        pattern: re.Pattern[str]
+        if language:
+            pattern = re.compile(rf"```{re.escape(language)}\s*\n(.*?)```", re.IGNORECASE | re.DOTALL)
+        else:
+            pattern = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+        return [m.group(1).strip() for m in pattern.finditer(text) if m.group(1).strip()]
+
+    python_blocks = extract_code_blocks(response_text, "python") + extract_code_blocks(response_text, "py")
+    if not python_blocks:
+        python_blocks = extract_code_blocks(response_text)
+    python_source = python_blocks[0] if python_blocks else ""
+    parsed_tree: ast.AST | None = None
+    parsed_error: str | None = None
+
+    def ensure_parsed() -> bool:
+        nonlocal parsed_tree, parsed_error
+        if parsed_tree is not None:
+            return True
+        if parsed_error is not None:
+            return False
+        if not python_source.strip():
+            parsed_error = "No code block found for AST parsing"
+            return False
+        try:
+            parsed_tree = ast.parse(python_source)
+            return True
+        except SyntaxError as exc:
+            parsed_error = str(exc)
+            return False
+
+    def call_name(call_node: ast.Call) -> str | None:
+        func = call_node.func
+        if isinstance(func, ast.Name):
+            return func.id
+        if isinstance(func, ast.Attribute):
+            return func.attr
+        return None
+
+    def node_value(node: ast.AST) -> Any:
+        try:
+            return ast.literal_eval(node)
+        except Exception:
+            if isinstance(node, ast.Name) and node.id in {"True", "False", "None"}:
+                return {"True": True, "False": False, "None": None}[node.id]
+            if hasattr(ast, "unparse"):
+                try:
+                    return ast.unparse(node)
+                except Exception:
+                    return None
+            return None
 
     must_contain = checks.get("must_contain") or []
     if isinstance(must_contain, list):
@@ -522,6 +604,86 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
             if ok:
                 passed += 1
 
+    python_block_required = checks.get("python_block")
+    if python_block_required is True:
+        total += 1
+        ok = bool(python_source.strip())
+        details["python_block"].append({"required": True, "ok": ok})
+        if ok:
+            passed += 1
+
+    python_ast_parse_required = checks.get("python_ast_parse")
+    if python_ast_parse_required is True:
+        total += 1
+        ok = ensure_parsed()
+        details["python_ast_parse"].append({"required": True, "ok": ok, "error": parsed_error})
+        if ok:
+            passed += 1
+
+    python_ast_calls = checks.get("python_ast_calls") or []
+    if isinstance(python_ast_calls, list):
+        call_names: set[str] = set()
+        parsed_ok = ensure_parsed()
+        if parsed_ok and parsed_tree is not None:
+            for node in ast.walk(parsed_tree):
+                if isinstance(node, ast.Call):
+                    name = call_name(node)
+                    if name:
+                        call_names.add(name)
+        for item in python_ast_calls:
+            total += 1
+            expected = str(item)
+            ok = parsed_ok and expected in call_names
+            details["python_ast_calls"].append({
+                "value": expected,
+                "ok": ok,
+                "error": parsed_error if not parsed_ok else None,
+            })
+            if ok:
+                passed += 1
+
+    python_ast_call_kwargs = checks.get("python_ast_call_kwargs") or []
+    if isinstance(python_ast_call_kwargs, list):
+        parsed_ok = ensure_parsed()
+        call_nodes: list[ast.Call] = []
+        if parsed_ok and parsed_tree is not None:
+            call_nodes = [node for node in ast.walk(parsed_tree) if isinstance(node, ast.Call)]
+
+        sentinel = object()
+        for item in python_ast_call_kwargs:
+            total += 1
+            spec = item if isinstance(item, dict) else {}
+            call_expected = str(spec.get("call") or "")
+            kw_expected = str(spec.get("kw") or "")
+            value_expected = spec.get("value", sentinel)
+            ok = False
+            observed_values: list[Any] = []
+            if parsed_ok:
+                for call in call_nodes:
+                    if call_expected and call_name(call) != call_expected:
+                        continue
+                    for kw in call.keywords:
+                        if kw.arg != kw_expected:
+                            continue
+                        observed = node_value(kw.value)
+                        observed_values.append(observed)
+                        if value_expected is sentinel:
+                            ok = True
+                        elif observed == value_expected:
+                            ok = True
+                    if ok:
+                        break
+            details["python_ast_call_kwargs"].append({
+                "call": call_expected,
+                "kw": kw_expected,
+                "value": None if value_expected is sentinel else value_expected,
+                "observed": observed_values,
+                "ok": ok,
+                "error": parsed_error if not parsed_ok else None,
+            })
+            if ok:
+                passed += 1
+
     max_lines_raw = checks.get("max_lines")
     if isinstance(max_lines_raw, int) and max_lines_raw >= 0:
         total += 1
@@ -563,11 +725,13 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     by_skills_mode: dict[str, dict[str, Any]] = {}
     by_harness_and_mode: dict[str, dict[str, Any]] = {}
     by_harness_model_and_mode: dict[str, dict[str, Any]] = {}
+    by_eval_intent: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         harness = str(row.get("harness"))
         model = str(row.get("model") or "")
         skills_mode = str(row.get("skills_mode"))
+        eval_intent = str(row.get("eval_intent") or "unspecified")
 
         if harness not in by_harness:
             by_harness[harness] = {
@@ -580,6 +744,16 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
         if skills_mode not in by_skills_mode:
             by_skills_mode[skills_mode] = {
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
+        if eval_intent not in by_eval_intent:
+            by_eval_intent[eval_intent] = {
+                "eval_intent": eval_intent,
                 "total": 0,
                 "passed": 0,
                 "scores": [],
@@ -642,6 +816,15 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         bucket_mode["scores"].append(float(row.get("score", 0.0)))
         bucket_mode["latency_ms"].append(int(row.get("latency_ms", 0)))
 
+        bucket_intent = by_eval_intent[eval_intent]
+        bucket_intent["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_intent["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_intent["harness_ok"] += 1
+        bucket_intent["scores"].append(float(row.get("score", 0.0)))
+        bucket_intent["latency_ms"].append(int(row.get("latency_ms", 0)))
+
         bucket_hm_model = by_harness_and_model[harness_model_key]
         bucket_hm_model["total"] += 1
         if bool(row.get("pass_bool")):
@@ -693,18 +876,25 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for bucket in by_harness_model_and_mode.values():
         finalize_bucket(bucket)
 
+    for bucket in by_eval_intent.values():
+        finalize_bucket(bucket)
+
     total_all = len(rows)
     passed_all = sum(1 for row in rows if bool(row.get("pass_bool")))
+    harness_ok_all = sum(1 for row in rows if bool(row.get("harness_ok")))
 
     return {
         "total_rows": total_all,
         "passed_rows": passed_all,
         "overall_pass_rate": (passed_all / total_all) if total_all else 0.0,
+        "harness_ok_rows": harness_ok_all,
+        "harness_ok_rate": (harness_ok_all / total_all) if total_all else 0.0,
         "by_harness": by_harness,
         "by_harness_and_model": by_harness_and_model,
         "by_skills_mode": by_skills_mode,
         "by_harness_and_mode": by_harness_and_mode,
         "by_harness_model_and_mode": by_harness_model_and_mode,
+        "by_eval_intent": by_eval_intent,
     }
 
 
@@ -903,6 +1093,7 @@ def main() -> int:
     with rows_path.open("w", encoding="utf-8") as rows_file:
         for journey in journeys:
             journey_id = str(journey.get("id"))
+            journey_intent = str(journey.get("eval_intent") or "unspecified")
             journey_cases = journey.get("cases") or []
 
             emit_otel_event(
@@ -1006,8 +1197,16 @@ def main() -> int:
                                     skills_text_for_harness = skills_text
 
                             if harness == "codex" and not args.codex_cwd:
-                                codex_home = codex_homes.get(mode, "")
-                                if codex_home:
+                                codex_home_base = codex_homes.get(mode, "")
+                                if codex_home_base:
+                                    codex_home = codex_home_base
+                                    if max_workers > 1:
+                                        codex_home = spawn_codex_home_instance(
+                                            base_codex_home=codex_home_base,
+                                            out_dir=out_dir,
+                                            mode=mode,
+                                            instance_id=f"{journey_id}-{case_id}-{harness_idx}-{uuid.uuid4().hex[:8]}",
+                                        )
                                     harness_env["CODEX_HOME"] = codex_home
 
                             result = run_harness(
@@ -1030,6 +1229,7 @@ def main() -> int:
                             "run_id": run_id,
                             "timestamp": now_iso(),
                             "journey_id": journey_id,
+                            "eval_intent": journey_intent,
                             "case_id": case_id,
                             "case_prompt": prompt,
                             "harness": harness,

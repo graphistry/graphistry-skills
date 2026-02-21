@@ -1,6 +1,7 @@
 {
   "id": "pygraphistry_e2e_big_journeys_v1",
   "description": "Larger end-to-end PyGraphistry journeys forcing full pipelines: raw ingest, shaping, algorithmic enrichment, GFQL extraction, styling, and plotting/sharing.",
+  "eval_intent": "realistic_capability",
   "tags": ["pygraphistry", "e2e", "big-journey", "skills-impact"],
   "cases": [
     {
