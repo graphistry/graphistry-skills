@@ -91,6 +91,9 @@ fi
 
 start_ms=$(date +%s%3N)
 set +e
+if [[ -n "$TRACEPARENT" ]]; then
+  export TRACEPARENT
+fi
 CODEX_CMD=(codex exec --json --skip-git-repo-check --color never --cd "$WORKDIR")
 if [[ -n "$MODEL" ]]; then
   CODEX_CMD+=(--model "$MODEL")
