@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+show_help() {
+  cat <<'EOF'
+List recent traces from Tempo.
+
+Usage:
+  bin/otel/cmds/list-traces [--since 15m] [--start ISO/epoch] [--end ISO/epoch]
+                       [--limit N] [--query TRACEQL] [--service NAME]
+
+Output columns:
+  trace_id  duration_ms  root_service  root_name  start_time
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${BASE_DIR}/_python" "${BASE_DIR}/trace_tools.py" list-traces "$@"

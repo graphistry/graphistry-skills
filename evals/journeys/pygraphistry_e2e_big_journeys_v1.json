@@ -1,0 +1,99 @@
+{
+  "id": "pygraphistry_e2e_big_journeys_v1",
+  "description": "Larger end-to-end PyGraphistry journeys forcing full pipelines: raw ingest, shaping, algorithmic enrichment, GFQL extraction, styling, and plotting/sharing.",
+  "tags": ["pygraphistry", "e2e", "big-journey", "skills-impact"],
+  "cases": [
+    {
+      "id": "e2e_csv_degree_gfql_viz_private",
+      "prompt": "Write one concise Python workflow (single code block) that starts from raw CSVs, shapes a graph, adds a degree-based enrichment, runs a GFQL subgraph query with a same-owner constraint, styles the result, and returns a private plot URL. Include: pandas read_csv, timestamp normalization, graphistry register(api=3) with environment variables, edges()+nodes(), a degree enrichment step, gfql([...]) with e_forward(...), where=[compare(col(...), '==', col(...))], encode_point_color + encode_point_size, graphistry.privacy(mode='private'), and plot(render=False).",
+      "checks": {
+        "regex": [
+          "pd\\.read_csv\\(",
+          "to_datetime\\(",
+          "register\\(",
+          "api\\s*=\\s*3",
+          "GRAPHISTRY_",
+          "graphistry\\.edges\\(",
+          "\\.nodes\\(",
+          "(groupby\\(|value_counts\\()",
+          "gfql\\(",
+          "e_forward\\(",
+          "where\\s*=\\s*\\[",
+          "compare\\(",
+          "col\\(",
+          "encode_point_color\\(",
+          "encode_point_size\\(",
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "must_not_contain": [
+          "leotest2",
+          "accountaccount"
+        ],
+        "max_lines": 60
+      }
+    },
+    {
+      "id": "e2e_hypergraph_temporal_gfql_layout",
+      "prompt": "Provide a compact PyGraphistry pipeline that starts from one row-oriented events table and goes through hypergraph shaping, temporal enrichment, GFQL filtering, layout styling, and plotting. Must include: graphistry.hypergraph(...), to_datetime for event time, an enrichment column for burst/weight signal, gfql with min_hops/max_hops and output_min_hops/output_max_hops, settings(url_params={'play': 0}), and a final plot call.",
+      "checks": {
+        "regex": [
+          "hypergraph\\(",
+          "to_datetime\\(",
+          "(burst|weight|score)",
+          "gfql\\(",
+          "min_hops\\s*=\\s*\\d+",
+          "max_hops\\s*=\\s*\\d+",
+          "output_min_hops\\s*=\\s*\\d+",
+          "output_max_hops\\s*=\\s*\\d+",
+          "settings\\(",
+          "url_params",
+          "['\\\"]play['\\\"]\\s*:\\s*0",
+          "\\.plot\\("
+        ],
+        "max_lines": 60
+      }
+    },
+    {
+      "id": "e2e_remote_slim_ai_gfql_viz",
+      "prompt": "Create a concise end-to-end snippet for a remote-heavy workflow: start from an existing Graphistry dataset_id, run gfql_remote with node_col_subset/edge_col_subset, apply one algorithmic enrichment (umap or dbscan), run a second GFQL restriction, style with icon or color, and produce a share-safe output. Include gfql_remote(...), node_col_subset or edge_col_subset, umap() or dbscan(), gfql(...), one encoding call, and privacy(mode='private').",
+      "checks": {
+        "regex": [
+          "dataset_id",
+          "gfql_remote\\(",
+          "(node_col_subset|edge_col_subset)\\s*=\\s*\\[",
+          "(umap\\(|dbscan\\()",
+          "gfql\\(",
+          "(encode_point_color\\(|encode_point_icon\\(|encode_edge_color\\()",
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)"
+        ],
+        "max_lines": 65
+      }
+    },
+    {
+      "id": "e2e_connector_dataframe_to_plot",
+      "prompt": "Give a short pipeline for pulling raw interactions from a connector path into DataFrames (Neo4j or Splunk), shaping to edges/nodes, enriching with one metric column, extracting a focused neighborhood with GFQL (not hop/chain) using where=[compare(col(...), '==', col(...))], styling, and plotting. Include connector mention, dataframe-first fallback, edges()+nodes(), one enrichment transform, gfql traversal with compare/col in where, one styling encode call, graphistry.privacy(mode='private'), and final plot(render=False).",
+      "checks": {
+        "regex": [
+          "(?i)(neo4j|splunk)",
+          "(?i)dataframe",
+          "edges\\(",
+          "\\.nodes\\(",
+          "(groupby\\(|value_counts\\(|assign\\()",
+          "gfql\\(",
+          "where\\s*=\\s*\\[",
+          "compare\\(",
+          "col\\(",
+          "encode_",
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "must_not_regex": [
+          "\\bhop\\(",
+          "\\bchain\\("
+        ],
+        "max_lines": 70
+      }
+    }
+  ]
+}

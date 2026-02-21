@@ -1,0 +1,144 @@
+{
+  "id": "pygraphistry_skill_pressure_v1",
+  "description": "Expanded PyGraphistry skill pressure tests across loading/ETL/shaping/viz/search/analytics/AI/connectors/safety.",
+  "tags": ["pygraphistry", "skills", "pressure"],
+  "cases": [
+    {
+      "id": "core_first_plot_with_auth",
+      "prompt": "Provide a concise Python snippet for a first PyGraphistry plot from edges and nodes. Include register(api=3) with environment variables, then edges(), nodes(), and plot().",
+      "checks": {
+        "regex": [
+          "register\\(",
+          "api\\s*=\\s*3",
+          "GRAPHISTRY_",
+          "graphistry\\.edges\\(",
+          "\\.nodes\\(",
+          "\\.plot\\("
+        ],
+        "must_not_contain": [
+          "leotest2",
+          "accountaccount"
+        ]
+      }
+    },
+    {
+      "id": "hypergraph_plus_materialize",
+      "prompt": "Show a short snippet for turning row-oriented actor/event/location data into a graph with hypergraph(), and then preparing node-centric operations with materialize_nodes().",
+      "checks": {
+        "regex": [
+          "hypergraph\\(",
+          "materialize_nodes\\("
+        ]
+      }
+    },
+    {
+      "id": "privacy_safe_share_url",
+      "prompt": "Show a privacy-safe sharing snippet that keeps data private and returns a plot URL without rendering inline.",
+      "checks": {
+        "regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ]
+      }
+    },
+    {
+      "id": "viz_encodings_and_layout_settings",
+      "prompt": "Provide a short PyGraphistry styling snippet using encode_point_color(), encode_point_size(), and settings(url_params=...) before plotting.",
+      "checks": {
+        "regex": [
+          "encode_point_color\\(",
+          "encode_point_size\\(",
+          "url_params",
+          "\\.plot\\("
+        ]
+      }
+    },
+    {
+      "id": "static_export_text_modes",
+      "prompt": "Show a snippet for static export with plot_static(), including one text mode output such as graphviz-dot or mermaid-code.",
+      "checks": {
+        "regex": [
+          "plot_static\\(",
+          "graphviz-dot|mermaid-code"
+        ]
+      }
+    },
+    {
+      "id": "gfql_local_pattern_hops",
+      "prompt": "Write a minimal GFQL snippet that imports n/e_forward, runs gfql(), and uses both min_hops and max_hops.",
+      "checks": {
+        "regex": [
+          "from\\s+graphistry\\s+import\\s+.*n.*e_forward",
+          "gfql\\(",
+          "min_hops\\s*=\\s*\\d+",
+          "max_hops\\s*=\\s*\\d+"
+        ]
+      }
+    },
+    {
+      "id": "gfql_remote_python_remote_postprocess",
+      "prompt": "Provide a concise remote workflow snippet using gfql_remote() and one of python_remote_table/python_remote_g/python_remote_json for result shaping.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\(",
+          "python_remote_(table|g|json)\\("
+        ]
+      }
+    },
+    {
+      "id": "hop_or_chain_for_neighborhood",
+      "prompt": "Show a neighborhood expansion snippet with hop() or chain(), and briefly mention when to use GFQL instead.",
+      "checks": {
+        "regex": [
+          "\\b(hop|chain)\\(",
+          "(?i)gfql"
+        ]
+      }
+    },
+    {
+      "id": "ai_umap_dbscan",
+      "prompt": "Provide a short Graph AI snippet with PyGraphistry using umap() followed by dbscan().",
+      "checks": {
+        "regex": [
+          "umap\\(",
+          "dbscan\\("
+        ]
+      }
+    },
+    {
+      "id": "ai_semantic_search",
+      "prompt": "Show a semantic search snippet using g.search(...) after preparing features or embeddings.",
+      "checks": {
+        "regex": [
+          "search\\(",
+          "(umap|featurize|embed)\\("
+        ]
+      }
+    },
+    {
+      "id": "connector_routing",
+      "prompt": "In 3-5 bullets, explain connector strategy for Neo4j vs Splunk and include a dataframe-first fallback path.",
+      "checks": {
+        "regex": [
+          "(?i)neo4j",
+          "(?i)splunk",
+          "(?i)dataframe|edges\\("
+        ]
+      }
+    },
+    {
+      "id": "auth_safety",
+      "prompt": "Give two safe-auth bullets for PyGraphistry credentials handling.",
+      "checks": {
+        "regex": [
+          "(?i)environment",
+          "GRAPHISTRY_"
+        ],
+        "must_not_contain": [
+          "leotest2",
+          "accountaccount"
+        ]
+      }
+    }
+  ]
+}

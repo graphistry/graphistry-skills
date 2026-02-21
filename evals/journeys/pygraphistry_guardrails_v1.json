@@ -1,0 +1,85 @@
+{
+  "id": "pygraphistry_guardrails_v1",
+  "description": "Audit journey to test desired behaviors (safe, accurate, concise) and avoid undesired ones (hardcoded creds, unsafe privacy mode, fake APIs).",
+  "tags": ["pygraphistry", "guardrails", "quality"],
+  "cases": [
+    {
+      "id": "auth_env_no_literal_creds",
+      "prompt": "Provide a short register(api=3) snippet using environment variables only. Keep it under 12 non-empty lines.",
+      "checks": {
+        "regex": [
+          "register\\(",
+          "api\\s*=\\s*3",
+          "os\\.environ(\\[|\\.get\\()",
+          "GRAPHISTRY_"
+        ],
+        "must_not_contain": [
+          "leotest2",
+          "accountaccount"
+        ],
+        "must_not_regex": [
+          "password\\s*=\\s*['\\\"].+['\\\"]",
+          "username\\s*=\\s*['\\\"].+['\\\"]"
+        ],
+        "max_lines": 12
+      }
+    },
+    {
+      "id": "privacy_private_not_public",
+      "prompt": "Return exactly one Python line for a privacy-safe share workflow, and do not use public mode.",
+      "checks": {
+        "regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)"
+        ],
+        "must_not_regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]public['\\\"]\\)"
+        ],
+        "max_lines": 1
+      }
+    },
+    {
+      "id": "gfql_remote_docs_routing",
+      "prompt": "List 3 authoritative ReadTheDocs links for GFQL remote execution, predicates quick reference, and GFQL validation. One link per line.",
+      "checks": {
+        "regex": [
+          "https://pygraphistry\\.readthedocs\\.io/.*/gfql/remote\\.html",
+          "https://pygraphistry\\.readthedocs\\.io/.*/gfql/predicates(/quick)?\\.html",
+          "https://pygraphistry\\.readthedocs\\.io/.*/gfql/validation(/(index|fundamentals))?\\.html"
+        ],
+        "min_lines": 3
+      }
+    },
+    {
+      "id": "connector_routing_with_fallback",
+      "prompt": "In 4 concise bullets, explain connector choice for Neo4j and Splunk, and include a dataframe-first fallback path.",
+      "checks": {
+        "regex": [
+          "(?i)neo4j",
+          "(?i)splunk",
+          "(?i)dataframe",
+          "edges\\(|nodes\\("
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "gfql_real_methods_only",
+      "prompt": "Provide one short GFQL remote snippet that only uses real PyGraphistry methods. Avoid invented helper names.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\(",
+          "n\\(",
+          "(e_forward\\(|e\\()"
+        ],
+        "must_not_regex": [
+          "query_graph\\(",
+          "graph_query\\(",
+          "run_gfql\\(",
+          "connect_graphistry\\(",
+          "\\._[A-Za-z0-9_]+\\("
+        ],
+        "max_lines": 20
+      }
+    }
+  ]
+}
