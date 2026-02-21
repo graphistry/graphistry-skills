@@ -90,6 +90,9 @@ fi
 
 start_ms=$(date +%s%3N)
 set +e
+if [[ -n "$TRACEPARENT" ]]; then
+  export TRACEPARENT
+fi
 CLAUDE_CMD=(claude --verbose -p --output-format stream-json)
 if [[ -n "$MODEL" ]]; then
   CLAUDE_CMD+=(--model "$MODEL")

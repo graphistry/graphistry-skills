@@ -165,7 +165,11 @@ def prepare_native_skill_env(
     return str(env_dir)
 
 
-def prepare_codex_home(env_dir: Path) -> str:
+def prepare_codex_home(
+    env_dir: Path,
+    otel_enabled: bool = False,
+    otel_endpoint: str = "",
+) -> str:
     codex_home = env_dir / ".codex"
     codex_home.mkdir(parents=True, exist_ok=True)
 
@@ -181,6 +185,20 @@ def prepare_codex_home(env_dir: Path) -> str:
         dst = codex_home / name
         if src.exists():
             shutil.copy2(src, dst)
+
+    if otel_enabled:
+        cfg_path = codex_home / "config.toml"
+        cfg_text = cfg_path.read_text(encoding="utf-8") if cfg_path.exists() else ""
+        if not re.search(r"(?m)^\[otel\]\s*$", cfg_text):
+            endpoint = (otel_endpoint or "http://localhost:4317").strip()
+            endpoint = endpoint.replace('"', '\\"')
+            block = (
+                "[otel]\n"
+                'environment = "dev"\n'
+                f'trace_exporter = {{ otlp-grpc = {{ endpoint = "{endpoint}" }} }}\n'
+            )
+            next_text = (cfg_text.rstrip() + "\n\n" + block) if cfg_text.strip() else block
+            cfg_path.write_text(next_text, encoding="utf-8")
 
     return str(codex_home)
 
@@ -824,7 +842,11 @@ def main() -> int:
                     skill_names=skill_names if mode == "on" else [],
                 )
                 if h == "codex":
-                    codex_homes[mode] = prepare_codex_home(Path(native_envs[mode][h]))
+                    codex_homes[mode] = prepare_codex_home(
+                        Path(native_envs[mode][h]),
+                        otel_enabled=bool(args.otel),
+                        otel_endpoint=args.otel_endpoint or "http://localhost:4317",
+                    )
     manifest["native_envs"] = native_envs
     manifest["codex_homes"] = codex_homes
 
