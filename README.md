@@ -26,15 +26,18 @@ npx skills add graphistry/graphistry-skills \
 - `pygraphistry-ai`
 - `pygraphistry-connectors`
 
-## Quick Eval
+## Evals
 
-```bash
-./bin/agent.sh \
-  --codex --claude \
-  --journeys pygraphistry_persona_journeys_v1 \
-  --skills-mode both \
-  --skills-delivery native
-```
+These skills are regularly evaluated and tuned against standard PyGraphistry user journeys (baseline vs skills, multiple runtimes/models).
+
+For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
+
+Current checked-in benchmark pack shows skills improving success rates and speed on harder cases, especially on Codex model-matrix runs:
+
+- Codex `skills=on`: `13/13` pass, avg `41.8s`
+- Codex `skills=off`: `10/13` pass, avg `65.8s`
+
+See [benchmarks/reports/2026-02-20-clean-rerun.md](benchmarks/reports/2026-02-20-clean-rerun.md) for details.
 
 ## Claude Code Example (Live URL)
 
