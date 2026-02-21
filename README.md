@@ -39,6 +39,10 @@ npx skills add graphistry/graphistry-skills \
 ## Docs
 
 - Contributor/dev workflows and sweep commands: `DEVELOP.md`
+- Contributing guide: `CONTRIBUTING.md`
+- Security policy: `SECURITY.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- License: `LICENSE`
 - Report generator: `scripts/benchmarks/make_report.py`
 - Benchmark artifact structure: `benchmarks/README.md`
 - Latest checked-in benchmark report: `benchmarks/reports/2026-02-20-clean-rerun.md`
