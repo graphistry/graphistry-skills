@@ -1,0 +1,137 @@
+{
+  "id": "pygraphistry_persona_journeys_v1",
+  "description": "Persona-driven PyGraphistry journeys spanning novice fraud analytics, auth/org setup, advanced coloring with GFQL slicing, and AI text/embedding workflows.",
+  "tags": ["pygraphistry", "persona", "journeys", "skills-impact"],
+  "cases": [
+    {
+      "id": "persona_novice_fraud_table_to_viz_algo",
+      "prompt": "A novice fraud analyst only has a transactions table. Provide one concise Python workflow from raw table data to a share-safe graph: include pandas load, graphistry.register(api=3) with env credentials, edges()+nodes() shaping, one enrichment metric (degree or count), one GFQL extraction step using explicit .gfql([...]) (not chain()/hop()), one styling encode call, and plot(render=False).",
+      "checks": {
+        "regex": [
+          "pd\\.(read_csv|DataFrame)\\(",
+          "register\\(",
+          "api\\s*=\\s*3",
+          "GRAPHISTRY_",
+          "edges\\(",
+          "\\.nodes\\(",
+          "(groupby\\(|value_counts\\(|degree|in_degree|out_degree)",
+          "gfql\\(",
+          "encode_",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "must_not_contain": [
+          "redacted_test_user",
+          "redacted_test_pass"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
+        ],
+        "max_lines": 70
+      }
+    },
+    {
+      "id": "persona_org_and_api_key_navigation",
+      "prompt": "Provide two short Python auth snippets for a user navigating organizations and API keys: (1) org-scoped login with org_name and optional idp_name, and (2) service-account login with personal_key_id/personal_key_secret. Use environment variables only.",
+      "checks": {
+        "regex": [
+          "register\\(",
+          "org_name",
+          "idp_name|GRAPHISTRY_IDP_NAME",
+          "personal_key_id",
+          "personal_key_secret",
+          "os\\.environ(\\[|\\.get\\()",
+          "GRAPHISTRY_"
+        ],
+        "must_not_contain": [
+          "redacted_test_user",
+          "redacted_test_pass"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
+        ],
+        "max_lines": 40
+      }
+    },
+    {
+      "id": "persona_advanced_coloring_with_gfql_slices",
+      "prompt": "A user wants more advanced coloring than categorical mapping and needs focused investigation slices. Provide one concise snippet that uses continuous palette coloring (as_continuous=True) and creates at least two GFQL subgraph slices using explicit .gfql([...]) (not chain()/hop()), each producing a share URL with plot(render=False).",
+      "checks": {
+        "regex": [
+          "encode_(point|edge)_color\\(",
+          "palette\\s*=\\s*\\[",
+          "as_continuous\\s*=\\s*True",
+          "gfql\\(",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "max_lines": 70
+      }
+    },
+    {
+      "id": "persona_umap_text_featurization",
+      "prompt": "Provide a compact text-AI workflow: featurize text columns, run UMAP, optionally DBSCAN, then semantic search. Include featurize(...), umap(...), and search(...).",
+      "checks": {
+        "regex": [
+          "featurize\\(",
+          "umap\\(",
+          "search\\("
+        ],
+        "max_lines": 70
+      }
+    },
+    {
+      "id": "persona_precomputed_embeddings_flow",
+      "prompt": "Show a concise workflow for precomputed embeddings already present as columns like emb_0...emb_n: build embedding_cols, run umap(X=embedding_cols), and transform_umap on a new batch.",
+      "checks": {
+        "regex": [
+          "embedding_cols",
+          "umap\\(X\\s*=\\s*embedding_cols\\)",
+          "transform_umap\\("
+        ],
+        "max_lines": 40
+      }
+    },
+    {
+      "id": "persona_connector_analyst_workflow",
+      "prompt": "Provide a concise connector-oriented workflow for Neo4j or Splunk with a dataframe-first fallback: mention connector choice, include explicit edges(...).nodes(...) shaping, run one GFQL filter using explicit .gfql([...]) (not chain()/hop()), set privacy mode (private or organization), and produce plot(render=False). If auth is shown, use environment variables only (no username/password string literals). Return one compact code block with minimal prose.",
+      "checks": {
+        "regex": [
+          "(?i)(neo4j|splunk)",
+          "(?i)dataframe",
+          "edges\\(",
+          "\\.nodes\\(",
+          "gfql\\(",
+          "privacy\\(mode\\s*=\\s*(['\\\"](private|organization)['\\\"]|[A-Za-z_][A-Za-z0-9_]*)\\)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
+        ],
+        "max_lines": 70
+      }
+    },
+    {
+      "id": "persona_auth_troubleshooting_checklist",
+      "prompt": "Give exactly 5 concise bullets for troubleshooting Graphistry org/API key auth issues in PyGraphistry, including api=3, server/protocol, org_name, and personal key env vars.",
+      "checks": {
+        "regex": [
+          "api\\s*=\\s*3",
+          "(?i)server",
+          "(?i)protocol",
+          "org_name",
+          "personal_key_(id|secret)|GRAPHISTRY_PERSONAL_KEY_(ID|SECRET)|GRAPHISTRY_API_KEY",
+          "GRAPHISTRY_"
+        ],
+        "max_lines": 10
+      }
+    }
+  ]
+}

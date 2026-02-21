@@ -1,0 +1,22 @@
+{
+  "id": "runtime_smoke",
+  "description": "Cross-runtime smoke checks for codex, claude, and louie harnesses.",
+  "tags": ["smoke", "runtime"],
+  "cases": [
+    {
+      "id": "echo_token",
+      "prompt": "Reply with exactly GRAPHISTRY_OK.",
+      "checks": {
+        "must_contain": ["GRAPHISTRY_OK"],
+        "regex": ["GRAPHISTRY_OK"]
+      }
+    },
+    {
+      "id": "privacy_snippet",
+      "prompt": "Provide one Python line that uses graphistry and includes privacy(mode='private').",
+      "checks": {
+        "regex": ["(?i)graphistry", "privacy\\(mode\\s*=\\s*['\"']private['\"']\\)"]
+      }
+    }
+  ]
+}

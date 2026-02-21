@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+show_help() {
+  cat <<'EOF'
+List recent sessions (api_run spans with session.id).
+
+Usage:
+  bin/otel/cmds/list-sessions [--since 30m] [--start ISO/epoch] [--end ISO/epoch]
+                               [--limit N] [--service NAME] [--query TRACEQL]
+
+Output columns:
+  session_id  time  duration_s  runs  status  git_sha  git_dirty
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${BASE_DIR}/_python" "${BASE_DIR}/trace_tools.py" list-sessions "$@"

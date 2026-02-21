@@ -1,0 +1,10 @@
+{
+  "pygraphistry_core": [
+    "pygraphistry",
+    "pygraphistry-core",
+    "pygraphistry-visualization",
+    "pygraphistry-gfql",
+    "pygraphistry-ai",
+    "pygraphistry-connectors"
+  ]
+}
