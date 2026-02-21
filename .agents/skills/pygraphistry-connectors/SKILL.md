@@ -10,6 +10,8 @@ description: "Select and use PyGraphistry connector and plugin workflows for gra
 - Use connector-specific notebook patterns when auth/query semantics are specialized.
 - For very large datasets, push filtering/aggregation upstream before plotting.
 - Keep connector and Graphistry credentials in env vars or secret stores; no hardcoded keys.
+- Never use placeholder literals like `username='user'` / `password='pass'` / `username='...'`; use `os.environ[...]` or `os.environ.get(...)`.
+- For concise tasks, respond with a single compact code block and minimal prose.
 - In concise snippets, prefer explicit privacy literals (`'private'` or `'organization'`) over placeholder variables.
 
 ## Connector triage rubric

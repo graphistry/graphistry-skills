@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "persona_novice_fraud_table_to_viz_algo",
-      "prompt": "A novice fraud analyst only has a transactions table. Provide one concise Python workflow from raw table data to a share-safe graph: include pandas load, graphistry.register(api=3) with env credentials, edges()+nodes() shaping, one enrichment metric (degree or count), one GFQL extraction step, one styling encode call, and plot(render=False).",
+      "prompt": "A novice fraud analyst only has a transactions table. Provide one concise Python workflow from raw table data to a share-safe graph: include pandas load, graphistry.register(api=3) with env credentials, edges()+nodes() shaping, one enrichment metric (degree or count), one GFQL extraction step using explicit .gfql([...]) (not chain()/hop()), one styling encode call, and plot(render=False).",
       "checks": {
         "regex": [
           "pd\\.(read_csv|DataFrame)\\(",
@@ -14,7 +14,7 @@
           "GRAPHISTRY_",
           "edges\\(",
           "\\.nodes\\(",
-          "(groupby\\(|value_counts\\()",
+          "(groupby\\(|value_counts\\(|degree|in_degree|out_degree)",
           "gfql\\(",
           "encode_",
           "plot\\(render\\s*=\\s*False\\)"
@@ -22,6 +22,12 @@
         "must_not_contain": [
           "redacted_test_user",
           "redacted_test_pass"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
         "max_lines": 70
       }
@@ -43,12 +49,18 @@
           "redacted_test_user",
           "redacted_test_pass"
         ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
+        ],
         "max_lines": 40
       }
     },
     {
       "id": "persona_advanced_coloring_with_gfql_slices",
-      "prompt": "A user wants more advanced coloring than categorical mapping and needs focused investigation slices. Provide one concise snippet that uses continuous palette coloring (as_continuous=True) and creates at least two GFQL subgraph slices, each producing a share URL with plot(render=False).",
+      "prompt": "A user wants more advanced coloring than categorical mapping and needs focused investigation slices. Provide one concise snippet that uses continuous palette coloring (as_continuous=True) and creates at least two GFQL subgraph slices using explicit .gfql([...]) (not chain()/hop()), each producing a share URL with plot(render=False).",
       "checks": {
         "regex": [
           "encode_(point|edge)_color\\(",
@@ -86,7 +98,7 @@
     },
     {
       "id": "persona_connector_analyst_workflow",
-      "prompt": "Provide a concise connector-oriented workflow for Neo4j or Splunk with a dataframe-first fallback: mention connector choice, shape to edges/nodes, run one GFQL filter, set privacy mode (private or organization), and produce plot(render=False).",
+      "prompt": "Provide a concise connector-oriented workflow for Neo4j or Splunk with a dataframe-first fallback: mention connector choice, include explicit edges(...).nodes(...) shaping, run one GFQL filter using explicit .gfql([...]) (not chain()/hop()), set privacy mode (private or organization), and produce plot(render=False). If auth is shown, use environment variables only (no username/password string literals). Return one compact code block with minimal prose.",
       "checks": {
         "regex": [
           "(?i)(neo4j|splunk)",
@@ -96,6 +108,12 @@
           "gfql\\(",
           "privacy\\(mode\\s*=\\s*(['\\\"](private|organization)['\\\"]|[A-Za-z_][A-Za-z0-9_]*)\\)",
           "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
         "max_lines": 70
       }

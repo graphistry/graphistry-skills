@@ -8,9 +8,11 @@ description: "Build PyGraphistry visualizations with bindings, encodings, layout
 ## Core pattern
 ```python
 g2 = (
-    g.bind(point_label='label', point_color='type', edge_color='etype')
+    # Keep a plain 'type' column on both nodes and edges for legend-friendly defaults
+    g.bind(point_label='label', point_color='type', edge_color='type')
      .encode_point_color('type', categorical_mapping={'agent': '#3b82f6'}, default_mapping='#94a3b8')
-     .encode_point_size('score')
+     # Optional: default node sizing is often degree for exploratory passes
+     .encode_point_size('degree')
      .settings(url_params={'play': 3000, 'info': True})
 )
 g2.plot()
@@ -31,6 +33,9 @@ g2 = (
 )
 g2.plot()
 ```
+
+Use valid Font Awesome names and keep icon mappings category-driven by `type`.
+See `references/fa-icons.md` for lookup links and examples.
 
 ## Continuous-color pattern (beyond categorical maps)
 ```python
@@ -64,7 +69,7 @@ plot_url = g.plot(render=False)
 - Filter and aggregate before plotting.
 - Keep only essential columns (drop large text blobs unless needed).
 - Use focused subgraphs (time slice, one-hop neighborhood, top-k signals).
-- Prefer singleton `type` columns for node/edge categories to keep legends stable.
+- Prefer plain `type` columns on both nodes and edges so legends and default category encodings stay stable.
 - Avoid dotted column names like `node.type` / `edge.type`; prefer plain names.
 - Use native datetime types for time encodings and time-sliced comparisons.
 
@@ -75,3 +80,4 @@ plot_url = g.plot(render=False)
 - Layout catalog: https://pygraphistry.readthedocs.io/en/latest/visualization/layout/catalog.html
 - Privacy/sharing: https://pygraphistry.readthedocs.io/en/latest/server/privacy.html
 - Visualization notebooks index: https://pygraphistry.readthedocs.io/en/latest/notebooks/visualization.html
+- Icon lookup reference: `references/fa-icons.md`

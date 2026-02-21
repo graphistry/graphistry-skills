@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import datetime as dt
 import hashlib
 import json
@@ -584,6 +585,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--journeys", default="runtime_smoke", help="CSV of journey IDs or 'all'")
     parser.add_argument("--journey-dir", default=str(DEFAULT_JOURNEY_DIR), help="Journey JSON directory")
     parser.add_argument("--harnesses", default="codex,claude,louie", help="CSV harness list")
+    parser.add_argument("--case-ids", default="", help="CSV case IDs filter (optional)")
     parser.add_argument("--skills-mode", default="off", help="on|off|both|CSV")
     parser.add_argument("--skills-profile", default="pygraphistry_core", help="Skills profile name or CSV of skill names")
     parser.add_argument("--skills-profiles-file", default=str(DEFAULT_SKILLS_PROFILES), help="Skills profiles JSON")
@@ -602,6 +604,7 @@ def parse_args() -> argparse.Namespace:
         help="How skills are provided to harnesses: native (default), inject, or auto (native for codex/claude + inject for others)",
     )
     parser.add_argument("--timeout-s", type=int, default=240, help="Timeout for each harness invocation")
+    parser.add_argument("--max-workers", type=int, default=1, help="Max parallel harness workers per case (>=1)")
     return parser.parse_args()
 
 
@@ -613,6 +616,7 @@ def main() -> int:
         raise ValueError("At least one harness is required")
 
     modes = parse_skills_modes(args.skills_mode)
+    max_workers = max(1, args.max_workers)
 
     timestamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     run_id = f"agent_eval_{timestamp}"
@@ -635,6 +639,31 @@ def main() -> int:
     journey_files = resolve_journey_files(Path(args.journey_dir), args.journeys)
     journeys = [load_journey(path) for path in journey_files]
 
+    case_filter = set(parse_csv(args.case_ids))
+    if case_filter:
+        filtered_journeys: list[dict[str, Any]] = []
+        matched_case_ids: set[str] = set()
+        for journey in journeys:
+            original_cases = journey.get("cases") or []
+            kept_cases = []
+            for case in original_cases:
+                case_id = str(case.get("id") or "")
+                if case_id in case_filter:
+                    kept_cases.append(case)
+                    matched_case_ids.add(case_id)
+            if kept_cases:
+                next_journey = dict(journey)
+                next_journey["cases"] = kept_cases
+                filtered_journeys.append(next_journey)
+
+        missing = sorted(case_filter - matched_case_ids)
+        if missing:
+            print(f"WARN: case IDs not found and skipped: {','.join(missing)}", file=sys.stderr)
+
+        if not filtered_journeys:
+            raise ValueError(f"No cases matched --case-ids: {args.case_ids}")
+        journeys = filtered_journeys
+
     git_sha = run_git_rev_parse("HEAD")
     git_branch = run_git_rev_parse("--abbrev-ref")
 
@@ -646,6 +675,7 @@ def main() -> int:
         "git_branch": git_branch,
         "harnesses": harnesses,
         "journeys": [j.get("id") for j in journeys],
+        "case_ids_filter": sorted(case_filter),
         "skills_mode": modes,
         "skills_profile": profile_name,
         "skills": {mode: cfg.get("skills_manifest", []) for mode, cfg in skill_configs.items()},
@@ -658,6 +688,7 @@ def main() -> int:
         "codex_cwd": args.codex_cwd,
         "skills_delivery": args.skills_delivery,
         "timeout_s": args.timeout_s,
+        "max_workers": max_workers,
     }
 
     native_envs: dict[str, dict[str, str]] = {mode: {} for mode in modes}
@@ -772,7 +803,7 @@ def main() -> int:
                         endpoint=args.otel_endpoint or None,
                     )
 
-                    for harness in harnesses:
+                    def run_case_for_harness(harness_idx: int, harness: str) -> dict[str, Any]:
                         traceparent, trace_id = make_traceparent()
 
                         emit_otel_event(
@@ -832,8 +863,6 @@ def main() -> int:
                                 skills_text=skills_text_for_harness,
                                 harness_cwd=harness_cwd,
                             )
-                            if args.failfast and not bool(result.get("ok")):
-                                failed_harnesses[harness] = str(result.get("error") or "unknown error")
 
                         response_text = str(result.get("response_text") or "")
                         pass_bool, score, breakdown = grade_response(response_text, checks)
@@ -868,11 +897,8 @@ def main() -> int:
                             "selected_harness": result.get("selected_harness"),
                             "delegates": result.get("delegates"),
                             "command_exit_code": result.get("command_exit_code"),
+                            "__harness_idx": harness_idx,
                         }
-
-                        rows.append(row)
-                        rows_file.write(json.dumps(row, sort_keys=True) + "\n")
-                        rows_file.flush()
 
                         emit_otel_event(
                             enabled=args.otel,
@@ -891,6 +917,36 @@ def main() -> int:
                             service=args.otel_service,
                             endpoint=args.otel_endpoint or None,
                         )
+
+                        return row
+
+                    case_rows: list[dict[str, Any]] = []
+                    worker_count = min(max_workers, len(harnesses)) if harnesses else 1
+                    if worker_count <= 1 or len(harnesses) <= 1:
+                        for harness_idx, harness in enumerate(harnesses):
+                            case_rows.append(run_case_for_harness(harness_idx, harness))
+                    else:
+                        with ThreadPoolExecutor(max_workers=worker_count) as pool:
+                            futures = {
+                                pool.submit(run_case_for_harness, harness_idx, harness): harness_idx
+                                for harness_idx, harness in enumerate(harnesses)
+                            }
+                            for fut in as_completed(futures):
+                                case_rows.append(fut.result())
+
+                    case_rows.sort(key=lambda r: int(r.pop("__harness_idx", 0)))
+                    for row in case_rows:
+                        harness = str(row.get("harness") or "")
+                        if (
+                            args.failfast
+                            and not bool(row.get("harness_ok"))
+                            and not str(row.get("harness_error") or "").startswith("failfast_skip:")
+                        ):
+                            failed_harnesses[harness] = str(row.get("harness_error") or "unknown error")
+
+                        rows.append(row)
+                        rows_file.write(json.dumps(row, sort_keys=True) + "\n")
+                        rows_file.flush()
 
                     emit_otel_event(
                         enabled=args.otel,

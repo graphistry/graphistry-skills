@@ -19,34 +19,11 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate skill frontmatter
+      - name: Validate skill manifests
         shell: bash
         run: |
           set -euo pipefail
-          shopt -s nullglob
-
-          files=(.agents/skills/*/SKILL.md)
-          if [[ ${#files[@]} -eq 0 ]]; then
-            echo "No skills found under .agents/skills/*/SKILL.md"
-            exit 1
-          fi
-
-          for f in "${files[@]}"; do
-            d="$(basename "$(dirname "$f")")"
-            name="$(awk '/^name:/{print $2; exit}' "$f")"
-            if [[ -z "${name:-}" ]]; then
-              echo "Missing frontmatter name in $f"
-              exit 1
-            fi
-            if [[ "$name" != "$d" ]]; then
-              echo "Skill dir/name mismatch: dir=$d name=$name file=$f"
-              exit 1
-            fi
-            if ! grep -q '^description:' "$f"; then
-              echo "Missing frontmatter description in $f"
-              exit 1
-            fi
-          done
+          python3 scripts/ci/validate_skills.py
 
       - name: List skills with npx
         shell: bash
@@ -102,3 +79,8 @@ jobs:
           # Ensure non-selected skills are not pulled in.
           test ! -e ".agents/skills/eval-otel"
 
+      - name: Runtime native-load smoke (best effort on available runtimes)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/ci/runtime_native_smoke.sh

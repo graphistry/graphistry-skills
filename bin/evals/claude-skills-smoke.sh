@@ -7,6 +7,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 ENV_DIR="${ROOT_DIR}/evals/env/claude"
 SKILLS_CSV="pygraphistry,pygraphistry-core,pygraphistry-visualization,pygraphistry-gfql,pygraphistry-ai,pygraphistry-connectors"
 PROMPT="What skills are loaded in this session? Reply with comma-separated skill names only. Do not use tool calls."
+REQUIRE_SKILLS_CSV="pygraphistry-core,pygraphistry-gfql,pygraphistry-visualization"
 OUT_DIR="/tmp/claude_skill_smoke_$(date +%Y%m%d-%H%M%S)"
 
 show_help() {
@@ -17,6 +18,7 @@ Options:
   --env-dir DIR     Env dir containing .claude/skills (default: evals/env/claude)
   --skills CSV      Comma-separated skill names to symlink from .agents/skills
   --prompt TEXT     Prompt to run (default asks loaded skills only)
+  --require-skills CSV Comma-separated skill names that must appear in loaded/init skills or response
   --out DIR         Output directory for raw stream-json and summary
   -h, --help        Show help
 
@@ -40,6 +42,10 @@ while [[ $# -gt 0 ]]; do
       PROMPT="$2"
       shift 2
       ;;
+    --require-skills)
+      REQUIRE_SKILLS_CSV="$2"
+      shift 2
+      ;;
     --out)
       OUT_DIR="$2"
       shift 2
@@ -57,6 +63,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 mkdir -p "${OUT_DIR}"
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "Claude CLI not found in PATH" >&2
+  exit 2
+fi
 
 "${ROOT_DIR}/scripts/evals/setup_claude_skill_env.sh" \
   --env-dir "${ENV_DIR}" \
@@ -105,3 +116,18 @@ if [[ "${TOOL_CALL_COUNT}" != "0" ]]; then
   echo "Unexpected tool call(s) detected in smoke test" >&2
   exit 3
 fi
+
+if [[ "${LOADED_SKILLS}" == "[]" ]]; then
+  echo "No loaded skills detected in Claude init payload" >&2
+  exit 4
+fi
+
+IFS=',' read -r -a required_skills <<< "${REQUIRE_SKILLS_CSV}"
+for skill in "${required_skills[@]}"; do
+  skill="${skill// /}"
+  [[ -z "${skill}" ]] && continue
+  if [[ "${LOADED_SKILLS}" != *"${skill}"* && "${RESPONSE_TEXT}" != *"${skill}"* ]]; then
+    echo "Required skill missing from smoke output: ${skill}" >&2
+    exit 5
+  fi
+done

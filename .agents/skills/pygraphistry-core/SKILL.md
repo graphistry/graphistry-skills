@@ -40,6 +40,8 @@ graphistry.register(
 
 ```python
 # edges_df: src,dst,... and nodes_df: id,...
+edges_df['type'] = edges_df.get('type', 'transaction')
+nodes_df['type'] = nodes_df.get('type', 'entity')
 g = graphistry.edges(edges_df, 'src', 'dst').nodes(nodes_df, 'id')
 g.plot()
 ```
@@ -53,6 +55,7 @@ hg['graph'].plot()
 
 ## ETL shaping checklist
 - Normalize identifier columns before binding (`src/dst/id` type consistency, null handling).
+- Prefer a plain `type` column on both edges and nodes for legend-friendly defaults and consistent category encodings.
 - Deduplicate high-volume repeated rows before first upload.
 - Materialize nodes for node-centric steps:
 ```python
@@ -63,7 +66,7 @@ g = graphistry.edges(edges_df, 'src', 'dst').materialize_nodes()
 - Confirm source/destination columns are non-null and correctly typed.
 - Materialize nodes if needed (`g.materialize_nodes()`) before node-centric operations.
 - Start with smaller slices for first render on large data.
-- For neighborhood expansion and pattern mining, use `hop()/chain()` or route to GFQL for stricter pattern constraints.
+- For neighborhood expansion and pattern mining, use `.gfql([...])` when the user requests GFQL; mention `hop()/chain()` only as optional shorthand.
 - Keep credentials in environment variables only; do not hardcode usernames/passwords/tokens.
 
 ## Canonical docs

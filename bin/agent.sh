@@ -8,6 +8,7 @@ HARNESSES=()
 JOURNEYS="runtime_smoke"
 SKILLS_MODE="off"
 SKILLS_PROFILE="pygraphistry_core"
+CASE_IDS=""
 OUT_DIR=""
 LOUIE_URL="${LOUIE_URL:-http://localhost:8501}"
 TIMEOUT_S="240"
@@ -18,6 +19,7 @@ OTEL="false"
 OTEL_SERVICE="agent-eval-runner"
 OTEL_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT_GRPC:-}"
 FAILFAST="false"
+MAX_WORKERS="1"
 
 show_help() {
   cat <<'USAGE'
@@ -33,6 +35,7 @@ Options:
   --journeys CSV     Journey IDs or 'all' (default: runtime_smoke)
   --skills-mode X    on|off|both|CSV (default: off)
   --skills-profile X Skills profile name (default: pygraphistry_core)
+  --case-ids CSV     Optional case-id filter (rerun only selected cases)
   --out DIR          Output run directory
   --louie-url URL    Louie base URL (default: http://localhost:8501)
   --timeout-s N      Per-harness timeout seconds (default: 240)
@@ -41,6 +44,7 @@ Options:
   --skills-delivery X native|inject|auto (default: native)
   --otel             Emit OTel lifecycle events via graphistrygpt helper
   --failfast         Fail fast per harness after first harness error (with Louie preflight)
+  --max-workers N    Parallel harness workers per case (default: 1)
   --otel-service X   OTel service name (default: agent-eval-runner)
   --otel-endpoint X  OTLP endpoint (default: OTEL_EXPORTER_OTLP_ENDPOINT_GRPC)
   -h, --help         Show help
@@ -48,6 +52,7 @@ Options:
 Examples:
   ./bin/agent.sh --codex --claude --journeys runtime_smoke
   ./bin/agent.sh --codex --claude --louie --skills-mode both --otel
+  ./bin/agent.sh --codex --claude --journeys pygraphistry_persona_journeys_v1 --case-ids persona_novice_fraud_table_to_viz_algo,persona_connector_analyst_workflow --max-workers 2
 USAGE
 }
 
@@ -81,6 +86,10 @@ while [[ $# -gt 0 ]]; do
       SKILLS_PROFILE="$2"
       shift 2
       ;;
+    --case-ids)
+      CASE_IDS="$2"
+      shift 2
+      ;;
     --out)
       OUT_DIR="$2"
       shift 2
@@ -112,6 +121,10 @@ while [[ $# -gt 0 ]]; do
     --failfast)
       FAILFAST="true"
       shift
+      ;;
+    --max-workers)
+      MAX_WORKERS="$2"
+      shift 2
       ;;
     --otel-service)
       OTEL_SERVICE="$2"
@@ -162,8 +175,10 @@ cmd=(
   --harnesses "$HARNESS_CSV"
   --skills-mode "$SKILLS_MODE"
   --skills-profile "$SKILLS_PROFILE"
+  --case-ids "$CASE_IDS"
   --louie-url "$LOUIE_URL"
   --timeout-s "$TIMEOUT_S"
+  --max-workers "$MAX_WORKERS"
   --claude-cwd "$CLAUDE_CWD"
   --codex-cwd "$CODEX_CWD"
   --skills-delivery "$SKILLS_DELIVERY"

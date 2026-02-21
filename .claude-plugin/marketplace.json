@@ -1,0 +1,27 @@
+{
+  "name": "graphistry-skills",
+  "owner": {
+    "name": "Graphistry",
+    "email": "support@graphistry.com"
+  },
+  "metadata": {
+    "description": "Official Graphistry PyGraphistry skills for code assistants",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "pygraphistry-core-pack",
+      "description": "PyGraphistry workflows for auth, shaping, GFQL, visualization, AI, and connectors",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agents/skills/pygraphistry",
+        "./.agents/skills/pygraphistry-core",
+        "./.agents/skills/pygraphistry-gfql",
+        "./.agents/skills/pygraphistry-visualization",
+        "./.agents/skills/pygraphistry-ai",
+        "./.agents/skills/pygraphistry-connectors"
+      ]
+    }
+  ]
+}
