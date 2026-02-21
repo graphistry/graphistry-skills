@@ -17,19 +17,6 @@ npx skills add graphistry/graphistry-skills \
   --yes
 ```
 
-## Evals
-
-These skills are regularly evaluated and tuned against standard PyGraphistry user journeys (baseline vs skills, multiple runtimes/models).
-
-For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
-
-Current checked-in benchmark pack shows skills improving success rates and speed on harder cases, especially on Codex model-matrix runs:
-
-- Codex `skills=on`: `13/13` pass, avg `41.8s`
-- Codex `skills=off`: `10/13` pass, avg `65.8s`
-
-See [benchmarks/reports/2026-02-20-clean-rerun.md](benchmarks/reports/2026-02-20-clean-rerun.md) for details.
-
 ## Claude Code Example (Live URL)
 
 Run from a project where these skills are installed and `graphistry` + `pandas` are available.
@@ -59,6 +46,19 @@ Sample output (validated on `2026-02-21`, `model=opus`, runtime `~68.2s`):
 ```text
 https://hub.graphistry.com/graph/graph.html?dataset=17743ba9ff3549729fdb4d9c1c071bbc&type=arrow&viztoken=e968954a-c0e5-4206-85a6-3d950817a6d4&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771659185&info=true
 ```
+
+## Evals
+
+These skills are regularly evaluated and tuned against standard PyGraphistry user journeys (baseline vs skills, multiple runtimes/models).
+
+For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
+
+Current checked-in benchmark pack shows skills improving success rates and speed on harder cases, especially on Codex model-matrix runs:
+
+- Codex `skills=on`: `13/13` pass, avg `41.8s`
+- Codex `skills=off`: `10/13` pass, avg `65.8s`
+
+See [benchmarks/reports/2026-02-20-clean-rerun.md](benchmarks/reports/2026-02-20-clean-rerun.md) for details.
 
 ## Docs
 
