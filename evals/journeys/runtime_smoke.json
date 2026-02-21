@@ -10,6 +10,15 @@
       "checks": {
         "must_contain": ["GRAPHISTRY_OK"],
         "regex": ["GRAPHISTRY_OK"]
+      },
+      "oracle": {
+        "min_score": 0.98,
+        "reference_answer": "GRAPHISTRY_OK",
+        "rubric": [
+          "Output should be exactly GRAPHISTRY_OK with no extra commentary.",
+          "Any extra narrative or unrelated text should reduce score sharply."
+        ],
+        "required_concepts": ["GRAPHISTRY_OK"]
       }
     },
     {

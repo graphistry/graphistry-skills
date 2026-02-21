@@ -1,0 +1,173 @@
+{
+  "rows": [
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8218-8272-7702-b6d7-6719bc7cf365"
+      },
+      "skills_mode": "off",
+      "trace_id": "95e73901d9c54cf787eaeddf8ea9cf5f"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "7044dbb7-9334-49b3-ad1a-e72c6fcf9527",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "6f19a689a51846868aab269ed41631e0"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8219-5b0c-7ad2-b4e3-a50ea2c1c11b"
+      },
+      "skills_mode": "on",
+      "trace_id": "3f32d5fee2b5454ebd2cb7bc3d2dbdb8"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "b762cd9f-9c55-407f-b2bc-b76a0b485247",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "f4c79d7eeb0a40f996b12324ceda4ee1"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c821a-29d8-7c92-af5c-134178e53b7d"
+      },
+      "skills_mode": "off",
+      "trace_id": "a6235e372660467eb6f8746ae0c09cf2"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "6ab2d610-c70d-4090-9778-08d01e92a82c",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "8103acd0902049e98da242a368f47370"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c821b-f48a-78a0-9c07-1d71a1a6f9ac"
+      },
+      "skills_mode": "on",
+      "trace_id": "cbe188ac19644e06bbcb80f80f22518c"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "313b88e6-c423-4bef-a00d-0110f75e7129",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "535708db0d364e5da85d5ea0d733f17d"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c821c-5cea-7891-8d9a-48decafbad67"
+      },
+      "skills_mode": "off",
+      "trace_id": "d5bd3968619f487d8457fc5718cfae5c"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "079b0410-e08c-4ee6-9a28-bcfd958fe673",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "78c70477fdd54e97bc932ccc5221bfee"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c821c-e939-7f92-86c4-9705136aa76c"
+      },
+      "skills_mode": "on",
+      "trace_id": "2c917125e4c34ebf8b2175519c5901cd"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "408063b6-f462-418d-a584-f2391dbbc4b4",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "1c3bf8ac51a043a18be2234b4b393c68"
+    }
+  ],
+  "run_id": "agent_eval_20260221-132609"
+}

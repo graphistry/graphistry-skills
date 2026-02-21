@@ -1,0 +1,105 @@
+{
+  "by_eval_intent": {
+    "runtime_smoke": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "eval_intent": "runtime_smoke",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "by_grading_mode": {
+    "oracle": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "grading_mode": "oracle",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "by_grading_source": {
+    "oracle": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "grading_source": "oracle",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "by_harness": {
+    "codex": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "by_harness_and_mode": {
+    "codex::off": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "skills_mode": "off",
+      "total": 1
+    }
+  },
+  "by_harness_and_model": {
+    "codex::default": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "by_harness_model_and_mode": {
+    "codex::default::off": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 1.0,
+      "passed": 1,
+      "skills_mode": "off",
+      "total": 1
+    }
+  },
+  "by_skills_mode": {
+    "off": {
+      "avg_latency_ms": 3439,
+      "avg_score": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "harness_ok_rate": 1.0,
+  "harness_ok_rows": 1,
+  "overall_pass_rate": 1.0,
+  "passed_rows": 1,
+  "total_rows": 1
+}

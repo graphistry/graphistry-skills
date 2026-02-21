@@ -1,0 +1,109 @@
+{
+  "case_ids_filter": [
+    "auth_env_no_literal_creds",
+    "core_first_plot_with_auth",
+    "e2e_csv_degree_gfql_viz_private",
+    "echo_token",
+    "exec_plot_public_render_false",
+    "gfql_edge_query_filter",
+    "louie_privacy_snippet",
+    "persona_novice_fraud_table_to_viz_algo"
+  ],
+  "claude_cwd": "",
+  "claude_models": [],
+  "codex_cwd": "",
+  "codex_homes": {
+    "on": "/tmp/graphistry_skills_phase2_quick_alljourneys_on_20260221-131729/native_env/pygraphistry_core-on-codex/.codex"
+  },
+  "codex_models": [],
+  "created_at": "2026-02-21T21:04:15.487320+00:00",
+  "cwd": "/home/lmeyerov/Work/graphistry-skills",
+  "failfast": true,
+  "git_branch": null,
+  "git_sha": "bac2052188d383ea8922da175cbbeca00472dbd0",
+  "grading": "deterministic",
+  "harness_variants": [
+    {
+      "harness": "codex",
+      "model": ""
+    },
+    {
+      "harness": "claude",
+      "model": ""
+    }
+  ],
+  "harnesses": [
+    "codex",
+    "claude"
+  ],
+  "journeys": [
+    "pygraphistry_e2e_big_journeys_v1",
+    "pygraphistry_execution_grade_v1",
+    "pygraphistry_guardrails_v1",
+    "pygraphistry_louie_subset_v1",
+    "pygraphistry_moltbook_alignment_v1",
+    "pygraphistry_persona_journeys_v1",
+    "pygraphistry_skill_pressure_v1",
+    "runtime_smoke"
+  ],
+  "louie_url": "http://localhost:8501",
+  "max_workers": 2,
+  "native_envs": {
+    "on": {
+      "claude": "/tmp/graphistry_skills_phase2_quick_alljourneys_on_20260221-131729/native_env/pygraphistry_core-on-claude",
+      "codex": "/tmp/graphistry_skills_phase2_quick_alljourneys_on_20260221-131729/native_env/pygraphistry_core-on-codex"
+    }
+  },
+  "oracle_claude_cwd": "",
+  "oracle_codex_cwd": "",
+  "oracle_harness": "codex",
+  "oracle_min_score_default": 0.8,
+  "oracle_model": "default",
+  "oracle_strict": false,
+  "oracle_timeout_s": 120,
+  "otel_enabled": false,
+  "otel_endpoint": "",
+  "otel_service": "agent-eval-runner",
+  "preflight": {},
+  "run_id": "agent_eval_20260221-130415",
+  "skills": {
+    "on": [
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry/SKILL.md",
+        "sha256": "b41cecc010da05a2516c6b5ba0c66235b91bd3be9398bcc29399212f71a1972b",
+        "skill": "pygraphistry"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-core/SKILL.md",
+        "sha256": "08c14b553e9dae9382ac186abb698083fe088415eb6ab16a0c83d8184b010d3d",
+        "skill": "pygraphistry-core"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-visualization/SKILL.md",
+        "sha256": "f9a850f4117f905ef31a78344ebcd4c62a1b0f3305d161a0a47edbfd5a9ebcb3",
+        "skill": "pygraphistry-visualization"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-gfql/SKILL.md",
+        "sha256": "639e54eb89160a4b9909fc26c94f2e088fc5149c65c3df22e2b990c63e09686b",
+        "skill": "pygraphistry-gfql"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-ai/SKILL.md",
+        "sha256": "6dea22ff0c079ba05c87c6b7826f07abb5d3bf67c31efcb40761f57f0ccec05c",
+        "skill": "pygraphistry-ai"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-connectors/SKILL.md",
+        "sha256": "9cb89982a191cb9ffdb417a2219e729693d2900ab8bfa2981dfc6613da3b8dab",
+        "skill": "pygraphistry-connectors"
+      }
+    ]
+  },
+  "skills_delivery": "native",
+  "skills_mode": [
+    "on"
+  ],
+  "skills_profile": "pygraphistry_core",
+  "timeout_s": 120
+}

@@ -56,6 +56,26 @@ Use this while editing skill text.
   --failfast
 ```
 
+## Grading Modes (Deterministic / Oracle / Hybrid)
+
+Default eval scoring is deterministic checks from each journey case.
+
+Oracle grading scaffold is also available:
+
+```bash
+OUT="/tmp/graphistry_skills_oracle_smoke_$(date +%Y%m%d-%H%M%S)"
+./bin/agent.sh \
+  --codex \
+  --journeys runtime_smoke \
+  --case-ids echo_token \
+  --skills-mode off \
+  --grading oracle \
+  --oracle-harness codex \
+  --out "$OUT"
+```
+
+Hybrid grading (deterministic + oracle conjunction) is enabled via `--grading hybrid`.
+
 ## Sweep Recipes
 
 ### 1) Persona sweep, baseline vs skills (codex + claude)
@@ -207,6 +227,19 @@ python3 scripts/benchmarks/make_report.py \
   --out-md benchmarks/reports/$(date +%Y-%m-%d)-local-sweep.md \
   --out-json benchmarks/data/$(date +%Y-%m-%d)-local-sweep/combined_metrics.json
 ```
+
+## Coverage Audit (Scenario Breadth)
+
+Run a coverage scan across all journeys:
+
+```bash
+python3 scripts/benchmarks/scenario_coverage_audit.py \
+  --journey-dir evals/journeys \
+  --out-md benchmarks/reports/$(date +%Y-%m-%d)-scenario-coverage.md \
+  --out-json benchmarks/data/$(date +%Y-%m-%d)-scenario-coverage.json
+```
+
+Use this before adding new journeys to close zero-bucket or severely imbalanced dimensions.
 
 ## Baseline Isolation Notes
 

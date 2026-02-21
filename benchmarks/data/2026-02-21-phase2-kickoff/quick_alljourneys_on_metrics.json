@@ -1,0 +1,350 @@
+{
+  "generated_at": "2026-02-21T21:07:52.693266+00:00",
+  "inputs": [
+    "/home/lmeyerov/Work/graphistry-skills/benchmarks/data/2026-02-21-phase2-kickoff/quick_alljourneys_on_rows.jsonl"
+  ],
+  "overall": {
+    "total": 16,
+    "passed": 14,
+    "pass_rate": 0.875
+  },
+  "by_harness_and_mode": [
+    {
+      "total": 8,
+      "passed": 6,
+      "pass_rate": 0.75,
+      "harness_ok": 8,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14691.75,
+      "avg_score": 0.9520833333333333,
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 8,
+      "passed": 8,
+      "pass_rate": 1.0,
+      "harness_ok": 8,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 25519.375,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_harness_model_and_mode": [
+    {
+      "total": 8,
+      "passed": 6,
+      "pass_rate": 0.75,
+      "harness_ok": 8,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14691.75,
+      "avg_score": 0.9520833333333333,
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on"
+    },
+    {
+      "total": 8,
+      "passed": 8,
+      "pass_rate": 1.0,
+      "harness_ok": 8,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 25519.375,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on"
+    }
+  ],
+  "by_eval_intent": [
+    {
+      "total": 2,
+      "passed": 1,
+      "pass_rate": 0.5,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15701.5,
+      "avg_score": 0.8333333333333333,
+      "eval_intent": "alignment_legacy"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 21910.5,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 11438.5,
+      "avg_score": 1.0,
+      "eval_intent": "guardrail"
+    },
+    {
+      "total": 4,
+      "passed": 3,
+      "pass_rate": 0.75,
+      "harness_ok": 4,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 41498.25,
+      "avg_score": 0.9875,
+      "eval_intent": "realistic_capability"
+    },
+    {
+      "total": 4,
+      "passed": 4,
+      "pass_rate": 1.0,
+      "harness_ok": 4,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 8122.0,
+      "avg_score": 1.0,
+      "eval_intent": "runtime_smoke"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 12553.5,
+      "avg_score": 1.0,
+      "eval_intent": "skill_pressure"
+    }
+  ],
+  "by_eval_intent_harness_and_mode": [
+    {
+      "total": 1,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 11530.0,
+      "avg_score": 0.6666666666666666,
+      "eval_intent": "alignment_legacy",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19873.0,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 5187.0,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 38634.0,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 8715.0,
+      "avg_score": 1.0,
+      "eval_intent": "guardrail",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14162.0,
+      "avg_score": 1.0,
+      "eval_intent": "guardrail",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 2,
+      "passed": 1,
+      "pass_rate": 0.5,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 34791.0,
+      "avg_score": 0.975,
+      "eval_intent": "realistic_capability",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 48205.5,
+      "avg_score": 1.0,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 6394.5,
+      "avg_score": 1.0,
+      "eval_intent": "runtime_smoke",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "harness_ok": 2,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 9849.5,
+      "avg_score": 1.0,
+      "eval_intent": "runtime_smoke",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 9731.0,
+      "avg_score": 1.0,
+      "eval_intent": "skill_pressure",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "harness_ok": 1,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15376.0,
+      "avg_score": 1.0,
+      "eval_intent": "skill_pressure",
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_grading_mode": [
+    {
+      "total": 16,
+      "passed": 14,
+      "pass_rate": 0.875,
+      "harness_ok": 16,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 20105.5625,
+      "avg_score": 0.9760416666666667,
+      "grading_mode": "deterministic"
+    }
+  ],
+  "by_grading_source": [
+    {
+      "total": 16,
+      "passed": 14,
+      "pass_rate": 0.875,
+      "harness_ok": 16,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 20105.5625,
+      "avg_score": 0.9760416666666667,
+      "grading_source": "deterministic"
+    }
+  ],
+  "kpi": {
+    "intents": [
+      "execution_grade",
+      "realistic_capability"
+    ],
+    "total": 6,
+    "passed": 5,
+    "pass_rate": 0.8333333333333334,
+    "by_harness_and_mode": [
+      {
+        "total": 3,
+        "passed": 2,
+        "pass_rate": 0.6666666666666666,
+        "harness_ok": 3,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 24923.0,
+        "avg_score": 0.9833333333333334,
+        "harness": "claude",
+        "skills_mode": "on"
+      },
+      {
+        "total": 3,
+        "passed": 3,
+        "pass_rate": 1.0,
+        "harness_ok": 3,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 45015.0,
+        "avg_score": 1.0,
+        "harness": "codex",
+        "skills_mode": "on"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "case_id": "gfql_edge_query_filter",
+      "score": 0.6666666666666666,
+      "latency_ms": 11530.0,
+      "source": "/home/lmeyerov/Work/graphistry-skills/benchmarks/data/2026-02-21-phase2-kickoff/quick_alljourneys_on_rows.jsonl"
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "score": 0.95,
+      "latency_ms": 37364.0,
+      "source": "/home/lmeyerov/Work/graphistry-skills/benchmarks/data/2026-02-21-phase2-kickoff/quick_alljourneys_on_rows.jsonl"
+    }
+  ]
+}

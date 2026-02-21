@@ -10,10 +10,18 @@ SKILLS_MODE="off"
 SKILLS_PROFILE="pygraphistry_core"
 CASE_IDS=""
 OUT_DIR=""
+GRADING="deterministic"
+ORACLE_HARNESS="codex"
+ORACLE_MODEL=""
+ORACLE_TIMEOUT_S="120"
+ORACLE_MIN_SCORE_DEFAULT="0.8"
+ORACLE_STRICT="false"
 LOUIE_URL="${LOUIE_URL:-http://localhost:8501}"
 TIMEOUT_S="240"
 CLAUDE_CWD=""
 CODEX_CWD=""
+ORACLE_CLAUDE_CWD=""
+ORACLE_CODEX_CWD=""
 CLAUDE_MODELS=""
 CODEX_MODELS=""
 SKILLS_DELIVERY="native"
@@ -39,10 +47,18 @@ Options:
   --skills-profile X Skills profile name (default: pygraphistry_core)
   --case-ids CSV     Optional case-id filter (rerun only selected cases)
   --out DIR          Output run directory
+  --grading X        deterministic|oracle|hybrid (default: deterministic)
+  --oracle-harness X codex|claude|louie (default: codex)
+  --oracle-model X   Optional oracle model override
+  --oracle-timeout-s N Oracle call timeout seconds (default: 120)
+  --oracle-min-score-default F Default oracle min score (default: 0.8)
+  --oracle-strict    Fail closed if oracle grading errors
   --louie-url URL    Louie base URL (default: http://localhost:8501)
   --timeout-s N      Per-harness timeout seconds (default: 240)
   --claude-cwd DIR   Working directory for claude harness (for native .claude/skills tests)
   --codex-cwd DIR    Working directory for codex harness (for native .codex/skills tests)
+  --oracle-claude-cwd DIR Optional cwd override for oracle claude harness
+  --oracle-codex-cwd DIR Optional cwd override for oracle codex harness
   --claude-models CSV Optional claude model list (e.g., sonnet,opus)
   --codex-models CSV Optional codex model list (e.g., o4-mini,o3)
   --skills-delivery X native|inject|auto (default: native)
@@ -99,6 +115,30 @@ while [[ $# -gt 0 ]]; do
       OUT_DIR="$2"
       shift 2
       ;;
+    --grading)
+      GRADING="$2"
+      shift 2
+      ;;
+    --oracle-harness)
+      ORACLE_HARNESS="$2"
+      shift 2
+      ;;
+    --oracle-model)
+      ORACLE_MODEL="$2"
+      shift 2
+      ;;
+    --oracle-timeout-s)
+      ORACLE_TIMEOUT_S="$2"
+      shift 2
+      ;;
+    --oracle-min-score-default)
+      ORACLE_MIN_SCORE_DEFAULT="$2"
+      shift 2
+      ;;
+    --oracle-strict)
+      ORACLE_STRICT="true"
+      shift
+      ;;
     --louie-url)
       LOUIE_URL="$2"
       shift 2
@@ -113,6 +153,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --codex-cwd)
       CODEX_CWD="$2"
+      shift 2
+      ;;
+    --oracle-claude-cwd)
+      ORACLE_CLAUDE_CWD="$2"
+      shift 2
+      ;;
+    --oracle-codex-cwd)
+      ORACLE_CODEX_CWD="$2"
       shift 2
       ;;
     --claude-models)
@@ -189,11 +237,18 @@ cmd=(
   --skills-mode "$SKILLS_MODE"
   --skills-profile "$SKILLS_PROFILE"
   --case-ids "$CASE_IDS"
+  --grading "$GRADING"
+  --oracle-harness "$ORACLE_HARNESS"
+  --oracle-model "$ORACLE_MODEL"
+  --oracle-timeout-s "$ORACLE_TIMEOUT_S"
+  --oracle-min-score-default "$ORACLE_MIN_SCORE_DEFAULT"
   --louie-url "$LOUIE_URL"
   --timeout-s "$TIMEOUT_S"
   --max-workers "$MAX_WORKERS"
   --claude-cwd "$CLAUDE_CWD"
   --codex-cwd "$CODEX_CWD"
+  --oracle-claude-cwd "$ORACLE_CLAUDE_CWD"
+  --oracle-codex-cwd "$ORACLE_CODEX_CWD"
   --claude-models "$CLAUDE_MODELS"
   --codex-models "$CODEX_MODELS"
   --skills-delivery "$SKILLS_DELIVERY"
@@ -210,6 +265,10 @@ fi
 
 if [[ "$FAILFAST" == "true" ]]; then
   cmd+=(--failfast)
+fi
+
+if [[ "$ORACLE_STRICT" == "true" ]]; then
+  cmd+=(--oracle-strict)
 fi
 
 if [[ -n "$OTEL_ENDPOINT" ]]; then

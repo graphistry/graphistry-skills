@@ -1,0 +1,203 @@
+{
+  "by_eval_intent": {
+    "realistic_capability": {
+      "avg_latency_ms": 35161,
+      "avg_score": 0.9761904761904762,
+      "eval_intent": "realistic_capability",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 10,
+      "total": 12
+    }
+  },
+  "by_grading_mode": {
+    "deterministic": {
+      "avg_latency_ms": 35161,
+      "avg_score": 0.9761904761904762,
+      "grading_mode": "deterministic",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 10,
+      "total": 12
+    }
+  },
+  "by_grading_source": {
+    "deterministic": {
+      "avg_latency_ms": 35161,
+      "avg_score": 0.9761904761904762,
+      "grading_source": "deterministic",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 10,
+      "total": 12
+    }
+  },
+  "by_harness": {
+    "claude": {
+      "avg_latency_ms": 17193,
+      "avg_score": 1.0,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6
+    },
+    "codex": {
+      "avg_latency_ms": 53128,
+      "avg_score": 0.9523809523809524,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.6666666666666666,
+      "passed": 4,
+      "total": 6
+    }
+  },
+  "by_harness_and_mode": {
+    "claude::off": {
+      "avg_latency_ms": 15374,
+      "avg_score": 1.0,
+      "harness": "claude",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 3,
+      "skills_mode": "off",
+      "total": 3
+    },
+    "claude::on": {
+      "avg_latency_ms": 19013,
+      "avg_score": 1.0,
+      "harness": "claude",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 3,
+      "skills_mode": "on",
+      "total": 3
+    },
+    "codex::off": {
+      "avg_latency_ms": 69657,
+      "avg_score": 0.9523809523809524,
+      "harness": "codex",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.6666666666666666,
+      "passed": 2,
+      "skills_mode": "off",
+      "total": 3
+    },
+    "codex::on": {
+      "avg_latency_ms": 36599,
+      "avg_score": 0.9523809523809524,
+      "harness": "codex",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.6666666666666666,
+      "passed": 2,
+      "skills_mode": "on",
+      "total": 3
+    }
+  },
+  "by_harness_and_model": {
+    "claude::default": {
+      "avg_latency_ms": 17193,
+      "avg_score": 1.0,
+      "harness": "claude",
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6
+    },
+    "codex::default": {
+      "avg_latency_ms": 53128,
+      "avg_score": 0.9523809523809524,
+      "harness": "codex",
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.6666666666666666,
+      "passed": 4,
+      "total": 6
+    }
+  },
+  "by_harness_model_and_mode": {
+    "claude::default::off": {
+      "avg_latency_ms": 15374,
+      "avg_score": 1.0,
+      "harness": "claude",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 1.0,
+      "passed": 3,
+      "skills_mode": "off",
+      "total": 3
+    },
+    "claude::default::on": {
+      "avg_latency_ms": 19013,
+      "avg_score": 1.0,
+      "harness": "claude",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 1.0,
+      "passed": 3,
+      "skills_mode": "on",
+      "total": 3
+    },
+    "codex::default::off": {
+      "avg_latency_ms": 69657,
+      "avg_score": 0.9523809523809524,
+      "harness": "codex",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.6666666666666666,
+      "passed": 2,
+      "skills_mode": "off",
+      "total": 3
+    },
+    "codex::default::on": {
+      "avg_latency_ms": 36599,
+      "avg_score": 0.9523809523809524,
+      "harness": "codex",
+      "harness_ok": 3,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.6666666666666666,
+      "passed": 2,
+      "skills_mode": "on",
+      "total": 3
+    }
+  },
+  "by_skills_mode": {
+    "off": {
+      "avg_latency_ms": 42516,
+      "avg_score": 0.9761904761904762,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 5,
+      "total": 6
+    },
+    "on": {
+      "avg_latency_ms": 27806,
+      "avg_score": 0.9761904761904762,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 5,
+      "total": 6
+    }
+  },
+  "harness_ok_rate": 1.0,
+  "harness_ok_rows": 12,
+  "overall_pass_rate": 0.8333333333333334,
+  "passed_rows": 10,
+  "total_rows": 12
+}

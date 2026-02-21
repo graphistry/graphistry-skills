@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 import sys
+import textwrap
 import time
 import uuid
 from pathlib import Path
@@ -58,6 +59,40 @@ def load_json(path: Path) -> Any:
 
 def parse_csv(value: str) -> list[str]:
     return [p.strip() for p in value.split(",") if p.strip()]
+
+
+def parse_float(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None:
+            return default
+        if isinstance(value, (int, float)):
+            return float(value)
+        return float(str(value).strip())
+    except Exception:
+        return default
+
+
+def parse_bool(value: Any, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+    return default
+
+
+def truncate_text(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    return text[: max(0, limit - 3)] + "..."
+
+
+def maybe_json_dumps(payload: Any) -> str:
+    try:
+        return json.dumps(payload, sort_keys=True)
+    except Exception:
+        return "{}"
 
 
 def variant_key(harness: str, model: str = "") -> str:
@@ -211,7 +246,8 @@ def spawn_codex_home_instance(
     instance_id: str,
 ) -> str:
     base = Path(base_codex_home)
-    suffix = re.sub(r"[^A-Za-z0-9._-]", "_", instance_id)[:48] or uuid.uuid4().hex[:12]
+    slug = re.sub(r"[^A-Za-z0-9._-]", "_", instance_id)[:24] or "instance"
+    suffix = f"{slug}-{uuid.uuid4().hex[:12]}"
     target = out_dir / "codex_home_instances" / f"{mode}-{suffix}"
     target.mkdir(parents=True, exist_ok=True)
 
@@ -471,6 +507,208 @@ def run_harness(
     return payload
 
 
+def extract_json_object(text: str) -> dict[str, Any] | None:
+    candidates: list[str] = []
+    raw = text.strip()
+    if raw:
+        candidates.append(raw)
+
+    for match in re.finditer(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.IGNORECASE | re.DOTALL):
+        block = match.group(1).strip()
+        if block:
+            candidates.append(block)
+
+    # Fallback: try the first balanced {...} object.
+    start = text.find("{")
+    while start != -1:
+        depth = 0
+        for i in range(start, len(text)):
+            ch = text[i]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    blob = text[start : i + 1].strip()
+                    if blob:
+                        candidates.append(blob)
+                    start = -1
+                    break
+        if start == -1:
+            break
+        start = text.find("{", start + 1)
+
+    seen: set[str] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            continue
+    return None
+
+
+def normalize_oracle_cfg(case: dict[str, Any], default_min_score: float = 0.8) -> dict[str, Any]:
+    raw = case.get("oracle")
+    if isinstance(raw, bool):
+        return {"enabled": raw}
+    if not isinstance(raw, dict):
+        return {"enabled": False}
+    return {
+        "enabled": parse_bool(raw.get("enabled"), default=True),
+        "min_score": max(0.0, min(1.0, parse_float(raw.get("min_score"), default=default_min_score))),
+        "reference_answer": str(raw.get("reference_answer") or "").strip(),
+        "rubric": raw.get("rubric"),
+        "required_concepts": [str(v) for v in (raw.get("required_concepts") or []) if str(v).strip()],
+        "forbidden_concepts": [str(v) for v in (raw.get("forbidden_concepts") or []) if str(v).strip()],
+    }
+
+
+def grade_response_oracle(
+    *,
+    eval_prompt: str,
+    response_text: str,
+    checks: dict[str, Any],
+    oracle_cfg: dict[str, Any],
+    out_dir: Path,
+    timeout_s: int,
+    louie_url: str,
+    harness: str,
+    model: str,
+    harness_cwd: str,
+    harness_env: dict[str, str] | None,
+) -> dict[str, Any]:
+    min_score = max(0.0, min(1.0, parse_float(oracle_cfg.get("min_score"), default=0.8)))
+    rubric_raw = oracle_cfg.get("rubric")
+    if isinstance(rubric_raw, list):
+        rubric = "\n".join(f"- {str(x)}" for x in rubric_raw if str(x).strip())
+    else:
+        rubric = str(rubric_raw or "").strip()
+
+    required_concepts = [str(v) for v in (oracle_cfg.get("required_concepts") or []) if str(v).strip()]
+    forbidden_concepts = [str(v) for v in (oracle_cfg.get("forbidden_concepts") or []) if str(v).strip()]
+    reference_answer = str(oracle_cfg.get("reference_answer") or "").strip()
+
+    judge_prompt = textwrap.dedent(
+        f"""
+        You are a strict evaluator for an LLM benchmark case.
+        Judge if the candidate response satisfies the task intent and checks.
+        Return ONLY one JSON object with keys:
+        - pass (boolean)
+        - score (number 0..1)
+        - reasons (array of short strings)
+        - matched (array of short strings)
+        - missed (array of short strings)
+        - unsafe (array of short strings)
+
+        Apply this threshold: pass should be true only when score >= {min_score:.2f}.
+        Penalize hallucinations, unsafe credential handling, and missing required steps.
+
+        [EVAL_PROMPT]
+        {truncate_text(eval_prompt, 2400)}
+        [/EVAL_PROMPT]
+
+        [DETERMINISTIC_CHECKS_JSON]
+        {truncate_text(maybe_json_dumps(checks), 2000)}
+        [/DETERMINISTIC_CHECKS_JSON]
+
+        [REFERENCE_ANSWER]
+        {truncate_text(reference_answer, 2400)}
+        [/REFERENCE_ANSWER]
+
+        [RUBRIC]
+        {truncate_text(rubric, 2000)}
+        [/RUBRIC]
+
+        [REQUIRED_CONCEPTS]
+        {truncate_text(maybe_json_dumps(required_concepts), 1000)}
+        [/REQUIRED_CONCEPTS]
+
+        [FORBIDDEN_CONCEPTS]
+        {truncate_text(maybe_json_dumps(forbidden_concepts), 1000)}
+        [/FORBIDDEN_CONCEPTS]
+
+        [CANDIDATE_RESPONSE]
+        {truncate_text(response_text, 8000)}
+        [/CANDIDATE_RESPONSE]
+        """
+    ).strip()
+
+    traceparent, trace_id = make_traceparent()
+    result = run_harness(
+        harness=harness,
+        prompt=judge_prompt,
+        out_dir=out_dir,
+        traceparent=traceparent,
+        timeout_s=max(20, timeout_s),
+        louie_url=louie_url,
+        skills_text="",
+        model=model,
+        harness_cwd=harness_cwd,
+        harness_env=harness_env,
+    )
+
+    response_raw = str(result.get("response_text") or "")
+    parsed = extract_json_object(response_raw)
+    if not bool(result.get("ok")):
+        return {
+            "attempted": True,
+            "ok": False,
+            "error": str(result.get("error") or "oracle_harness_failed"),
+            "trace_id": trace_id,
+            "harness": harness,
+            "model": model if model else "default",
+            "latency_ms": int(result.get("latency_ms") or 0),
+            "raw_ref": result.get("raw_ref"),
+            "response_tail": response_raw[-1500:],
+        }
+
+    if not isinstance(parsed, dict):
+        return {
+            "attempted": True,
+            "ok": False,
+            "error": "oracle_parse_failed",
+            "trace_id": trace_id,
+            "harness": harness,
+            "model": model if model else "default",
+            "latency_ms": int(result.get("latency_ms") or 0),
+            "raw_ref": result.get("raw_ref"),
+            "response_tail": response_raw[-1500:],
+        }
+
+    score = max(0.0, min(1.0, parse_float(parsed.get("score"), default=0.0)))
+    pass_claim = parsed.get("pass")
+    pass_bool = parse_bool(pass_claim, default=(score >= min_score))
+    if score < min_score:
+        pass_bool = False
+
+    return {
+        "attempted": True,
+        "ok": True,
+        "pass_bool": pass_bool,
+        "score": score,
+        "threshold": min_score,
+        "trace_id": trace_id,
+        "harness": harness,
+        "model": model if model else "default",
+        "latency_ms": int(result.get("latency_ms") or 0),
+        "raw_ref": result.get("raw_ref"),
+        "parsed": {
+            "pass": parsed.get("pass"),
+            "score": parsed.get("score"),
+            "reasons": parsed.get("reasons"),
+            "matched": parsed.get("matched"),
+            "missed": parsed.get("missed"),
+            "unsafe": parsed.get("unsafe"),
+        },
+        "response_tail": response_raw[-1500:],
+    }
+
+
 def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, float, dict[str, Any]]:
     details: dict[str, Any] = {
         "must_contain": [],
@@ -726,12 +964,16 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     by_harness_and_mode: dict[str, dict[str, Any]] = {}
     by_harness_model_and_mode: dict[str, dict[str, Any]] = {}
     by_eval_intent: dict[str, dict[str, Any]] = {}
+    by_grading_mode: dict[str, dict[str, Any]] = {}
+    by_grading_source: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         harness = str(row.get("harness"))
         model = str(row.get("model") or "")
         skills_mode = str(row.get("skills_mode"))
         eval_intent = str(row.get("eval_intent") or "unspecified")
+        grading_mode = str(row.get("grading_mode") or "deterministic")
+        grading_source = str(row.get("grading_source") or "deterministic")
 
         if harness not in by_harness:
             by_harness[harness] = {
@@ -754,6 +996,26 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         if eval_intent not in by_eval_intent:
             by_eval_intent[eval_intent] = {
                 "eval_intent": eval_intent,
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
+        if grading_mode not in by_grading_mode:
+            by_grading_mode[grading_mode] = {
+                "grading_mode": grading_mode,
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
+        if grading_source not in by_grading_source:
+            by_grading_source[grading_source] = {
+                "grading_source": grading_source,
                 "total": 0,
                 "passed": 0,
                 "scores": [],
@@ -825,6 +1087,24 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         bucket_intent["scores"].append(float(row.get("score", 0.0)))
         bucket_intent["latency_ms"].append(int(row.get("latency_ms", 0)))
 
+        bucket_grading_mode = by_grading_mode[grading_mode]
+        bucket_grading_mode["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_grading_mode["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_grading_mode["harness_ok"] += 1
+        bucket_grading_mode["scores"].append(float(row.get("score", 0.0)))
+        bucket_grading_mode["latency_ms"].append(int(row.get("latency_ms", 0)))
+
+        bucket_grading_source = by_grading_source[grading_source]
+        bucket_grading_source["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_grading_source["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_grading_source["harness_ok"] += 1
+        bucket_grading_source["scores"].append(float(row.get("score", 0.0)))
+        bucket_grading_source["latency_ms"].append(int(row.get("latency_ms", 0)))
+
         bucket_hm_model = by_harness_and_model[harness_model_key]
         bucket_hm_model["total"] += 1
         if bool(row.get("pass_bool")):
@@ -879,6 +1159,12 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for bucket in by_eval_intent.values():
         finalize_bucket(bucket)
 
+    for bucket in by_grading_mode.values():
+        finalize_bucket(bucket)
+
+    for bucket in by_grading_source.values():
+        finalize_bucket(bucket)
+
     total_all = len(rows)
     passed_all = sum(1 for row in rows if bool(row.get("pass_bool")))
     harness_ok_all = sum(1 for row in rows if bool(row.get("harness_ok")))
@@ -895,6 +1181,8 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "by_harness_and_mode": by_harness_and_mode,
         "by_harness_model_and_mode": by_harness_model_and_mode,
         "by_eval_intent": by_eval_intent,
+        "by_grading_mode": by_grading_mode,
+        "by_grading_source": by_grading_source,
     }
 
 
@@ -907,6 +1195,30 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skills-mode", default="off", help="on|off|both|CSV")
     parser.add_argument("--skills-profile", default="pygraphistry_core", help="Skills profile name or CSV of skill names")
     parser.add_argument("--skills-profiles-file", default=str(DEFAULT_SKILLS_PROFILES), help="Skills profiles JSON")
+    parser.add_argument(
+        "--grading",
+        default="deterministic",
+        choices=["deterministic", "oracle", "hybrid"],
+        help="How to score cases: deterministic checks, oracle LLM judge, or hybrid",
+    )
+    parser.add_argument(
+        "--oracle-harness",
+        default="codex",
+        help="Harness for oracle grading when --grading=oracle|hybrid",
+    )
+    parser.add_argument("--oracle-model", default="", help="Model override for oracle harness (optional)")
+    parser.add_argument("--oracle-timeout-s", type=int, default=120, help="Timeout per oracle grading call")
+    parser.add_argument(
+        "--oracle-min-score-default",
+        type=float,
+        default=0.8,
+        help="Default oracle score threshold when case.oracle.min_score is not set",
+    )
+    parser.add_argument(
+        "--oracle-strict",
+        action="store_true",
+        help="Fail closed when oracle grading errors; default is fail-open to deterministic",
+    )
     parser.add_argument("--out", default="", help="Output run directory")
     parser.add_argument("--otel", action="store_true", help="Emit OTel lifecycle logs")
     parser.add_argument("--failfast", action="store_true", help="Fail fast per harness after first harness error; includes Louie preflight")
@@ -915,6 +1227,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--louie-url", default=os.environ.get("LOUIE_URL", "http://localhost:8501"), help="Louie server URL")
     parser.add_argument("--claude-cwd", default="", help="Working directory for claude harness (for native .claude/skills env tests)")
     parser.add_argument("--codex-cwd", default="", help="Working directory for codex harness (for native .codex/skills env tests)")
+    parser.add_argument("--oracle-claude-cwd", default="", help="Optional override cwd for oracle claude harness")
+    parser.add_argument("--oracle-codex-cwd", default="", help="Optional override cwd for oracle codex harness")
     parser.add_argument("--claude-models", default="", help="CSV model list for claude harness (optional)")
     parser.add_argument("--codex-models", default="", help="CSV model list for codex harness (optional)")
     parser.add_argument(
@@ -934,6 +1248,11 @@ def main() -> int:
     harnesses = parse_csv(args.harnesses)
     if not harnesses:
         raise ValueError("At least one harness is required")
+    if args.oracle_harness and args.oracle_harness not in {"codex", "claude", "louie"}:
+        raise ValueError(f"Invalid --oracle-harness: {args.oracle_harness}")
+
+    args.oracle_min_score_default = max(0.0, min(1.0, float(args.oracle_min_score_default)))
+
     harness_variants = resolve_harness_variants(
         harnesses=harnesses,
         claude_models_csv=args.claude_models,
@@ -1005,6 +1324,12 @@ def main() -> int:
         "skills_mode": modes,
         "skills_profile": profile_name,
         "skills": {mode: cfg.get("skills_manifest", []) for mode, cfg in skill_configs.items()},
+        "grading": args.grading,
+        "oracle_harness": args.oracle_harness,
+        "oracle_model": args.oracle_model if args.oracle_model else "default",
+        "oracle_timeout_s": args.oracle_timeout_s,
+        "oracle_min_score_default": args.oracle_min_score_default,
+        "oracle_strict": bool(args.oracle_strict),
         "otel_enabled": bool(args.otel),
         "failfast": bool(args.failfast),
         "otel_service": args.otel_service,
@@ -1012,6 +1337,8 @@ def main() -> int:
         "louie_url": args.louie_url,
         "claude_cwd": args.claude_cwd,
         "codex_cwd": args.codex_cwd,
+        "oracle_claude_cwd": args.oracle_claude_cwd,
+        "oracle_codex_cwd": args.oracle_codex_cwd,
         "claude_models": parse_csv(args.claude_models),
         "codex_models": parse_csv(args.codex_models),
         "skills_delivery": args.skills_delivery,
@@ -1021,8 +1348,13 @@ def main() -> int:
 
     native_envs: dict[str, dict[str, str]] = {mode: {} for mode in modes}
     codex_homes: dict[str, str] = {}
+    env_harnesses = list(harnesses)
+    if args.grading in {"oracle", "hybrid"} and args.oracle_harness in {"claude", "codex"}:
+        if args.oracle_harness not in env_harnesses:
+            env_harnesses.append(args.oracle_harness)
+
     for mode in modes:
-        for h in harnesses:
+        for h in env_harnesses:
             if h in {"claude", "codex"}:
                 native_envs[mode][h] = prepare_native_skill_env(
                     out_dir=out_dir,
@@ -1223,7 +1555,105 @@ def main() -> int:
                             )
 
                         response_text = str(result.get("response_text") or "")
-                        pass_bool, score, breakdown = grade_response(response_text, checks)
+                        det_pass_bool, det_score, det_breakdown = grade_response(response_text, checks)
+
+                        oracle_cfg = normalize_oracle_cfg(case, default_min_score=args.oracle_min_score_default)
+                        oracle_requested = args.grading in {"oracle", "hybrid"} and bool(oracle_cfg.get("enabled"))
+                        oracle_grade: dict[str, Any] = {"attempted": False, "ok": False}
+
+                        if oracle_requested:
+                            oracle_harness = args.oracle_harness
+                            oracle_model = args.oracle_model
+                            oracle_cwd = ""
+                            oracle_env: dict[str, str] = {}
+                            if oracle_harness == "claude":
+                                oracle_cwd = args.oracle_claude_cwd or args.claude_cwd
+                                if not oracle_cwd:
+                                    oracle_cwd = native_envs.get(mode, {}).get("claude", "")
+                            elif oracle_harness == "codex":
+                                oracle_cwd = args.oracle_codex_cwd or args.codex_cwd
+                                if not oracle_cwd:
+                                    oracle_cwd = native_envs.get(mode, {}).get("codex", "")
+                                codex_home_base = codex_homes.get(mode, "")
+                                if codex_home_base:
+                                    codex_home = codex_home_base
+                                    if max_workers > 1:
+                                        codex_home = spawn_codex_home_instance(
+                                            base_codex_home=codex_home_base,
+                                            out_dir=out_dir,
+                                            mode=mode,
+                                            instance_id=(
+                                                f"{journey_id}-{case_id}-oracle-{harness}-{harness_idx}-"
+                                                f"{uuid.uuid4().hex[:8]}"
+                                            ),
+                                        )
+                                    oracle_env["CODEX_HOME"] = codex_home
+
+                            oracle_grade = grade_response_oracle(
+                                eval_prompt=prompt,
+                                response_text=response_text,
+                                checks=checks,
+                                oracle_cfg=oracle_cfg,
+                                out_dir=out_dir,
+                                timeout_s=args.oracle_timeout_s,
+                                louie_url=args.louie_url,
+                                harness=oracle_harness,
+                                model=oracle_model,
+                                harness_cwd=oracle_cwd,
+                                harness_env=oracle_env,
+                            )
+
+                        pass_bool = det_pass_bool
+                        score = det_score
+                        grading_source = "deterministic"
+                        breakdown: dict[str, Any] = {
+                            "deterministic": det_breakdown,
+                        }
+
+                        if args.grading == "oracle":
+                            if oracle_requested and oracle_grade.get("ok"):
+                                pass_bool = bool(oracle_grade.get("pass_bool"))
+                                score = parse_float(oracle_grade.get("score"), default=0.0)
+                                grading_source = "oracle"
+                                breakdown["oracle"] = oracle_grade
+                            elif oracle_requested:
+                                breakdown["oracle"] = oracle_grade
+                                breakdown["oracle_error"] = str(
+                                    oracle_grade.get("error") or "oracle_unavailable"
+                                )
+                                if args.oracle_strict:
+                                    pass_bool = False
+                                    score = 0.0
+                                    grading_source = "oracle_strict_error"
+                                else:
+                                    grading_source = "deterministic_fallback"
+
+                        elif args.grading == "hybrid":
+                            if oracle_requested and oracle_grade.get("ok"):
+                                oracle_pass = bool(oracle_grade.get("pass_bool"))
+                                oracle_score = parse_float(oracle_grade.get("score"), default=0.0)
+                                pass_bool = bool(det_pass_bool and oracle_pass)
+                                score = max(0.0, min(1.0, (det_score + oracle_score) / 2.0))
+                                grading_source = "hybrid"
+                                breakdown["oracle"] = oracle_grade
+                                breakdown["hybrid"] = {
+                                    "rule": "deterministic_and_oracle",
+                                    "deterministic_pass": bool(det_pass_bool),
+                                    "oracle_pass": oracle_pass,
+                                    "deterministic_score": det_score,
+                                    "oracle_score": oracle_score,
+                                }
+                            elif oracle_requested:
+                                breakdown["oracle"] = oracle_grade
+                                breakdown["oracle_error"] = str(
+                                    oracle_grade.get("error") or "oracle_unavailable"
+                                )
+                                if args.oracle_strict:
+                                    pass_bool = False
+                                    score = 0.0
+                                    grading_source = "hybrid_strict_error"
+                                else:
+                                    grading_source = "deterministic_fallback"
 
                         row = {
                             "run_id": run_id,
@@ -1244,6 +1674,27 @@ def main() -> int:
                             "response_text": response_text,
                             "pass_bool": pass_bool,
                             "score": score,
+                            "grading_mode": args.grading,
+                            "grading_source": grading_source,
+                            "deterministic_pass_bool": det_pass_bool,
+                            "deterministic_score": det_score,
+                            "oracle_requested": oracle_requested,
+                            "oracle_attempted": bool(oracle_grade.get("attempted", False)),
+                            "oracle_ok": bool(oracle_grade.get("ok", False)),
+                            "oracle_pass_bool": (
+                                bool(oracle_grade.get("pass_bool"))
+                                if isinstance(oracle_grade.get("pass_bool"), bool)
+                                else None
+                            ),
+                            "oracle_score": (
+                                parse_float(oracle_grade.get("score"), default=0.0)
+                                if oracle_grade.get("score") is not None
+                                else None
+                            ),
+                            "oracle_error": oracle_grade.get("error"),
+                            "oracle_harness": oracle_grade.get("harness"),
+                            "oracle_model": oracle_grade.get("model"),
+                            "oracle_trace_id": oracle_grade.get("trace_id"),
                             "check_breakdown": breakdown,
                             "latency_ms": int(result.get("latency_ms") or 0),
                             "raw_ref": result.get("raw_ref"),
@@ -1273,6 +1724,9 @@ def main() -> int:
                                 "agent_eval.outcome": "pass" if pass_bool else "fail",
                                 "agent_eval.score": f"{score:.3f}",
                                 "agent_eval.latency_ms": row["latency_ms"],
+                                "agent_eval.grading_mode": args.grading,
+                                "agent_eval.grading_source": grading_source,
+                                "agent_eval.oracle_ok": row["oracle_ok"],
                                 "agent_eval.trace_id": trace_id,
                             },
                             service=args.otel_service,

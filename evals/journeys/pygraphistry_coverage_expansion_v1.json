@@ -1,0 +1,73 @@
+{
+  "id": "pygraphistry_coverage_expansion_v1",
+  "description": "Coverage-focused persona scenarios to close underrepresented dimensions (analyst, social-media, connectors, generic domain, and explicit end-to-end workflows).",
+  "eval_intent": "realistic_capability",
+  "tags": ["pygraphistry", "coverage", "persona", "quality"],
+  "cases": [
+    {
+      "id": "coverage_analyst_social_claim_reuse",
+      "coverage": {
+        "persona": "analyst",
+        "domain": "social-media",
+        "task_family": "shaping_viz",
+        "input_level": "raw_table",
+        "output_depth": "workflow"
+      },
+      "prompt": "An analyst is investigating coordinated social-media claim reuse. Provide one concise Python workflow from a posts table to a share-safe graph: normalize claim text into a key, compute claim reuse counts, shape edges+nodes for users and claims, style by reuse risk, and call plot(render=False).",
+      "checks": {
+        "regex": [
+          "(claim_text|claim_key|claim)",
+          "(groupby\\(|value_counts\\()",
+          "edges\\(",
+          "\\.nodes\\(",
+          "(encode_(point|edge)_color|pointColor|edgeColor|palette)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "max_lines": 110
+      }
+    },
+    {
+      "id": "coverage_analyst_connector_triage",
+      "coverage": {
+        "persona": "analyst",
+        "domain": "platform",
+        "task_family": "connectors",
+        "input_level": "conceptual",
+        "output_depth": "snippet"
+      },
+      "prompt": "Provide a compact connector triage snippet for an analyst using Neo4j or Splunk data with a dataframe fallback: mention connector choice, shape with edges(...).nodes(...), set private or organization privacy, and produce plot(render=False).",
+      "checks": {
+        "regex": [
+          "(?i)(neo4j|splunk|connector)",
+          "(?i)dataframe",
+          "edges\\(",
+          "\\.nodes\\(",
+          "privacy\\(mode\\s*=\\s*(['\\\"](private|organization)['\\\"]|[A-Za-z_][A-Za-z0-9_]*)\\)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "max_lines": 70
+      }
+    },
+    {
+      "id": "coverage_generic_end_to_end_workflow",
+      "coverage": {
+        "persona": "analyst",
+        "domain": "generic",
+        "task_family": "ingest_etl",
+        "input_level": "raw_table",
+        "output_depth": "e2e_workflow"
+      },
+      "prompt": "For a non-fraud, non-cyber operations dataset, provide an end-to-end Python workflow from raw tabular records to a Graphistry visualization: include ingest, light ETL shaping, edges+nodes binding, one metric enrichment, and plot(render=False). Keep it concise.",
+      "checks": {
+        "regex": [
+          "pd\\.(read_csv|DataFrame)\\(",
+          "edges\\(",
+          "\\.nodes\\(",
+          "(groupby\\(|value_counts\\(|degree)",
+          "plot\\(render\\s*=\\s*False\\)"
+        ],
+        "max_lines": 90
+      }
+    }
+  ]
+}
