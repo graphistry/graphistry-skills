@@ -47,6 +47,7 @@ export GRAPHISTRY_SERVER="hub.graphistry.com"
 export GRAPHISTRY_PROTOCOL="https"
 
 claude -p \
+  --model opus \
   --permission-mode bypassPermissions \
   --tools Bash \
   "Write and run a minimal Python script that:
@@ -56,6 +57,12 @@ claude -p \
   - builds graphistry.edges(...).nodes(...)
   - calls plot(render=False)
   Return only the final live visualization URL."
+```
+
+Sample output (validated on `2026-02-21`, `model=opus`, runtime `~35.4s`):
+
+```text
+https://hub.graphistry.com/graph/graph.html?dataset=ae5fa55ad196484ba497c1f34b3beaf2&type=arrow&viztoken=fbad826d-6ea3-4d7b-84c1-bf94de52146e&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771658593&info=true
 ```
 
 ## Docs
