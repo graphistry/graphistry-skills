@@ -50,19 +50,13 @@ claude -p \
   --model opus \
   --permission-mode bypassPermissions \
   --tools Bash \
-  "Write and run a minimal Python script that:
-  - imports pandas and graphistry
-  - calls graphistry.register(api=3) using GRAPHISTRY_* env vars
-  - creates tiny edges/nodes tables with src,dst,id,type
-  - builds graphistry.edges(...).nodes(...)
-  - calls plot(render=False)
-  Return only the final live visualization URL."
+  "Using Bash tool calls, create and run a tiny PyGraphistry cyber hunt demo (5-10 rows) with realistic devices/users/processes/ips/domains and event edges, include node and edge type fields, style with icons plus risk coloring, set graphistry.privacy(mode='public', notify=False), call plot(render=False), and print only the final live URL."
 ```
 
-Sample output (validated on `2026-02-21`, `model=opus`, runtime `~35.4s`):
+Sample output (validated on `2026-02-21`, `model=opus`, runtime `~65.7s`):
 
 ```text
-https://hub.graphistry.com/graph/graph.html?dataset=ae5fa55ad196484ba497c1f34b3beaf2&type=arrow&viztoken=fbad826d-6ea3-4d7b-84c1-bf94de52146e&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771658593&info=true
+https://hub.graphistry.com/graph/graph.html?dataset=b70ec48e8e444ebcad0219fd41805a17&type=arrow&viztoken=d71dcdf3-041a-4d03-8862-4f44364131c3&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771659004&info=true&pointSize=0.8&edgeCurvature=0.2
 ```
 
 ## Docs
