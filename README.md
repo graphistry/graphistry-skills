@@ -50,13 +50,13 @@ claude -p \
   --model opus \
   --permission-mode bypassPermissions \
   --tools Bash \
-  "Using Bash tool calls, create and run a tiny PyGraphistry cyber hunt demo (5-10 rows) with realistic devices/users/processes/ips/domains and event edges, include node and edge type fields, style with icons plus risk coloring, set graphistry.privacy(mode='public', notify=False), call plot(render=False), and print only the final live URL."
+  "Using Bash tool calls, run (without creating files) a tiny PyGraphistry cyber hunt demo (5-10 rows) with realistic devices/users/processes/ips/domains and event entities that include explicit event_time timestamps, include node and edge type fields, style with icons plus risk coloring, set graphistry.privacy(mode='public', notify=False), call plot(render=False), and print only the final live URL."
 ```
 
-Sample output (validated on `2026-02-21`, `model=opus`, runtime `~65.7s`):
+Sample output (validated on `2026-02-21`, `model=opus`, runtime `~68.2s`):
 
 ```text
-https://hub.graphistry.com/graph/graph.html?dataset=b70ec48e8e444ebcad0219fd41805a17&type=arrow&viztoken=d71dcdf3-041a-4d03-8862-4f44364131c3&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771659004&info=true&pointSize=0.8&edgeCurvature=0.2
+https://hub.graphistry.com/graph/graph.html?dataset=17743ba9ff3549729fdb4d9c1c071bbc&type=arrow&viztoken=e968954a-c0e5-4206-85a6-3d950817a6d4&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771659185&info=true
 ```
 
 ## Docs
