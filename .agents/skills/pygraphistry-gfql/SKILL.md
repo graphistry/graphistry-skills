@@ -34,13 +34,14 @@ g2 = g.gfql([e_forward(min_hops=2, max_hops=4, output_min_hops=3, output_max_hop
 ```
 
 ## High-value patterns
-- When user asks for GFQL, prefer explicit `.gfql([...])` examples; mention `chain()` only as an alternate traversal helper.
+- When user explicitly asks for GFQL (or says `gfql`), final snippets must include explicit `.gfql([...])`; do not substitute `chain()`/`hop()` as the primary answer.
+- Only show `chain()`/`hop()` when the user explicitly asks for that shorthand; otherwise keep snippets in `.gfql([...])` form.
 - Use `name=` labels for intermediate matches when you need constraints.
 - Use `where=[...]` for cross-step/path constraints.
 - Use `min_hops`/`max_hops` and `output_min_hops`/`output_max_hops` for traversal vs returned slice.
 - Use predicates (`is_in`, numeric/date predicates) for concise filtering.
 - Use `engine='auto'` by default; force `cudf`/`pandas` only when needed.
-- For neighborhood-mining tasks without full pattern logic, consider `hop()` / `chain()` first.
+- For neighborhood-mining tasks without full pattern logic, mention `hop()` / `chain()` as optional alternates after providing the primary `.gfql([...])` answer.
 
 ## Remote mode
 ```python

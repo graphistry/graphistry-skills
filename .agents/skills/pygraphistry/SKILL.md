@@ -17,6 +17,7 @@ Use this skill as a dispatcher to specialized skills.
 ## Default Safety Rules
 - Read credentials from environment variables; do not hardcode secrets in tracked files.
 - Prefer `api=3` for modern features.
+- Prefer a plain `type` column on both nodes and edges for legend/category defaults.
 - Set explicit privacy mode before sharing links for sensitive data.
 - For large graphs, reduce columns/rows before upload and visualize focused subgraphs first.
 
