@@ -17,15 +17,6 @@ npx skills add graphistry/graphistry-skills \
   --yes
 ```
 
-## Skill Pack
-
-- `pygraphistry`
-- `pygraphistry-core`
-- `pygraphistry-gfql`
-- `pygraphistry-visualization`
-- `pygraphistry-ai`
-- `pygraphistry-connectors`
-
 ## Evals
 
 These skills are regularly evaluated and tuned against standard PyGraphistry user journeys (baseline vs skills, multiple runtimes/models).
