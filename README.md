@@ -66,10 +66,16 @@ Compare model tiers within a runtime:
 
 ```text
 .agents/skills/<skill>/SKILL.md
+benchmarks/
 evals/journeys/*.json
 scripts/agent_eval_loop.py
 bin/agent.sh
 ```
+
+## Benchmarks
+
+- Latest checked-in benchmark report: `benchmarks/reports/2026-02-20-clean-rerun.md`
+- Latest checked-in benchmark data: `benchmarks/data/2026-02-20-clean-rerun`
 
 ## Notes
 
