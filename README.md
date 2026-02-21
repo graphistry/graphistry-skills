@@ -58,7 +58,7 @@ Current checked-in benchmark pack shows skills improving success rates and speed
 - Codex `skills=on`: `13/13` pass, avg `41.8s`
 - Codex `skills=off`: `10/13` pass, avg `65.8s`
 
-See [benchmarks/reports/2026-02-20-clean-rerun.md](benchmarks/reports/2026-02-20-clean-rerun.md) for details.
+See [benchmarks/reports/2026-02-21-phase2-combined.md](benchmarks/reports/2026-02-21-phase2-combined.md) for details.
 
 ## Docs
 
@@ -68,5 +68,6 @@ See [benchmarks/reports/2026-02-20-clean-rerun.md](benchmarks/reports/2026-02-20
 - [Code of conduct](CODE_OF_CONDUCT.md)
 - [License](LICENSE)
 - [Report generator](scripts/benchmarks/make_report.py)
+- [Scenario coverage audit tool](scripts/benchmarks/scenario_coverage_audit.py)
 - [Benchmark artifact structure](benchmarks/README.md)
-- [Latest checked-in benchmark report](benchmarks/reports/2026-02-20-clean-rerun.md)
+- [Latest checked-in benchmark report](benchmarks/reports/2026-02-21-phase2-combined.md)

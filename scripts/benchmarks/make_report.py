@@ -158,6 +158,8 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
     harness_model_mode = group_metrics(rows, ["harness", "model", "skills_mode"])
     eval_intent_mode = group_metrics(rows, ["eval_intent", "harness", "skills_mode"])
     by_eval_intent = group_metrics(rows, ["eval_intent"])
+    by_grading_mode = group_metrics(rows, ["grading_mode"])
+    by_grading_source = group_metrics(rows, ["grading_source"])
 
     kpi_intents = {"realistic_capability", "execution_grade"}
     kpi_rows = [r for r in rows if eval_intent_name(r) in kpi_intents]
@@ -206,6 +208,8 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
         "by_harness_model_and_mode": harness_model_mode,
         "by_eval_intent": by_eval_intent,
         "by_eval_intent_harness_and_mode": eval_intent_mode,
+        "by_grading_mode": by_grading_mode,
+        "by_grading_source": by_grading_source,
         "kpi": {
             "intents": sorted(kpi_intents),
             "total": kpi_total,
@@ -245,6 +249,38 @@ def build_markdown(title: str, metrics: dict[str, Any]) -> str:
             metrics["by_eval_intent"],
             [
                 "eval_intent",
+                "passed",
+                "total",
+                "pass_rate",
+                "avg_latency_ms",
+                "avg_score",
+            ],
+        )
+    )
+    lines.append("")
+    lines.append("## By Grading Source")
+    lines.append("")
+    lines.append(
+        markdown_table(
+            metrics["by_grading_source"],
+            [
+                "grading_source",
+                "passed",
+                "total",
+                "pass_rate",
+                "avg_latency_ms",
+                "avg_score",
+            ],
+        )
+    )
+    lines.append("")
+    lines.append("## By Grading Mode")
+    lines.append("")
+    lines.append(
+        markdown_table(
+            metrics["by_grading_mode"],
+            [
+                "grading_mode",
                 "passed",
                 "total",
                 "pass_rate",
