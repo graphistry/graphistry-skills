@@ -36,6 +36,28 @@ npx skills add graphistry/graphistry-skills \
   --skills-delivery native
 ```
 
+## Claude Code Example (Live URL)
+
+Run from a project where these skills are installed and `graphistry` + `pandas` are available.
+
+```bash
+export GRAPHISTRY_USERNAME="your_user"
+export GRAPHISTRY_PASSWORD="your_pass"
+export GRAPHISTRY_SERVER="hub.graphistry.com"
+export GRAPHISTRY_PROTOCOL="https"
+
+claude -p \
+  --permission-mode bypassPermissions \
+  --tools Bash \
+  "Write and run a minimal Python script that:
+  - imports pandas and graphistry
+  - calls graphistry.register(api=3) using GRAPHISTRY_* env vars
+  - creates tiny edges/nodes tables with src,dst,id,type
+  - builds graphistry.edges(...).nodes(...)
+  - calls plot(render=False)
+  Return only the final live visualization URL."
+```
+
 ## Docs
 
 - Contributor/dev workflows and sweep commands: `DEVELOP.md`
