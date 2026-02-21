@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+show_help() {
+  cat <<'EOF'
+List runs for a session ID.
+
+Usage:
+  bin/otel/cmds/session2runs <session_id> [--since 2h] [--start ISO/epoch] [--end ISO/epoch]
+                               [--limit N] [--service NAME]
+
+Output columns:
+  turn  run_id  dthread_id  duration_ms  agent  status  trace_id
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${BASE_DIR}/_python" "${BASE_DIR}/trace_tools.py" session2runs "$@"

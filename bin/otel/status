@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+show_help() {
+  cat <<'EOF'
+Check OTel stack health and API OTel configuration.
+
+Usage:
+  bin/otel/status [--api URL] [--token JWT] [--collector URL]
+
+Options:
+  --api URL        API base URL (default: .louie-ports or LOUIE_API_URL)
+  --token JWT      Bearer token for /api/capabilities (default: GRAPHISTRY_TOKEN)
+  --collector URL  OTel collector health URL (default: http://localhost:13133)
+
+Examples:
+  bin/otel/status
+  bin/otel/status --api http://localhost:10014
+  bin/otel/status --api http://localhost:10014 --token "$GRAPHISTRY_TOKEN"
+
+Notes:
+  Tempo/logs/collector checks use local defaults; set OTEL_TEMPO_URL/OTEL_LOG_URL/OTEL_COLLECTOR_URL
+  to target non-local backends or force checks.
+
+See: bin/otel/README.md
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${SCRIPT_DIR}/_python" "${SCRIPT_DIR}/trace_tools.py" status "$@"

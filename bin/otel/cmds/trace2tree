@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+show_help() {
+  cat <<'EOF'
+Print a trace as an indented span tree.
+
+Usage:
+  bin/otel/cmds/trace2tree <trace_id> [--match REGEX]
+EOF
+}
+
+if [[ $# -lt 1 || "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${BASE_DIR}/_python" "${BASE_DIR}/trace_tools.py" trace2tree "$@"

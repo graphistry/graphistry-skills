@@ -16,18 +16,47 @@ g2 = g.gfql([
 ])
 ```
 
+## Targeted patterns (high signal)
+```python
+# Edge query filtering
+g2 = g.gfql([n(), e_forward(edge_query="type == 'replied_to' and submolt == 'X'"), n()])
+```
+
+```python
+# Same-path constraints with where + compare/col
+from graphistry import col, compare
+g2 = g.gfql([n(name='a'), e_forward(name='e'), n(name='b')], where=[compare(col('a', 'owner_id'), '==', col('b', 'owner_id'))])
+```
+
+```python
+# Traverse 2-4 hops but only return hops 3-4
+g2 = g.gfql([e_forward(min_hops=2, max_hops=4, output_min_hops=3, output_max_hops=4)])
+```
+
 ## High-value patterns
+- When user asks for GFQL, prefer explicit `.gfql([...])` examples; mention `chain()` only as an alternate traversal helper.
 - Use `name=` labels for intermediate matches when you need constraints.
 - Use `where=[...]` for cross-step/path constraints.
 - Use `min_hops`/`max_hops` and `output_min_hops`/`output_max_hops` for traversal vs returned slice.
 - Use predicates (`is_in`, numeric/date predicates) for concise filtering.
 - Use `engine='auto'` by default; force `cudf`/`pandas` only when needed.
+- For neighborhood-mining tasks without full pattern logic, consider `hop()` / `chain()` first.
 
 ## Remote mode
 ```python
 # Existing remote dataset
 rg = graphistry.bind(dataset_id='my-dataset')
 res = rg.gfql_remote([n(), e_forward(), n()], engine='auto')
+```
+
+```python
+# Remote slim payload (only required columns)
+res = rg.gfql_remote([n(), e_forward(), n()], output_type='nodes', node_col_subset=['node_id', 'time'])
+```
+
+```python
+# Post-process on remote side when you want trimmed transfer payloads
+res = rg.python_remote_table(lambda g: g._edges[['src', 'dst']].head(1000))
 ```
 
 ## Validation and safety
@@ -42,3 +71,4 @@ res = rg.gfql_remote([n(), e_forward(), n()], engine='auto')
 - Predicate quick reference: https://pygraphistry.readthedocs.io/en/latest/gfql/predicates/quick.html
 - GFQL remote mode: https://pygraphistry.readthedocs.io/en/latest/gfql/remote.html
 - GFQL validation: https://pygraphistry.readthedocs.io/en/latest/gfql/validation/index.html
+- GFQL + loaders/AI patterns: https://pygraphistry.readthedocs.io/en/latest/gfql/combo.html

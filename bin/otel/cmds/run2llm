@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+show_help() {
+  cat <<'EOF'
+Show LLM calls for a specific run.
+
+Usage:
+  bin/otel/cmds/run2llm <run_id> [--prompts] [--full] [--logs] [--json]
+                       [--index N] [--since 1h] [--service NAME]
+
+Output columns (default):
+  name  duration_ms  model  tokens_in  tokens_out  trace_id  span_id
+
+With --prompts:
+  Shows prompt/response preview content for each LLM call.
+
+With --full:
+  Shows full prompt/response content from logs backend.
+  Combine with --prompts for preview + full.
+
+With --logs:
+  Prints log lines correlated to each LLM span.
+
+With --json:
+  Emits JSON payload for artifact capture.
+
+Examples:
+  bin/otel/cmds/run2llm R_abc123
+  bin/otel/cmds/run2llm R_abc123 --prompts
+  bin/otel/cmds/run2llm R_abc123 --full
+  bin/otel/cmds/run2llm R_abc123 --index 1 --prompts
+  bin/otel/cmds/run2llm R_abc123 --full --json
+
+See: bin/otel/README.md
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" || -z "${1:-}" ]]; then
+  show_help
+  exit 0
+fi
+
+exec "${BASE_DIR}/_python" "${BASE_DIR}/trace_tools.py" run2llm "$@"

@@ -1,0 +1,89 @@
+{
+  "id": "pygraphistry_moltbook_alignment_v1",
+  "description": "Alignment checks against older moltbook skill simulations for GFQL and visualization patterns.",
+  "tags": ["pygraphistry", "skills", "alignment", "moltbook"],
+  "cases": [
+    {
+      "id": "gfql_edge_query_filter",
+      "prompt": "Provide a concise GFQL snippet that filters edges with edge_query for replied_to interactions in one submolt.",
+      "checks": {
+        "regex": [
+          "gfql\\(",
+          "edge_query\\s*=\\s*['\\\"]",
+          "(?i)replied_to",
+          "(?i)submolt"
+        ]
+      }
+    },
+    {
+      "id": "gfql_where_owner_compare",
+      "prompt": "Show a short GFQL snippet using where=[...] with compare(col(...), '==', col(...)) to keep paths where both endpoint nodes share owner_id.",
+      "checks": {
+        "regex": [
+          "where\\s*=\\s*\\[",
+          "compare\\(",
+          "col\\(",
+          "owner_id"
+        ]
+      }
+    },
+    {
+      "id": "gfql_output_hop_slicing",
+      "prompt": "Write a minimal GFQL snippet that traverses min_hops=2 and max_hops=4 but only returns output hops 3-4.",
+      "checks": {
+        "regex": [
+          "min_hops\\s*=\\s*2",
+          "max_hops\\s*=\\s*4",
+          "output_min_hops\\s*=\\s*3",
+          "output_max_hops\\s*=\\s*4"
+        ]
+      }
+    },
+    {
+      "id": "gfql_remote_nodes_subset",
+      "prompt": "Provide a concise gfql_remote example that requests output_type='nodes' and limits payload with node_col_subset.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\(",
+          "output_type\\s*=\\s*['\\\"]nodes['\\\"]",
+          "node_col_subset\\s*=\\s*\\["
+        ]
+      }
+    },
+    {
+      "id": "viz_external_layout_play0",
+      "prompt": "Provide a short PyGraphistry snippet for using precomputed node coordinates x/y and disabling animation playback with settings(url_params={'play': 0}).",
+      "checks": {
+        "regex": [
+          "bind\\(.*point_x\\s*=\\s*['\\\"]x['\\\"]",
+          "point_y\\s*=\\s*['\\\"]y['\\\"]",
+          "settings\\(",
+          "url_params",
+          "['\\\"]play['\\\"]\\s*:\\s*0"
+        ]
+      }
+    },
+    {
+      "id": "viz_icon_and_badge",
+      "prompt": "Show a concise PyGraphistry styling snippet that uses both encode_point_icon() and encode_point_badge().",
+      "checks": {
+        "regex": [
+          "encode_point_icon\\(",
+          "encode_point_badge\\("
+        ]
+      }
+    },
+    {
+      "id": "viz_schema_hygiene_bullets",
+      "prompt": "Give exactly 3 concise bullets on schema hygiene for Graphistry visuals: singleton type columns, avoiding dotted names, and native datetime usage.",
+      "checks": {
+        "regex": [
+          "(?i)type",
+          "(?i)dot|node\\.type|edge\\.type",
+          "(?i)datetime"
+        ],
+        "max_lines": 6
+      }
+    }
+  ]
+}

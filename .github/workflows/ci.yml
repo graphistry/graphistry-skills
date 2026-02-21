@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  skills-install-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate skill frontmatter
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          files=(.agents/skills/*/SKILL.md)
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No skills found under .agents/skills/*/SKILL.md"
+            exit 1
+          fi
+
+          for f in "${files[@]}"; do
+            d="$(basename "$(dirname "$f")")"
+            name="$(awk '/^name:/{print $2; exit}' "$f")"
+            if [[ -z "${name:-}" ]]; then
+              echo "Missing frontmatter name in $f"
+              exit 1
+            fi
+            if [[ "$name" != "$d" ]]; then
+              echo "Skill dir/name mismatch: dir=$d name=$name file=$f"
+              exit 1
+            fi
+            if ! grep -q '^description:' "$f"; then
+              echo "Missing frontmatter description in $f"
+              exit 1
+            fi
+          done
+
+      - name: List skills with npx
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx -y skills add . --list --agent codex --agent claude-code > /tmp/skills-list.txt 2>&1
+          cat /tmp/skills-list.txt
+
+          for s in \
+            pygraphistry \
+            pygraphistry-core \
+            pygraphistry-gfql \
+            pygraphistry-visualization \
+            pygraphistry-ai \
+            pygraphistry-connectors
+          do
+            grep -q "$s" /tmp/skills-list.txt
+          done
+
+      - name: Install selected pygraphistry skills into temp project
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tmp_dir="$(mktemp -d)"
+          cd "$tmp_dir"
+
+          npx -y skills add "$GITHUB_WORKSPACE" \
+            --agent codex \
+            --agent claude-code \
+            --skill pygraphistry \
+            --skill pygraphistry-core \
+            --skill pygraphistry-gfql \
+            --skill pygraphistry-visualization \
+            --skill pygraphistry-ai \
+            --skill pygraphistry-connectors \
+            --yes > /tmp/skills-install.txt 2>&1
+
+          cat /tmp/skills-install.txt
+
+          for s in \
+            pygraphistry \
+            pygraphistry-core \
+            pygraphistry-gfql \
+            pygraphistry-visualization \
+            pygraphistry-ai \
+            pygraphistry-connectors
+          do
+            test -f ".agents/skills/$s/SKILL.md"
+            test -L ".claude/skills/$s"
+          done
+
+          # Ensure non-selected skills are not pulled in.
+          test ! -e ".agents/skills/eval-otel"
+

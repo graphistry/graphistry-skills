@@ -1,6 +1,6 @@
 ---
 name: pygraphistry
-description: "TOC router for PyGraphistry tasks. Use when a request involves PyGraphistry and you need to choose the right workflow: core auth/bind/plot, visualization/layout/sharing, GFQL query construction, AI/UMAP/embed workflows, or connector-specific ingestion."
+description: "TOC router for PyGraphistry tasks. Use when a request involves PyGraphistry and you need to choose the right workflow: loading/ETL shaping, visualization/layout/sharing, GFQL or hop/chain traversal/search, AI/UMAP/embed/semantic-search workflows, or connector-specific ingestion."
 ---
 
 # PyGraphistry Router
