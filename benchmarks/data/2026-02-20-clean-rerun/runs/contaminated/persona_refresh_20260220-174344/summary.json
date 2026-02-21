@@ -1,0 +1,91 @@
+{
+  "by_harness": {
+    "claude": {
+      "avg_latency_ms": 22420,
+      "avg_score": 0.9592490842490842,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.6428571428571429,
+      "passed": 9,
+      "total": 14
+    },
+    "codex": {
+      "avg_latency_ms": 27837,
+      "avg_score": 1.0,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 14,
+      "total": 14
+    }
+  },
+  "by_harness_and_mode": {
+    "claude::off": {
+      "avg_latency_ms": 18196,
+      "avg_score": 0.9711538461538461,
+      "harness": "claude",
+      "harness_ok": 7,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7142857142857143,
+      "passed": 5,
+      "skills_mode": "off",
+      "total": 7
+    },
+    "claude::on": {
+      "avg_latency_ms": 26644,
+      "avg_score": 0.9473443223443223,
+      "harness": "claude",
+      "harness_ok": 7,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.5714285714285714,
+      "passed": 4,
+      "skills_mode": "on",
+      "total": 7
+    },
+    "codex::off": {
+      "avg_latency_ms": 25965,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "harness_ok": 7,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 7,
+      "skills_mode": "off",
+      "total": 7
+    },
+    "codex::on": {
+      "avg_latency_ms": 29708,
+      "avg_score": 1.0,
+      "harness": "codex",
+      "harness_ok": 7,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 7,
+      "skills_mode": "on",
+      "total": 7
+    }
+  },
+  "by_skills_mode": {
+    "off": {
+      "avg_latency_ms": 22081,
+      "avg_score": 0.9855769230769231,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8571428571428571,
+      "passed": 12,
+      "total": 14
+    },
+    "on": {
+      "avg_latency_ms": 28176,
+      "avg_score": 0.9736721611721613,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7857142857142857,
+      "passed": 11,
+      "total": 14
+    }
+  },
+  "overall_pass_rate": 0.8214285714285714,
+  "passed_rows": 23,
+  "total_rows": 28
+}

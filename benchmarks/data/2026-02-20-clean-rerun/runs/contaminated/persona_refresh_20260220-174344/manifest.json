@@ -1,0 +1,64 @@
+{
+  "claude_cwd": "",
+  "codex_cwd": "",
+  "created_at": "2026-02-21T01:43:44.982011+00:00",
+  "cwd": "/home/lmeyerov/Work/graphistry-skills",
+  "failfast": false,
+  "git_branch": null,
+  "git_sha": "606e6953ff85e3c22799803854dfd18e28f051c2",
+  "harnesses": [
+    "codex",
+    "claude"
+  ],
+  "journeys": [
+    "pygraphistry_persona_journeys_v1"
+  ],
+  "louie_url": "http://localhost:8501",
+  "otel_enabled": false,
+  "otel_endpoint": "",
+  "otel_service": "agent-eval-runner",
+  "preflight": {},
+  "run_id": "agent_eval_20260220-174344",
+  "skills": {
+    "off": [],
+    "on": [
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry/SKILL.md",
+        "sha256": "b41cecc010da05a2516c6b5ba0c66235b91bd3be9398bcc29399212f71a1972b",
+        "skill": "pygraphistry"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-core/SKILL.md",
+        "sha256": "843e933e900c4f3d843b0243f3500630aa0e35bca6ae31cf378fd32d0401d237",
+        "skill": "pygraphistry-core"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-visualization/SKILL.md",
+        "sha256": "f9a850f4117f905ef31a78344ebcd4c62a1b0f3305d161a0a47edbfd5a9ebcb3",
+        "skill": "pygraphistry-visualization"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-gfql/SKILL.md",
+        "sha256": "b7d4b008839f11c2158c134f7c7ba310529cbcc900301eb6deb0e9e896e824bb",
+        "skill": "pygraphistry-gfql"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-ai/SKILL.md",
+        "sha256": "6dea22ff0c079ba05c87c6b7826f07abb5d3bf67c31efcb40761f57f0ccec05c",
+        "skill": "pygraphistry-ai"
+      },
+      {
+        "path": "/home/lmeyerov/Work/graphistry-skills/.agents/skills/pygraphistry-connectors/SKILL.md",
+        "sha256": "50590cd05458d7f1b002c6d2e8cd1a0574a10465ca1f705e36de3714db83f627",
+        "skill": "pygraphistry-connectors"
+      }
+    ]
+  },
+  "skills_delivery": "native",
+  "skills_mode": [
+    "off",
+    "on"
+  ],
+  "skills_profile": "pygraphistry_core",
+  "timeout_s": 180
+}

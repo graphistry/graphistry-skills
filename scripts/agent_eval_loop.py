@@ -165,6 +165,26 @@ def prepare_native_skill_env(
     return str(env_dir)
 
 
+def prepare_codex_home(env_dir: Path) -> str:
+    codex_home = env_dir / ".codex"
+    codex_home.mkdir(parents=True, exist_ok=True)
+
+    source_home = Path(os.environ.get("CODEX_HOME") or (Path.home() / ".codex"))
+    try:
+        if source_home.resolve() == codex_home.resolve():
+            return str(codex_home)
+    except Exception:
+        pass
+
+    for name in ("auth.json", "config.toml", "version.json"):
+        src = source_home / name
+        dst = codex_home / name
+        if src.exists():
+            shutil.copy2(src, dst)
+
+    return str(codex_home)
+
+
 def materialize_skills(
     out_dir: Path,
     profile_name: str,
@@ -298,6 +318,7 @@ def run_harness(
     skills_text: str,
     model: str = "",
     harness_cwd: str = "",
+    harness_env: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     harness_script = ROOT / "bin" / "harness" / f"{harness}.sh"
     if not harness_script.exists():
@@ -341,9 +362,13 @@ def run_harness(
 
     started = time.time()
     try:
+        child_env = os.environ.copy()
+        if harness_env:
+            child_env.update(harness_env)
         proc = subprocess.run(
             cmd,
             cwd=ROOT,
+            env=child_env,
             capture_output=True,
             text=True,
             timeout=timeout_s + 10,
@@ -787,9 +812,8 @@ def main() -> int:
     }
 
     native_envs: dict[str, dict[str, str]] = {mode: {} for mode in modes}
+    codex_homes: dict[str, str] = {}
     for mode in modes:
-        if mode != "on":
-            continue
         for h in harnesses:
             if h in {"claude", "codex"}:
                 native_envs[mode][h] = prepare_native_skill_env(
@@ -797,8 +821,12 @@ def main() -> int:
                     profile_name=profile_name,
                     mode_name=mode,
                     harness=h,
-                    skill_names=skill_names,
+                    skill_names=skill_names if mode == "on" else [],
                 )
+                if h == "codex":
+                    codex_homes[mode] = prepare_codex_home(Path(native_envs[mode][h]))
+    manifest["native_envs"] = native_envs
+    manifest["codex_homes"] = codex_homes
 
     failed_harnesses: dict[str, str] = {}
     preflight_results: dict[str, Any] = {}
@@ -937,6 +965,7 @@ def main() -> int:
                             }
                         else:
                             harness_cwd = ""
+                            harness_env: dict[str, str] = {}
                             if harness == "claude" and args.claude_cwd:
                                 harness_cwd = args.claude_cwd
                             elif harness == "codex" and args.codex_cwd:
@@ -944,18 +973,20 @@ def main() -> int:
 
                             deliver = args.skills_delivery
                             skills_text_for_harness = ""
-                            if mode == "on":
-                                if deliver == "inject":
+                            if deliver == "inject":
+                                if mode == "on":
                                     skills_text_for_harness = skills_text
-                                elif deliver == "native":
+                            elif deliver in {"native", "auto"}:
+                                if harness in {"claude", "codex"}:
                                     if not harness_cwd:
                                         harness_cwd = native_envs.get(mode, {}).get(harness, "")
-                                elif deliver == "auto":
-                                    if harness in {"claude", "codex"}:
-                                        if not harness_cwd:
-                                            harness_cwd = native_envs.get(mode, {}).get(harness, "")
-                                    else:
-                                        skills_text_for_harness = skills_text
+                                elif mode == "on" and deliver == "auto":
+                                    skills_text_for_harness = skills_text
+
+                            if harness == "codex" and not args.codex_cwd:
+                                codex_home = codex_homes.get(mode, "")
+                                if codex_home:
+                                    harness_env["CODEX_HOME"] = codex_home
 
                             result = run_harness(
                                 harness=harness,
@@ -967,6 +998,7 @@ def main() -> int:
                                 skills_text=skills_text_for_harness,
                                 model=model,
                                 harness_cwd=harness_cwd,
+                                harness_env=harness_env,
                             )
 
                         response_text = str(result.get("response_text") or "")
