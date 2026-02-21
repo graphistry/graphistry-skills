@@ -46,11 +46,18 @@ export GRAPHISTRY_PASSWORD="your_pass"
 export GRAPHISTRY_SERVER="hub.graphistry.com"
 export GRAPHISTRY_PROTOCOL="https"
 
+PROMPT='Using Bash tool calls, run (without creating files) a tiny PyGraphistry
+cyber hunt demo (5-10 rows) with realistic devices/users/processes/ips/domains
+and event entities that include explicit event_time timestamps, include node and
+edge type fields, style with icons plus risk coloring, set
+graphistry.privacy(mode='"'"'public'"'"', notify=False), call plot(render=False),
+and print only the final live URL.'
+
 claude -p \
   --model opus \
   --permission-mode bypassPermissions \
   --tools Bash \
-  "Using Bash tool calls, run (without creating files) a tiny PyGraphistry cyber hunt demo (5-10 rows) with realistic devices/users/processes/ips/domains and event entities that include explicit event_time timestamps, include node and edge type fields, style with icons plus risk coloring, set graphistry.privacy(mode='public', notify=False), call plot(render=False), and print only the final live URL."
+  "$PROMPT"
 ```
 
 Sample output (validated on `2026-02-21`, `model=opus`, runtime `~68.2s`):
