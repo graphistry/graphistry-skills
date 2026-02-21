@@ -20,8 +20,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_JOURNEY_DIR = ROOT / "evals" / "journeys"
 DEFAULT_SKILLS_PROFILES = ROOT / "evals" / "skills_profiles.json"
-DEFAULT_OTEL_PY = Path("/home/USER/Work/graphistrygpt/bin/otel/_python")
-DEFAULT_OTEL_LOG_EVENT = Path("/home/USER/Work/graphistrygpt/bin/otel/log_event.py")
+DEFAULT_OTEL_DIR = ROOT / "bin" / "otel"
+DEFAULT_OTEL_PY = DEFAULT_OTEL_DIR / "_python"
+DEFAULT_OTEL_LOG_EVENT = DEFAULT_OTEL_DIR / "log_event.py"
 
 
 def now_iso() -> str:
@@ -94,6 +95,45 @@ def summarize_skill_text(text: str, limit: int = 1200) -> str:
     if len(body) <= limit:
         return body
     return body[: limit - 3] + "..."
+
+
+def _clear_symlinks(path: Path) -> None:
+    if not path.exists():
+        return
+    for child in path.iterdir():
+        if child.is_symlink():
+            child.unlink(missing_ok=True)
+
+
+def prepare_native_skill_env(
+    out_dir: Path,
+    profile_name: str,
+    mode_name: str,
+    harness: str,
+    skill_names: list[str],
+) -> str:
+    env_dir = out_dir / "native_env" / f"{profile_name}-{mode_name}-{harness}"
+    env_dir.mkdir(parents=True, exist_ok=True)
+
+    if harness == "claude":
+        target_skills_dir = env_dir / ".claude" / "skills"
+    elif harness == "codex":
+        target_skills_dir = env_dir / ".codex" / "skills"
+    else:
+        return str(env_dir)
+
+    target_skills_dir.mkdir(parents=True, exist_ok=True)
+    _clear_symlinks(target_skills_dir)
+
+    for skill in skill_names:
+        src = ROOT / ".agents" / "skills" / skill
+        if not (src / "SKILL.md").exists():
+            continue
+        dst = target_skills_dir / skill
+        dst.unlink(missing_ok=True)
+        dst.symlink_to(src, target_is_directory=True)
+
+    return str(env_dir)
 
 
 def materialize_skills(
@@ -219,16 +259,6 @@ def emit_otel_event(
     subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def compose_prompt(prompt: str, skills_prompt_text: str) -> str:
-    if not skills_prompt_text.strip():
-        return prompt
-    return (
-        "Supplemental skill context is available below. Use it when relevant, but answer the user task directly.\n\n"
-        f"{skills_prompt_text}\n\n"
-        f"User task:\n{prompt}"
-    )
-
-
 def run_harness(
     harness: str,
     prompt: str,
@@ -237,6 +267,7 @@ def run_harness(
     timeout_s: int,
     louie_url: str,
     skills_text: str,
+    harness_cwd: str = "",
 ) -> dict[str, Any]:
     harness_script = ROOT / "bin" / "harness" / f"{harness}.sh"
     if not harness_script.exists():
@@ -273,6 +304,8 @@ def run_harness(
         "--louie-url",
         louie_url,
     ]
+    if harness_cwd and harness in {"claude", "codex"}:
+        cmd.extend(["--cd", harness_cwd])
 
     started = time.time()
     try:
@@ -342,10 +375,25 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
         "must_contain": [],
         "must_not_contain": [],
         "regex": [],
+        "must_not_regex": [],
+        "max_lines": [],
+        "min_lines": [],
     }
 
     total = 0
     passed = 0
+
+    def content_line_count(text: str) -> int:
+        lines = []
+        for raw in text.splitlines():
+            line = raw.strip()
+            if not line:
+                continue
+            # Ignore markdown code fences when applying line-count guardrails.
+            if line.startswith("```"):
+                continue
+            lines.append(line)
+        return len(lines)
 
     must_contain = checks.get("must_contain") or []
     if isinstance(must_contain, list):
@@ -383,6 +431,48 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
             if ok:
                 passed += 1
 
+    must_not_regex = checks.get("must_not_regex") or []
+    if isinstance(must_not_regex, list):
+        for item in must_not_regex:
+            total += 1
+            pattern = str(item)
+            ok = False
+            error = None
+            try:
+                ok = re.search(pattern, response_text) is None
+            except re.error as exc:
+                error = str(exc)
+                ok = False
+            details["must_not_regex"].append({"value": pattern, "ok": ok, "error": error})
+            if ok:
+                passed += 1
+
+    max_lines_raw = checks.get("max_lines")
+    if isinstance(max_lines_raw, int) and max_lines_raw >= 0:
+        total += 1
+        non_empty_line_count = content_line_count(response_text)
+        ok = non_empty_line_count <= max_lines_raw
+        details["max_lines"].append({
+            "value": max_lines_raw,
+            "line_count": non_empty_line_count,
+            "ok": ok,
+        })
+        if ok:
+            passed += 1
+
+    min_lines_raw = checks.get("min_lines")
+    if isinstance(min_lines_raw, int) and min_lines_raw >= 0:
+        total += 1
+        non_empty_line_count = content_line_count(response_text)
+        ok = non_empty_line_count >= min_lines_raw
+        details["min_lines"].append({
+            "value": min_lines_raw,
+            "line_count": non_empty_line_count,
+            "ok": ok,
+        })
+        if ok:
+            passed += 1
+
     if total == 0:
         ok = bool(response_text.strip())
         score = 1.0 if ok else 0.0
@@ -394,9 +484,13 @@ def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, fl
 
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     by_harness: dict[str, dict[str, Any]] = {}
+    by_skills_mode: dict[str, dict[str, Any]] = {}
+    by_harness_and_mode: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         harness = str(row.get("harness"))
+        skills_mode = str(row.get("skills_mode"))
+
         if harness not in by_harness:
             by_harness[harness] = {
                 "total": 0,
@@ -405,6 +499,28 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "latency_ms": [],
                 "harness_ok": 0,
             }
+
+        if skills_mode not in by_skills_mode:
+            by_skills_mode[skills_mode] = {
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
+        harness_mode_key = f"{harness}::{skills_mode}"
+        if harness_mode_key not in by_harness_and_mode:
+            by_harness_and_mode[harness_mode_key] = {
+                "harness": harness,
+                "skills_mode": skills_mode,
+                "total": 0,
+                "passed": 0,
+                "scores": [],
+                "latency_ms": [],
+                "harness_ok": 0,
+            }
+
         bucket = by_harness[harness]
         bucket["total"] += 1
         if bool(row.get("pass_bool")):
@@ -414,7 +530,25 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         bucket["scores"].append(float(row.get("score", 0.0)))
         bucket["latency_ms"].append(int(row.get("latency_ms", 0)))
 
-    for bucket in by_harness.values():
+        bucket_mode = by_skills_mode[skills_mode]
+        bucket_mode["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_mode["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_mode["harness_ok"] += 1
+        bucket_mode["scores"].append(float(row.get("score", 0.0)))
+        bucket_mode["latency_ms"].append(int(row.get("latency_ms", 0)))
+
+        bucket_hm = by_harness_and_mode[harness_mode_key]
+        bucket_hm["total"] += 1
+        if bool(row.get("pass_bool")):
+            bucket_hm["passed"] += 1
+        if bool(row.get("harness_ok")):
+            bucket_hm["harness_ok"] += 1
+        bucket_hm["scores"].append(float(row.get("score", 0.0)))
+        bucket_hm["latency_ms"].append(int(row.get("latency_ms", 0)))
+
+    def finalize_bucket(bucket: dict[str, Any]) -> None:
         total = bucket["total"]
         bucket["pass_rate"] = (bucket["passed"] / total) if total else 0.0
         bucket["harness_ok_rate"] = (bucket["harness_ok"] / total) if total else 0.0
@@ -422,6 +556,15 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         lats = bucket.pop("latency_ms", [])
         bucket["avg_score"] = (sum(scores) / len(scores)) if scores else 0.0
         bucket["avg_latency_ms"] = int(sum(lats) / len(lats)) if lats else 0
+
+    for bucket in by_harness.values():
+        finalize_bucket(bucket)
+
+    for bucket in by_skills_mode.values():
+        finalize_bucket(bucket)
+
+    for bucket in by_harness_and_mode.values():
+        finalize_bucket(bucket)
 
     total_all = len(rows)
     passed_all = sum(1 for row in rows if bool(row.get("pass_bool")))
@@ -431,6 +574,8 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "passed_rows": passed_all,
         "overall_pass_rate": (passed_all / total_all) if total_all else 0.0,
         "by_harness": by_harness,
+        "by_skills_mode": by_skills_mode,
+        "by_harness_and_mode": by_harness_and_mode,
     }
 
 
@@ -444,9 +589,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skills-profiles-file", default=str(DEFAULT_SKILLS_PROFILES), help="Skills profiles JSON")
     parser.add_argument("--out", default="", help="Output run directory")
     parser.add_argument("--otel", action="store_true", help="Emit OTel lifecycle logs")
+    parser.add_argument("--failfast", action="store_true", help="Fail fast per harness after first harness error; includes Louie preflight")
     parser.add_argument("--otel-service", default="agent-eval-runner", help="OTel service name for lifecycle events")
     parser.add_argument("--otel-endpoint", default=os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT_GRPC", ""), help="OTLP gRPC endpoint")
     parser.add_argument("--louie-url", default=os.environ.get("LOUIE_URL", "http://localhost:8501"), help="Louie server URL")
+    parser.add_argument("--claude-cwd", default="", help="Working directory for claude harness (for native .claude/skills env tests)")
+    parser.add_argument("--codex-cwd", default="", help="Working directory for codex harness (for native .codex/skills env tests)")
+    parser.add_argument(
+        "--skills-delivery",
+        default="native",
+        choices=["native", "inject", "auto"],
+        help="How skills are provided to harnesses: native (default), inject, or auto (native for codex/claude + inject for others)",
+    )
     parser.add_argument("--timeout-s", type=int, default=240, help="Timeout for each harness invocation")
     return parser.parse_args()
 
@@ -496,11 +650,59 @@ def main() -> int:
         "skills_profile": profile_name,
         "skills": {mode: cfg.get("skills_manifest", []) for mode, cfg in skill_configs.items()},
         "otel_enabled": bool(args.otel),
+        "failfast": bool(args.failfast),
         "otel_service": args.otel_service,
         "otel_endpoint": args.otel_endpoint,
         "louie_url": args.louie_url,
+        "claude_cwd": args.claude_cwd,
+        "codex_cwd": args.codex_cwd,
+        "skills_delivery": args.skills_delivery,
         "timeout_s": args.timeout_s,
     }
+
+    native_envs: dict[str, dict[str, str]] = {mode: {} for mode in modes}
+    for mode in modes:
+        if mode != "on":
+            continue
+        for h in harnesses:
+            if h in {"claude", "codex"}:
+                native_envs[mode][h] = prepare_native_skill_env(
+                    out_dir=out_dir,
+                    profile_name=profile_name,
+                    mode_name=mode,
+                    harness=h,
+                    skill_names=skill_names,
+                )
+
+    failed_harnesses: dict[str, str] = {}
+    preflight_results: dict[str, Any] = {}
+
+    # Louie commonly fails with endpoint timeout when unavailable.
+    # In failfast mode, run one short preflight and skip remaining Louie rows if it fails.
+    if args.failfast and "louie" in harnesses:
+        preflight_timeout = max(5, min(args.timeout_s, 20))
+        pre_traceparent, _ = make_traceparent()
+        pre_result = run_harness(
+            harness="louie",
+            prompt="Reply with exactly GRAPHISTRY_OK.",
+            out_dir=out_dir,
+            traceparent=pre_traceparent,
+            timeout_s=preflight_timeout,
+            louie_url=args.louie_url,
+            skills_text="",
+            harness_cwd="",
+        )
+        preflight_results["louie"] = {
+            "ok": bool(pre_result.get("ok")),
+            "error": pre_result.get("error"),
+            "latency_ms": int(pre_result.get("latency_ms") or 0),
+            "timeout_s": preflight_timeout,
+            "raw_ref": pre_result.get("raw_ref"),
+        }
+        if not bool(pre_result.get("ok")):
+            failed_harnesses["louie"] = f"preflight_failed: {pre_result.get('error') or 'unknown error'}"
+
+    manifest["preflight"] = preflight_results
 
     emit_otel_event(
         enabled=args.otel,
@@ -541,7 +743,6 @@ def main() -> int:
                 for mode in modes:
                     skills_cfg = skill_configs[mode]
                     skills_text = str(skills_cfg.get("skills_prompt_text", ""))
-                    full_prompt = compose_prompt(prompt, skills_text)
 
                     emit_otel_event(
                         enabled=args.otel,
@@ -589,15 +790,50 @@ def main() -> int:
                             endpoint=args.otel_endpoint or None,
                         )
 
-                        result = run_harness(
-                            harness=harness,
-                            prompt=full_prompt,
-                            out_dir=out_dir,
-                            traceparent=traceparent,
-                            timeout_s=args.timeout_s,
-                            louie_url=args.louie_url,
-                            skills_text=skills_text,
-                        )
+                        if args.failfast and harness in failed_harnesses:
+                            result = {
+                                "ok": False,
+                                "harness": harness,
+                                "error": f"failfast_skip: {failed_harnesses[harness]}",
+                                "response_text": "",
+                                "latency_ms": 0,
+                                "raw_ref": None,
+                                "command_exit_code": None,
+                            }
+                        else:
+                            harness_cwd = ""
+                            if harness == "claude" and args.claude_cwd:
+                                harness_cwd = args.claude_cwd
+                            elif harness == "codex" and args.codex_cwd:
+                                harness_cwd = args.codex_cwd
+
+                            deliver = args.skills_delivery
+                            skills_text_for_harness = ""
+                            if mode == "on":
+                                if deliver == "inject":
+                                    skills_text_for_harness = skills_text
+                                elif deliver == "native":
+                                    if not harness_cwd:
+                                        harness_cwd = native_envs.get(mode, {}).get(harness, "")
+                                elif deliver == "auto":
+                                    if harness in {"claude", "codex"}:
+                                        if not harness_cwd:
+                                            harness_cwd = native_envs.get(mode, {}).get(harness, "")
+                                    else:
+                                        skills_text_for_harness = skills_text
+
+                            result = run_harness(
+                                harness=harness,
+                                prompt=prompt,
+                                out_dir=out_dir,
+                                traceparent=traceparent,
+                                timeout_s=args.timeout_s,
+                                louie_url=args.louie_url,
+                                skills_text=skills_text_for_harness,
+                                harness_cwd=harness_cwd,
+                            )
+                            if args.failfast and not bool(result.get("ok")):
+                                failed_harnesses[harness] = str(result.get("error") or "unknown error")
 
                         response_text = str(result.get("response_text") or "")
                         pass_bool, score, breakdown = grade_response(response_text, checks)

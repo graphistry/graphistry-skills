@@ -1,0 +1,34 @@
+{
+  "id": "pygraphistry_louie_subset_v1",
+  "description": "Smaller subset for validating Louie runtime path on core PyGraphistry skill prompts.",
+  "tags": ["pygraphistry", "louie", "runtime"],
+  "cases": [
+    {
+      "id": "louie_privacy_snippet",
+      "prompt": "Provide one Python line with graphistry.privacy(mode='private').",
+      "checks": {
+        "regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)"
+        ]
+      }
+    },
+    {
+      "id": "louie_gfql_remote",
+      "prompt": "Provide one concise line showing gfql_remote usage on an existing bound graph.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\("
+        ]
+      }
+    },
+    {
+      "id": "louie_ai_search",
+      "prompt": "Provide one concise line that includes PyGraphistry semantic search with search(...).",
+      "checks": {
+        "regex": [
+          "search\\("
+        ]
+      }
+    }
+  ]
+}

@@ -7,6 +7,7 @@ SKILLS_TEXT_FILE=""
 RAW_OUT=""
 TRACEPARENT=""
 TIMEOUT_S="${AGENT_HARNESS_TIMEOUT_S:-240}"
+WORKDIR="${AGENT_HARNESS_WORKDIR:-$PWD}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -32,6 +33,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --timeout-s)
       TIMEOUT_S="$2"
+      shift 2
+      ;;
+    --cd)
+      WORKDIR="$2"
       shift 2
       ;;
     --louie-url)
@@ -80,7 +85,7 @@ fi
 
 start_ms=$(date +%s%3N)
 set +e
-timeout "$TIMEOUT_S" claude --verbose -p --output-format stream-json "$FINAL_PROMPT" > "$RAW_OUT" 2>&1
+(cd "$WORKDIR" && timeout "$TIMEOUT_S" claude --verbose -p --output-format stream-json "$FINAL_PROMPT") > "$RAW_OUT" 2>&1
 exit_code=$?
 set -e
 end_ms=$(date +%s%3N)
