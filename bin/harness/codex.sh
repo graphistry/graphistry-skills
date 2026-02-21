@@ -8,6 +8,8 @@ RAW_OUT=""
 TRACEPARENT=""
 TIMEOUT_S="${AGENT_HARNESS_TIMEOUT_S:-240}"
 WORKDIR="${AGENT_HARNESS_WORKDIR:-$PWD}"
+MODEL=""
+REASONING_EFFORT="${AGENT_CODEX_REASONING_EFFORT:-high}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -29,6 +31,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --traceparent)
       TRACEPARENT="$2"
+      shift 2
+      ;;
+    --model)
+      MODEL="$2"
       shift 2
       ;;
     --timeout-s)
@@ -85,7 +91,15 @@ fi
 
 start_ms=$(date +%s%3N)
 set +e
-timeout "$TIMEOUT_S" codex exec --json --skip-git-repo-check --color never --cd "$WORKDIR" "$FINAL_PROMPT" > "$RAW_OUT" 2>&1
+CODEX_CMD=(codex exec --json --skip-git-repo-check --color never --cd "$WORKDIR")
+if [[ -n "$MODEL" ]]; then
+  CODEX_CMD+=(--model "$MODEL")
+  # Explicit model selections often conflict with profile defaults like reasoning.effort=xhigh.
+  # Force a broadly supported effort unless overridden via AGENT_CODEX_REASONING_EFFORT.
+  CODEX_CMD+=(-c "model_reasoning_effort=\"${REASONING_EFFORT}\"")
+fi
+CODEX_CMD+=("$FINAL_PROMPT")
+timeout "$TIMEOUT_S" "${CODEX_CMD[@]}" > "$RAW_OUT" 2>&1
 exit_code=$?
 set -e
 end_ms=$(date +%s%3N)

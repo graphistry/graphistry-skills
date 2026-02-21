@@ -14,6 +14,8 @@ LOUIE_URL="${LOUIE_URL:-http://localhost:8501}"
 TIMEOUT_S="240"
 CLAUDE_CWD=""
 CODEX_CWD=""
+CLAUDE_MODELS=""
+CODEX_MODELS=""
 SKILLS_DELIVERY="native"
 OTEL="false"
 OTEL_SERVICE="agent-eval-runner"
@@ -41,6 +43,8 @@ Options:
   --timeout-s N      Per-harness timeout seconds (default: 240)
   --claude-cwd DIR   Working directory for claude harness (for native .claude/skills tests)
   --codex-cwd DIR    Working directory for codex harness (for native .codex/skills tests)
+  --claude-models CSV Optional claude model list (e.g., sonnet,opus)
+  --codex-models CSV Optional codex model list (e.g., o4-mini,o3)
   --skills-delivery X native|inject|auto (default: native)
   --otel             Emit OTel lifecycle events via graphistrygpt helper
   --failfast         Fail fast per harness after first harness error (with Louie preflight)
@@ -52,6 +56,7 @@ Options:
 Examples:
   ./bin/agent.sh --codex --claude --journeys runtime_smoke
   ./bin/agent.sh --codex --claude --louie --skills-mode both --otel
+  ./bin/agent.sh --claude --journeys runtime_smoke --claude-models sonnet,opus --skills-mode both
   ./bin/agent.sh --codex --claude --journeys pygraphistry_persona_journeys_v1 --case-ids persona_novice_fraud_table_to_viz_algo,persona_connector_analyst_workflow --max-workers 2
 USAGE
 }
@@ -108,6 +113,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --codex-cwd)
       CODEX_CWD="$2"
+      shift 2
+      ;;
+    --claude-models)
+      CLAUDE_MODELS="$2"
+      shift 2
+      ;;
+    --codex-models)
+      CODEX_MODELS="$2"
       shift 2
       ;;
     --skills-delivery)
@@ -181,6 +194,8 @@ cmd=(
   --max-workers "$MAX_WORKERS"
   --claude-cwd "$CLAUDE_CWD"
   --codex-cwd "$CODEX_CWD"
+  --claude-models "$CLAUDE_MODELS"
+  --codex-models "$CODEX_MODELS"
   --skills-delivery "$SKILLS_DELIVERY"
   --otel-service "$OTEL_SERVICE"
 )
