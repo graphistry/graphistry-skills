@@ -1,6 +1,10 @@
 # graphistry-skills
 
-Public PyGraphistry skills for agent runtimes (Codex, Claude Code, and compatible skill loaders).
+Skill files for AI agents (including Claude Code and OpenAI Codex) to better use the Graphistry ecosystem.
+
+Graphistry is a graph intelligence ecosystem with fast-moving capabilities across graph ETL/shaping, visualization, GFQL graph querying, and AI workflows. These skills help agents use more of that surface area correctly and reach good results faster.
+
+Strong frontier models often already know core Graphistry/PyGraphistry patterns due to ecosystem maturity and backward compatibility. The skills add high-value guidance on newer features, preferred workflow patterns, and safer/more reliable execution details.
 
 ## Install
 
@@ -49,7 +53,7 @@ https://hub.graphistry.com/graph/graph.html?dataset=17743ba9ff3549729fdb4d9c1c07
 
 ## Evals
 
-These skills are regularly evaluated and tuned against standard PyGraphistry user journeys (baseline vs skills, multiple runtimes/models).
+These skills are regularly benchmarked and tuned against standard Graphistry user journeys (baseline vs skills, multiple runtimes/models).
 
 For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
