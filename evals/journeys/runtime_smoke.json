@@ -25,7 +25,27 @@
       "id": "privacy_snippet",
       "prompt": "Provide one Python line that uses graphistry and includes privacy(mode='private').",
       "checks": {
-        "regex": ["(?i)graphistry", "privacy\\(mode\\s*=\\s*['\"']private['\"']\\)"]
+        "regex": [
+          "(?i)graphistry",
+          "privacy\\(mode\\s*=\\s*['\"']private['\"']\\)"
+        ],
+        "must_not_regex": [
+          "privacy\\(mode\\s*=\\s*['\\\"]public['\\\"][^\\)]*\\)"
+        ],
+        "max_lines": 2
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.9,
+        "reference_answer": "graphistry.privacy(mode='private')",
+        "rubric": [
+          "Must include graphistry usage and privacy(mode='private').",
+          "Should be concise and line-like for smoke intent."
+        ],
+        "required_concepts": [
+          "graphistry",
+          "privacy private mode"
+        ]
       }
     }
   ]

@@ -5,6 +5,13 @@ description: "Construct and run GFQL graph queries in PyGraphistry for pattern m
 
 # PyGraphistry GFQL
 
+## Doc routing (local + canonical)
+- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
+- Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
+- In user-facing answers, prefer canonical `https://pygraphistry.readthedocs.io/en/latest/...` links.
+
 ## Quick start
 ```python
 from graphistry import n, e_forward
@@ -36,6 +43,7 @@ g2 = g.gfql([e_forward(min_hops=2, max_hops=4, output_min_hops=3, output_max_hop
 ## High-value patterns
 - When user explicitly asks for GFQL (or says `gfql`), final snippets must include explicit `.gfql([...])`; do not substitute `chain()`/`hop()` as the primary answer.
 - Only show `chain()`/`hop()` when the user explicitly asks for that shorthand; otherwise keep snippets in `.gfql([...])` form.
+- When the task explicitly says remote execution/dataset, use `gfql_remote(...)` as the primary query call; do not substitute `chain()`/`hop()` in that case.
 - Use `name=` labels for intermediate matches when you need constraints.
 - Use `where=[...]` for cross-step/path constraints.
 - Use `min_hops`/`max_hops` and `output_min_hops`/`output_max_hops` for traversal vs returned slice.

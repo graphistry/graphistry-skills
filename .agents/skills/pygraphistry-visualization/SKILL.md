@@ -5,6 +5,14 @@ description: "Build PyGraphistry visualizations with bindings, encodings, layout
 
 # PyGraphistry Visualization
 
+## Doc routing (local + canonical)
+- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
+- Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
+- Use local icon lookup notes from `references/fa-icons.md`.
+- In user-facing answers, prefer canonical `https://pygraphistry.readthedocs.io/en/latest/...` links.
+
 ## Core pattern
 ```python
 g2 = (
@@ -56,6 +64,8 @@ urls = [high_risk.plot(render=False), partner_flow.plot(render=False)]
 graphistry.privacy(mode='private')
 plot_url = g.plot(render=False)
 ```
+- Use explicit `graphistry.privacy(mode='private'|'organization'|'public')` before plotting share links.
+- Do not treat `plot()` kwargs like `as_files` or `memoize` as privacy controls.
 
 ## Common tasks
 - Encodings: `encode_point_color`, `encode_edge_color`, `encode_point_size`, `encode_point_icon`, `encode_point_badge`.

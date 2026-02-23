@@ -141,6 +141,46 @@ OUT="/tmp/graphistry_skills_cross_runtime_matrix_$(date +%Y%m%d-%H%M%S)"
   --out "$OUT"
 ```
 
+### 5) Codex effort A/B (high vs medium, full journeys)
+
+Run with the same matrix and only change `AGENT_CODEX_REASONING_EFFORT`.
+
+```bash
+# high
+OUT="/tmp/graphistry_skills_codex_full_effort_high_$(date +%Y%m%d-%H%M%S)"
+AGENT_EVAL_NATIVE_SKILLS_MOUNT_MODE=copy \
+AGENT_EVAL_NATIVE_DOCS_MODE=web-only \
+AGENT_CODEX_REASONING_EFFORT=high \
+./bin/agent.sh \
+  --codex \
+  --journeys all \
+  --skills-mode both \
+  --skills-profile pygraphistry_core \
+  --skills-delivery native \
+  --codex-models gpt-5.3-codex \
+  --timeout-s 240 \
+  --max-workers 2 \
+  --out "$OUT"
+```
+
+```bash
+# medium
+OUT="/tmp/graphistry_skills_codex_full_effort_medium_$(date +%Y%m%d-%H%M%S)"
+AGENT_EVAL_NATIVE_SKILLS_MOUNT_MODE=copy \
+AGENT_EVAL_NATIVE_DOCS_MODE=web-only \
+AGENT_CODEX_REASONING_EFFORT=medium \
+./bin/agent.sh \
+  --codex \
+  --journeys all \
+  --skills-mode both \
+  --skills-profile pygraphistry_core \
+  --skills-delivery native \
+  --codex-models gpt-5.3-codex \
+  --timeout-s 240 \
+  --max-workers 2 \
+  --out "$OUT"
+```
+
 ## OTel-Enabled Sweeps
 
 Enable OTel on any sweep:
@@ -244,6 +284,25 @@ Use this before adding new journeys to close zero-bucket or severely imbalanced 
 ## Baseline Isolation Notes
 
 For Codex native-mode evals, `agent_eval_loop.py` creates mode-scoped native env dirs and mode-scoped `CODEX_HOME` under each run directory. This avoids baseline contamination from globally installed skills when comparing `skills-mode off` vs `on`.
+
+For docs-mode control in native mode, use strict mount mode:
+
+```bash
+AGENT_EVAL_NATIVE_SKILLS_MOUNT_MODE=copy \
+AGENT_EVAL_NATIVE_DOCS_MODE=toc \
+./scripts/agent_eval_loop.py ...
+```
+
+and rerun with `AGENT_EVAL_NATIVE_DOCS_MODE=web-only`.
+
+Why:
+- `copy` mode isolates skill files under the run env.
+- TOC mode in `copy` removes local docs mirror subtree if present.
+- `manifest.json` now records `native_skills_mount_mode`, `native_docs_mode`, and `native_docs_ref`.
+
+Note:
+- Local docs mirror tooling is intentionally not part of the default shipped workflow in this repo revision.
+- Reintroduce mirror experiments only in a dedicated branch with clear KPI evidence.
 
 ## Publishing Benchmarks
 

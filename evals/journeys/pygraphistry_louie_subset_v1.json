@@ -9,29 +9,54 @@
       "prompt": "Provide one concise Python line setting a non-public Graphistry privacy mode for safe sharing.",
       "checks": {
         "regex": [
+          "(?i)graphistry",
           "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"][^\\)]*\\)"
         ],
         "must_not_regex": [
           "privacy\\(mode\\s*=\\s*['\\\"]public['\\\"][^\\)]*\\)"
-        ]
+        ],
+        "max_lines": 2
       }
     },
     {
       "id": "louie_gfql_remote",
-      "prompt": "Provide one concise line showing gfql_remote usage on an existing bound graph while limiting returned columns.",
+      "prompt": "Provide one concise line showing GFQL remote usage on an existing remote-bound graph while limiting returned columns with real PyGraphistry methods.",
       "checks": {
         "regex": [
-          "gfql_remote\\(",
-          "(node_col_subset|edge_col_subset)\\s*=\\s*\\["
-        ]
+          "(gfql_remote\\(|fetch_remote\\(|\\bchain\\(|chain_remote\\()",
+          "(node_col_subset|edge_col_subset|outputs\\s*=|select\\(|select_columns\\(|cols\\s*=|\\[\\[[^\\]]+\\]\\])"
+        ],
+        "must_not_regex": [
+          "query_graph\\(",
+          "graph_query\\(",
+          "run_gfql\\(",
+          "connect_graphistry\\("
+        ],
+        "max_lines": 3
       }
     },
     {
       "id": "louie_ai_search",
-      "prompt": "Provide one concise line that includes PyGraphistry semantic search with search(...).",
+      "prompt": "Provide one concise line for a PyGraphistry semantic-search step after preparing features or embeddings.",
       "checks": {
         "regex": [
-          "search\\("
+          "search\\(",
+          "(featurize\\(|umap\\(|embed|embedding)"
+        ],
+        "max_lines": 3
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.78,
+        "reference_answer": "A strong one-liner includes semantic search and indicates prior feature/embedding preparation.",
+        "rubric": [
+          "Must include a plausible semantic search operation.",
+          "Must indicate feature or embedding preparation context.",
+          "Should stay concise and method-valid."
+        ],
+        "required_concepts": [
+          "semantic search",
+          "feature or embedding preparation"
         ]
       }
     }

@@ -53,12 +53,18 @@ These skills are regularly evaluated and tuned against standard PyGraphistry use
 
 For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
-Current checked-in benchmark pack shows skills improving success rates and speed on harder cases, especially on Codex model-matrix runs:
+Current checked-in benchmark packs show skills improving pass rates and speed:
 
-- Codex `skills=on`: `13/13` pass, avg `41.8s`
-- Codex `skills=off`: `10/13` pass, avg `65.8s`
+- Cross-runtime post-cleanup full sweep (`codex+claude`, `skills=both`):
+  - `skills=on`: `88/100` pass, avg `28.0s`
+  - `skills=off`: `81/100` pass, avg `39.4s`
+- Codex effort A/B (`gpt-5.3-codex`, all journeys, `skills=both`):
+  - `high`: `87/100` pass, avg `34.0s`
+  - `medium`: `86/100` pass, avg `21.2s`
 
-See [benchmarks/reports/2026-02-21-phase2-combined.md](benchmarks/reports/2026-02-21-phase2-combined.md) for details.
+See:
+- [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md)
+- [benchmarks/reports/2026-02-23-codex-effort-ab.md](benchmarks/reports/2026-02-23-codex-effort-ab.md)
 
 ## Docs
 
@@ -70,4 +76,4 @@ See [benchmarks/reports/2026-02-21-phase2-combined.md](benchmarks/reports/2026-0
 - [Report generator](scripts/benchmarks/make_report.py)
 - [Scenario coverage audit tool](scripts/benchmarks/scenario_coverage_audit.py)
 - [Benchmark artifact structure](benchmarks/README.md)
-- [Latest checked-in benchmark report](benchmarks/reports/2026-02-21-phase2-combined.md)
+- [Latest checked-in benchmark report](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md)

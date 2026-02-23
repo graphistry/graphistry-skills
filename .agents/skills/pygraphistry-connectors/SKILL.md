@@ -5,6 +5,13 @@ description: "Select and use PyGraphistry connector and plugin workflows for gra
 
 # PyGraphistry Connectors
 
+## Doc routing (local + canonical)
+- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
+- Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
+- In user-facing answers, prefer canonical `https://pygraphistry.readthedocs.io/en/latest/...` links.
+
 ## Strategy
 - Prefer dataframe-first ingestion when practical, then bind with `edges()/nodes()`.
 - Use connector-specific notebook patterns when auth/query semantics are specialized.

@@ -7,3 +7,9 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+bin/otel/.venv/
+bin/otel/.venv.lock
+evals/env/claude/.claude/skills/*
+!evals/env/claude/.claude/skills/.gitkeep
+evals/env/codex/.codex/skills/*
+!evals/env/codex/.codex/skills/.gitkeep
