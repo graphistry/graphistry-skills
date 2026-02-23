@@ -1,0 +1,197 @@
+{
+  "by_eval_intent": {
+    "alignment_legacy": {
+      "avg_latency_ms": 15858,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy",
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 14,
+      "total": 14
+    },
+    "execution_grade": {
+      "avg_latency_ms": 11765,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6
+    },
+    "guardrail": {
+      "avg_latency_ms": 15524,
+      "avg_score": 0.975,
+      "eval_intent": "guardrail",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8333333333333334,
+      "passed": 10,
+      "total": 12
+    },
+    "realistic_capability": {
+      "avg_latency_ms": 31699,
+      "avg_score": 0.9402983920841065,
+      "eval_intent": "realistic_capability",
+      "harness_ok": 28,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.75,
+      "passed": 21,
+      "total": 28
+    },
+    "runtime_smoke": {
+      "avg_latency_ms": 11358,
+      "avg_score": 0.975,
+      "eval_intent": "runtime_smoke",
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.9,
+      "passed": 9,
+      "total": 10
+    },
+    "skill_pressure": {
+      "avg_latency_ms": 19285,
+      "avg_score": 0.9739583333333334,
+      "eval_intent": "skill_pressure",
+      "harness_ok": 24,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.9166666666666666,
+      "passed": 22,
+      "total": 24
+    },
+    "speed_routing": {
+      "avg_latency_ms": 29910,
+      "avg_score": 0.9,
+      "eval_intent": "speed_routing",
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.6666666666666666,
+      "passed": 4,
+      "total": 6
+    }
+  },
+  "by_grading_mode": {
+    "deterministic": {
+      "avg_latency_ms": 21223,
+      "avg_score": 0.9655335497835498,
+      "grading_mode": "deterministic",
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.86,
+      "passed": 86,
+      "total": 100
+    }
+  },
+  "by_grading_source": {
+    "deterministic": {
+      "avg_latency_ms": 21223,
+      "avg_score": 0.9655335497835498,
+      "grading_source": "deterministic",
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.86,
+      "passed": 86,
+      "total": 100
+    }
+  },
+  "by_harness": {
+    "codex": {
+      "avg_latency_ms": 21223,
+      "avg_score": 0.9655335497835498,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.86,
+      "passed": 86,
+      "total": 100
+    }
+  },
+  "by_harness_and_mode": {
+    "codex::off": {
+      "avg_latency_ms": 25382,
+      "avg_score": 0.9443701298701299,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8,
+      "passed": 40,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "codex::on": {
+      "avg_latency_ms": 17064,
+      "avg_score": 0.9866969696969697,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.92,
+      "passed": 46,
+      "skills_mode": "on",
+      "total": 50
+    }
+  },
+  "by_harness_and_model": {
+    "codex::gpt-5.3-codex": {
+      "avg_latency_ms": 21223,
+      "avg_score": 0.9655335497835498,
+      "harness": "codex",
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "model": "gpt-5.3-codex",
+      "pass_rate": 0.86,
+      "passed": 86,
+      "total": 100
+    }
+  },
+  "by_harness_model_and_mode": {
+    "codex::gpt-5.3-codex::off": {
+      "avg_latency_ms": 25382,
+      "avg_score": 0.9443701298701299,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "gpt-5.3-codex",
+      "pass_rate": 0.8,
+      "passed": 40,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "codex::gpt-5.3-codex::on": {
+      "avg_latency_ms": 17064,
+      "avg_score": 0.9866969696969697,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "gpt-5.3-codex",
+      "pass_rate": 0.92,
+      "passed": 46,
+      "skills_mode": "on",
+      "total": 50
+    }
+  },
+  "by_skills_mode": {
+    "off": {
+      "avg_latency_ms": 25382,
+      "avg_score": 0.9443701298701299,
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8,
+      "passed": 40,
+      "total": 50
+    },
+    "on": {
+      "avg_latency_ms": 17064,
+      "avg_score": 0.9866969696969697,
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.92,
+      "passed": 46,
+      "total": 50
+    }
+  },
+  "harness_ok_rate": 1.0,
+  "harness_ok_rows": 100,
+  "overall_pass_rate": 0.86,
+  "passed_rows": 86,
+  "total_rows": 100
+}

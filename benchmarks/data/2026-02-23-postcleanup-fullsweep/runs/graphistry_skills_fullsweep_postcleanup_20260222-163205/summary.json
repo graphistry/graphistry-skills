@@ -1,0 +1,263 @@
+{
+  "by_eval_intent": {
+    "alignment_legacy": {
+      "avg_latency_ms": 21864,
+      "avg_score": 0.8119047619047619,
+      "eval_intent": "alignment_legacy",
+      "harness_ok": 28,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7857142857142857,
+      "passed": 22,
+      "total": 28
+    },
+    "execution_grade": {
+      "avg_latency_ms": 17760,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 12,
+      "total": 12
+    },
+    "guardrail": {
+      "avg_latency_ms": 22887,
+      "avg_score": 0.9571759259259259,
+      "eval_intent": "guardrail",
+      "harness_ok": 24,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.875,
+      "passed": 21,
+      "total": 24
+    },
+    "realistic_capability": {
+      "avg_latency_ms": 52551,
+      "avg_score": 0.955586154916512,
+      "eval_intent": "realistic_capability",
+      "harness_ok": 56,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7678571428571429,
+      "passed": 43,
+      "total": 56
+    },
+    "runtime_smoke": {
+      "avg_latency_ms": 12558,
+      "avg_score": 0.9083333333333334,
+      "eval_intent": "runtime_smoke",
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7,
+      "passed": 14,
+      "total": 20
+    },
+    "skill_pressure": {
+      "avg_latency_ms": 32939,
+      "avg_score": 0.9645833333333332,
+      "eval_intent": "skill_pressure",
+      "harness_ok": 48,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.9375,
+      "passed": 45,
+      "total": 48
+    },
+    "speed_routing": {
+      "avg_latency_ms": 49753,
+      "avg_score": 1.0,
+      "eval_intent": "speed_routing",
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 1.0,
+      "passed": 12,
+      "total": 12
+    }
+  },
+  "by_grading_mode": {
+    "deterministic": {
+      "avg_latency_ms": 33734,
+      "avg_score": 0.9384252344877345,
+      "grading_mode": "deterministic",
+      "harness_ok": 200,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.845,
+      "passed": 169,
+      "total": 200
+    }
+  },
+  "by_grading_source": {
+    "deterministic": {
+      "avg_latency_ms": 33734,
+      "avg_score": 0.9384252344877345,
+      "grading_source": "deterministic",
+      "harness_ok": 200,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.845,
+      "passed": 169,
+      "total": 200
+    }
+  },
+  "by_harness": {
+    "claude": {
+      "avg_latency_ms": 18656,
+      "avg_score": 0.891880772005772,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.75,
+      "passed": 75,
+      "total": 100
+    },
+    "codex": {
+      "avg_latency_ms": 48811,
+      "avg_score": 0.984969696969697,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.94,
+      "passed": 94,
+      "total": 100
+    }
+  },
+  "by_harness_and_mode": {
+    "claude::off": {
+      "avg_latency_ms": 23501,
+      "avg_score": 0.8560487012987014,
+      "harness": "claude",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.7,
+      "passed": 35,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "claude::on": {
+      "avg_latency_ms": 13811,
+      "avg_score": 0.9277128427128427,
+      "harness": "claude",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.8,
+      "passed": 40,
+      "skills_mode": "on",
+      "total": 50
+    },
+    "codex::off": {
+      "avg_latency_ms": 55367,
+      "avg_score": 0.9802424242424244,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.92,
+      "passed": 46,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "codex::on": {
+      "avg_latency_ms": 42256,
+      "avg_score": 0.9896969696969697,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.96,
+      "passed": 48,
+      "skills_mode": "on",
+      "total": 50
+    }
+  },
+  "by_harness_and_model": {
+    "claude::default": {
+      "avg_latency_ms": 18656,
+      "avg_score": 0.891880772005772,
+      "harness": "claude",
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.75,
+      "passed": 75,
+      "total": 100
+    },
+    "codex::default": {
+      "avg_latency_ms": 48811,
+      "avg_score": 0.984969696969697,
+      "harness": "codex",
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.94,
+      "passed": 94,
+      "total": 100
+    }
+  },
+  "by_harness_model_and_mode": {
+    "claude::default::off": {
+      "avg_latency_ms": 23501,
+      "avg_score": 0.8560487012987014,
+      "harness": "claude",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.7,
+      "passed": 35,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "claude::default::on": {
+      "avg_latency_ms": 13811,
+      "avg_score": 0.9277128427128427,
+      "harness": "claude",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.8,
+      "passed": 40,
+      "skills_mode": "on",
+      "total": 50
+    },
+    "codex::default::off": {
+      "avg_latency_ms": 55367,
+      "avg_score": 0.9802424242424244,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.92,
+      "passed": 46,
+      "skills_mode": "off",
+      "total": 50
+    },
+    "codex::default::on": {
+      "avg_latency_ms": 42256,
+      "avg_score": 0.9896969696969697,
+      "harness": "codex",
+      "harness_ok": 50,
+      "harness_ok_rate": 1.0,
+      "model": "default",
+      "pass_rate": 0.96,
+      "passed": 48,
+      "skills_mode": "on",
+      "total": 50
+    }
+  },
+  "by_skills_mode": {
+    "off": {
+      "avg_latency_ms": 39434,
+      "avg_score": 0.9181455627705628,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.81,
+      "passed": 81,
+      "total": 100
+    },
+    "on": {
+      "avg_latency_ms": 28034,
+      "avg_score": 0.9587049062049061,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "pass_rate": 0.88,
+      "passed": 88,
+      "total": 100
+    }
+  },
+  "harness_ok_rate": 1.0,
+  "harness_ok_rows": 200,
+  "overall_pass_rate": 0.845,
+  "passed_rows": 169,
+  "total_rows": 200
+}

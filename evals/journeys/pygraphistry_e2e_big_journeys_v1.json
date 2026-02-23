@@ -6,37 +6,46 @@
   "cases": [
     {
       "id": "e2e_csv_degree_gfql_viz_private",
-      "prompt": "Write one concise Python workflow (single code block) that starts from raw CSVs, shapes a graph, adds a degree-based enrichment, runs a GFQL subgraph query with a same-owner constraint, styles the result, and returns a private plot URL. Include: pandas read_csv, timestamp normalization, graphistry register(api=3) with environment variables, edges()+nodes(), a degree enrichment step, gfql([...]) with e_forward(...), where=[compare(col(...), '==', col(...))], encode_point_color + encode_point_size, graphistry.privacy(mode='private'), and plot(render=False).",
+      "prompt": "Write one concise Python workflow (single code block) from raw CSV interactions to a share-safe graph investigation: ingest data, normalize time, do safe Graphistry auth (env vars), shape edges+nodes, add one degree-like enrichment, run one focused GFQL extraction, apply visual styling, set private privacy mode, and return a non-inline URL.",
       "checks": {
         "regex": [
           "pd\\.read_csv\\(",
           "to_datetime\\(",
           "register\\(",
-          "api\\s*=\\s*3",
           "GRAPHISTRY_",
-          "graphistry\\.edges\\(",
+          "edges\\(",
           "\\.nodes\\(",
-          "(groupby\\(|value_counts\\()",
-          "gfql\\(",
-          "e_forward\\(",
-          "where\\s*=\\s*\\[",
-          "compare\\(",
-          "col\\(",
-          "encode_point_color\\(",
-          "encode_point_size\\(",
-          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
-          "plot\\(render\\s*=\\s*False\\)"
+          "(groupby\\(|value_counts\\(|degree|in_degree|out_degree)",
+          "(gfql\\(|\\bhop\\(|\\bchain\\()",
+          "encode_",
+          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"][^)]*\\)",
+          "plot\\(render\\s*=\\s*False[^)]*\\)"
         ],
         "must_not_contain": [
           "leotest2",
           "accountaccount"
         ],
-        "max_lines": 60
+        "max_lines": 90
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.82,
+        "reference_answer": "A strong answer gives an end-to-end CSV->graph workflow with safe auth, graph shaping, degree-style enrichment, focused GFQL extraction, styling, and private non-inline plotting.",
+        "rubric": [
+          "Must include a coherent end-to-end workflow from ingest to non-inline plotting.",
+          "Must include safe credential handling and private sharing behavior.",
+          "Must include a focused extraction step and meaningful styling."
+        ],
+        "required_concepts": [
+          "safe auth",
+          "focused extraction",
+          "private non-inline plot"
+        ]
       }
     },
     {
       "id": "e2e_hypergraph_temporal_gfql_layout",
-      "prompt": "Provide a compact PyGraphistry pipeline that starts from one row-oriented events table and goes through hypergraph shaping, temporal enrichment, GFQL filtering, layout styling, and plotting. Must include: graphistry.hypergraph(...), to_datetime for event time, an enrichment column for burst/weight signal, gfql with min_hops/max_hops and output_min_hops/output_max_hops, settings(url_params={'play': 0}), and a final plot call.",
+      "prompt": "Provide a compact PyGraphistry pipeline from a row-oriented events table through hypergraph shaping, temporal enrichment, focused traversal, static-ish layout settings, and plotting.",
       "checks": {
         "regex": [
           "hypergraph\\(",
@@ -45,55 +54,99 @@
           "gfql\\(",
           "min_hops\\s*=\\s*\\d+",
           "max_hops\\s*=\\s*\\d+",
-          "output_min_hops\\s*=\\s*\\d+",
-          "output_max_hops\\s*=\\s*\\d+",
+          "output_(min|max)_hops\\s*=\\s*\\d+",
           "settings\\(",
           "url_params",
-          "['\\\"]play['\\\"]\\s*:\\s*0",
           "\\.plot\\("
         ],
-        "max_lines": 60
+        "max_lines": 70
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer builds a hypergraph from event rows, enriches temporal signal, uses bounded traversal, and configures layout for a static readable plot.",
+        "rubric": [
+          "Must include hypergraph shaping and temporal handling.",
+          "Must include bounded traversal/focused extraction.",
+          "Should include layout control for stable visualization."
+        ],
+        "required_concepts": [
+          "hypergraph + temporal enrichment",
+          "bounded traversal",
+          "layout control"
+        ]
       }
     },
     {
       "id": "e2e_remote_slim_ai_gfql_viz",
-      "prompt": "Create a concise end-to-end snippet for a remote-heavy workflow: start from an existing Graphistry dataset_id, run gfql_remote with node_col_subset/edge_col_subset, apply one algorithmic enrichment (umap or dbscan), run a second GFQL restriction, style with icon or color, and produce a share-safe output. Include gfql_remote(...), node_col_subset or edge_col_subset, umap() or dbscan(), gfql(...), one encoding call, and privacy(mode='private').",
+      "prompt": "Create a concise remote-heavy workflow from an existing Graphistry dataset handle: trim returned columns, run one graph-AI enrichment step, apply a second focused extraction, style the result, and produce a non-public non-inline URL.",
       "checks": {
         "regex": [
-          "dataset_id",
+          "(dataset_id|bind\\()",
           "gfql_remote\\(",
           "(node_col_subset|edge_col_subset)\\s*=\\s*\\[",
-          "(umap\\(|dbscan\\()",
+          "(umap\\(|dbscan\\(|featurize\\(|search\\()",
           "gfql\\(",
-          "(encode_point_color\\(|encode_point_icon\\(|encode_edge_color\\()",
-          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)"
+          "(encode_point_color\\(|encode_point_icon\\(|encode_edge_color\\(|encode_point_size\\()",
+          "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"]\\)",
+          "plot\\(render\\s*=\\s*False\\)"
         ],
-        "max_lines": 65
+        "max_lines": 75
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer demonstrates remote query slimming, one AI enrichment, a follow-on focused extraction, clear styling, and privacy-safe non-inline output.",
+        "rubric": [
+          "Must show remote query slimming and focused extraction.",
+          "Must include at least one AI enrichment capability.",
+          "Must include non-public share-safe output."
+        ],
+        "required_concepts": [
+          "remote slimming",
+          "AI enrichment",
+          "privacy-safe sharing"
+        ]
       }
     },
     {
       "id": "e2e_connector_dataframe_to_plot",
-      "prompt": "Give a short pipeline for pulling raw interactions from a connector path into DataFrames (Neo4j or Splunk), shaping to edges/nodes, enriching with one metric column, extracting a focused neighborhood with GFQL (not hop/chain) using where=[compare(col(...), '==', col(...))], styling, and plotting. Include connector mention, dataframe-first fallback, edges()+nodes(), one enrichment transform, gfql traversal with compare/col in where, one styling encode call, graphistry.privacy(mode='private'), and final plot(render=False).",
+      "prompt": "Give a short pipeline for pulling interactions via a connector path (Neo4j or Splunk) with dataframe fallback, shaping edges/nodes, enriching one metric, extracting a focused subgraph, styling, and plotting a non-public non-inline URL. If auth appears, keep it safe.",
       "checks": {
         "regex": [
           "(?i)(neo4j|splunk)",
           "(?i)dataframe",
           "edges\\(",
           "\\.nodes\\(",
-          "(groupby\\(|value_counts\\(|assign\\()",
+          "(groupby\\(|value_counts\\(|assign\\(|degree)",
           "gfql\\(",
-          "where\\s*=\\s*\\[",
-          "compare\\(",
-          "col\\(",
+          "(where\\s*=\\s*\\[|edge_query\\s*=|min_hops\\s*=|max_hops\\s*=)",
           "encode_",
-          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
+          "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"]\\)",
           "plot\\(render\\s*=\\s*False\\)"
         ],
         "must_not_regex": [
-          "\\bhop\\(",
-          "\\bchain\\("
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
-        "max_lines": 70
+        "max_lines": 80
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer includes connector-aware routing, dataframe fallback, graph shaping, focused extraction, and privacy-safe non-inline plotting.",
+        "rubric": [
+          "Must include connector-aware guidance and dataframe fallback.",
+          "Must include shaping, enrichment, and focused extraction.",
+          "Must include privacy-safe non-inline plot behavior."
+        ],
+        "required_concepts": [
+          "connector + fallback",
+          "focused extraction",
+          "privacy-safe output"
+        ]
       }
     }
   ]

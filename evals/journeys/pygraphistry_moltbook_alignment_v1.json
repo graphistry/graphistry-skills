@@ -6,10 +6,10 @@
   "cases": [
     {
       "id": "gfql_edge_query_filter",
-      "prompt": "Provide a concise GFQL snippet that filters edges by type using edge_query within one focused community/channel slice.",
+      "prompt": "Provide a concise GFQL snippet that narrows a focused community/channel slice by applying an inline edge predicate on interaction type.",
       "checks": {
         "regex": [
-          "(gfql|chain|node_query|hop)\\(",
+          "gfql\\(",
           "edge_query\\s*(=\\s*f?['\\\"]|\\()",
           "(?i)type"
         ]
@@ -17,7 +17,7 @@
     },
     {
       "id": "gfql_where_owner_compare",
-      "prompt": "Show a short GFQL snippet using where=[...] with compare(col(...), '==', col(...)) to keep paths where endpoint nodes share the same attribute value.",
+      "prompt": "Show a short GFQL snippet that keeps only paths where start/end nodes share the same owner-like attribute through an explicit path-level equality constraint.",
       "checks": {
         "regex": [
           "where\\s*=\\s*\\[",
@@ -31,6 +31,7 @@
       "prompt": "Write a minimal GFQL snippet that traverses a wider hop range but only returns a narrower output hop range.",
       "checks": {
         "regex": [
+          "gfql\\(",
           "min_hops\\s*=\\s*\\d+",
           "max_hops\\s*=\\s*\\d+",
           "output_min_hops\\s*=\\s*\\d+",
@@ -40,11 +41,10 @@
     },
     {
       "id": "gfql_remote_nodes_subset",
-      "prompt": "Provide a concise gfql_remote example that requests output_type='nodes' and limits payload with node_col_subset.",
+      "prompt": "Provide a concise remote GFQL example that returns only node results and minimizes transfer payload by selecting a small node column subset.",
       "checks": {
         "regex": [
           "gfql_remote\\(",
-          "output_type\\s*=\\s*['\\\"]nodes['\\\"]",
           "node_col_subset\\s*=\\s*\\["
         ]
       }
@@ -54,8 +54,9 @@
       "prompt": "Provide a short PyGraphistry snippet for using precomputed node coordinates x/y and disabling automatic playback for a static external layout view.",
       "checks": {
         "regex": [
-          "bind\\(.*point_x\\s*=\\s*['\\\"]x['\\\"]",
-          "point_y\\s*=\\s*['\\\"]y['\\\"]",
+          "bind\\(",
+          "['\\\"]x['\\\"]",
+          "['\\\"]y['\\\"]",
           "settings\\(",
           "url_params",
           "['\\\"]play['\\\"]\\s*:\\s*0"
@@ -64,11 +65,24 @@
     },
     {
       "id": "viz_icon_and_badge",
-      "prompt": "Show a concise PyGraphistry styling snippet that uses both encode_point_icon() and encode_point_badge().",
+      "prompt": "Show a concise PyGraphistry styling snippet that maps entity categories to node icons and overlays a risk/severity badge channel.",
       "checks": {
         "regex": [
           "encode_point_icon\\(",
           "encode_point_badge\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer includes icon and badge encodings mapped to meaningful categories/risks, not just method name mentions.",
+        "rubric": [
+          "Must include both icon and badge encoding in plausible PyGraphistry usage.",
+          "Should show category/risk mapping intent, not only bare calls."
+        ],
+        "required_concepts": [
+          "icon mapping",
+          "badge or risk/severity mapping"
         ]
       }
     },
@@ -82,6 +96,21 @@
           "(?i)datetime"
         ],
         "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A strong answer provides 3 concise, practical schema hygiene bullets covering type columns, avoiding dotted names, and datetime usage.",
+        "rubric": [
+          "Must provide exactly three concise bullets.",
+          "Must clearly cover type-column guidance, dotted-name avoidance, and datetime guidance.",
+          "Should be practical for Graphistry workflows."
+        ],
+        "required_concepts": [
+          "type columns",
+          "avoid dotted names",
+          "native datetime"
+        ]
       }
     }
   ]

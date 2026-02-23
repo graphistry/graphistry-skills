@@ -170,6 +170,56 @@ def _clear_symlinks(path: Path) -> None:
             child.unlink(missing_ok=True)
 
 
+def _remove_path(path: Path) -> None:
+    if not path.exists() and not path.is_symlink():
+        return
+    if path.is_symlink() or path.is_file():
+        path.unlink(missing_ok=True)
+    elif path.is_dir():
+        shutil.rmtree(path, ignore_errors=True)
+
+
+def _link_if_absent_or_stale(dst: Path, src: Path) -> None:
+    if not src.exists():
+        return
+    if dst.exists() and not dst.is_symlink():
+        return
+    if dst.is_symlink():
+        try:
+            if dst.resolve() == src.resolve():
+                return
+        except Exception:
+            pass
+        dst.unlink(missing_ok=True)
+    dst.symlink_to(src, target_is_directory=src.is_dir())
+
+
+def _native_docs_mode() -> str:
+    return (os.environ.get("AGENT_EVAL_NATIVE_DOCS_MODE") or "toc").strip().lower()
+
+
+def _native_skills_mount_mode() -> str:
+    return (os.environ.get("AGENT_EVAL_NATIVE_SKILLS_MOUNT_MODE") or "symlink").strip().lower()
+
+
+def _is_web_only_docs_mode(mode: str) -> bool:
+    return mode in {"web-only", "web", "remote-only"}
+
+
+def _resolve_native_docs_ref(mode: str | None = None) -> Path | None:
+    refs_root = ROOT / ".agents" / "skills" / "pygraphistry" / "references"
+    mirror_root = refs_root / "rtd-local"
+    mode = (mode or _native_docs_mode()).strip().lower()
+
+    if mode in {"none", "off", "disable", "disabled"} or _is_web_only_docs_mode(mode):
+        return None
+    if mode in {"mirror", "local-mirror"}:
+        return mirror_root if mirror_root.exists() else refs_root
+    if mode in {"auto", "prefer-mirror"}:
+        return mirror_root if mirror_root.exists() else refs_root
+    return refs_root
+
+
 def prepare_native_skill_env(
     out_dir: Path,
     profile_name: str,
@@ -188,15 +238,66 @@ def prepare_native_skill_env(
         return str(env_dir)
 
     target_skills_dir.mkdir(parents=True, exist_ok=True)
-    _clear_symlinks(target_skills_dir)
+    mount_mode = _native_skills_mount_mode()
+    if mount_mode == "symlink":
+        _clear_symlinks(target_skills_dir)
+    else:
+        for child in target_skills_dir.iterdir():
+            _remove_path(child)
 
     for skill in skill_names:
         src = ROOT / ".agents" / "skills" / skill
         if not (src / "SKILL.md").exists():
             continue
         dst = target_skills_dir / skill
-        dst.unlink(missing_ok=True)
-        dst.symlink_to(src, target_is_directory=True)
+        _remove_path(dst)
+        if mount_mode == "copy":
+            shutil.copytree(src, dst, symlinks=True)
+        else:
+            dst.symlink_to(src, target_is_directory=True)
+
+    docs_mode = _native_docs_mode()
+
+    # Optional strict docs isolation for A/B benchmarks:
+    # - TOC mode: keep references but remove mirror subtree.
+    # - WEB-ONLY mode: remove local references entirely.
+    if mount_mode == "copy" and docs_mode in {"toc"}:
+        mirror = target_skills_dir / "pygraphistry" / "references" / "rtd-local"
+        _remove_path(mirror)
+    if mount_mode == "copy" and _is_web_only_docs_mode(docs_mode):
+        refs_root = target_skills_dir / "pygraphistry" / "references"
+        _remove_path(refs_root)
+
+    # Keep native eval envs lightweight but non-empty so models can quickly
+    # discover local references instead of burning turns on missing-path probes.
+    docs_ref = _resolve_native_docs_ref(docs_mode)
+    context_links = {
+        "evals": ROOT / "evals",
+        "README.md": ROOT / "README.md",
+    }
+
+    if mount_mode == "copy":
+        # Keep local copied skills discoverable at the familiar .agents path
+        # while avoiding a direct link back to repo-root .agents.
+        local_agents = env_dir / ".agents"
+        local_agents.mkdir(parents=True, exist_ok=True)
+        local_skills = local_agents / "skills"
+        _remove_path(local_skills)
+        local_skills.symlink_to(target_skills_dir, target_is_directory=True)
+    else:
+        context_links[".agents"] = ROOT / ".agents"
+
+    local_docs_ref = target_skills_dir / "pygraphistry" / "references"
+    if mount_mode == "copy" and not _is_web_only_docs_mode(docs_mode) and local_docs_ref.exists():
+        context_links["docs"] = local_docs_ref
+        context_links["demos"] = local_docs_ref
+        context_links["graphistry"] = local_docs_ref
+    elif docs_ref is not None:
+        context_links["docs"] = docs_ref
+        context_links["demos"] = docs_ref
+        context_links["graphistry"] = docs_ref
+    for name, src in context_links.items():
+        _link_if_absent_or_stale(env_dir / name, src)
 
     return str(env_dir)
 
@@ -385,7 +486,24 @@ def emit_otel_event(
     for key, value in attrs.items():
         cmd.extend(["--attr", f"{key}={value}"])
 
-    subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    debug = os.environ.get("AGENT_EVAL_OTEL_DEBUG", "").strip().lower() in {"1", "true", "yes", "on"}
+    proc = subprocess.run(
+        cmd,
+        check=False,
+        capture_output=debug,
+        text=True,
+        stdout=subprocess.DEVNULL if not debug else None,
+        stderr=subprocess.DEVNULL if not debug else None,
+    )
+    if debug and proc.returncode != 0:
+        stderr_tail = (proc.stderr or "").strip()[-2000:]
+        stdout_tail = (proc.stdout or "").strip()[-1000:]
+        print(
+            f"OTEL emit failed: event={event_name} rc={proc.returncode} cmd={' '.join(cmd)}\n"
+            f"stdout={stdout_tail}\n"
+            f"stderr={stderr_tail}",
+            file=sys.stderr,
+        )
 
 
 def run_harness(
@@ -1310,6 +1428,9 @@ def main() -> int:
 
     git_sha = run_git_rev_parse("HEAD")
     git_branch = run_git_rev_parse("--abbrev-ref")
+    native_docs_mode = _native_docs_mode()
+    native_docs_ref = _resolve_native_docs_ref(native_docs_mode)
+    native_skills_mount_mode = _native_skills_mount_mode()
 
     manifest = {
         "run_id": run_id,
@@ -1342,6 +1463,9 @@ def main() -> int:
         "claude_models": parse_csv(args.claude_models),
         "codex_models": parse_csv(args.codex_models),
         "skills_delivery": args.skills_delivery,
+        "native_skills_mount_mode": native_skills_mount_mode,
+        "native_docs_mode": native_docs_mode,
+        "native_docs_ref": str(native_docs_ref) if native_docs_ref else "",
         "timeout_s": args.timeout_s,
         "max_workers": max_workers,
     }
@@ -1735,22 +1859,8 @@ def main() -> int:
 
                         return row
 
-                    case_rows: list[dict[str, Any]] = []
-                    worker_count = min(max_workers, len(harness_variants)) if harness_variants else 1
-                    if worker_count <= 1 or len(harness_variants) <= 1:
-                        for harness_idx, harness_variant in enumerate(harness_variants):
-                            case_rows.append(run_case_for_harness(harness_idx, harness_variant))
-                    else:
-                        with ThreadPoolExecutor(max_workers=worker_count) as pool:
-                            futures = {
-                                pool.submit(run_case_for_harness, harness_idx, harness_variant): harness_idx
-                                for harness_idx, harness_variant in enumerate(harness_variants)
-                            }
-                            for fut in as_completed(futures):
-                                case_rows.append(fut.result())
-
-                    case_rows.sort(key=lambda r: int(r.pop("__harness_idx", 0)))
-                    for row in case_rows:
+                    def persist_row(row: dict[str, Any]) -> None:
+                        row.pop("__harness_idx", None)
                         harness = str(row.get("harness") or "")
                         model = str(row.get("model") or "")
                         if (
@@ -1765,6 +1875,19 @@ def main() -> int:
                         rows.append(row)
                         rows_file.write(json.dumps(row, sort_keys=True) + "\n")
                         rows_file.flush()
+
+                    worker_count = min(max_workers, len(harness_variants)) if harness_variants else 1
+                    if worker_count <= 1 or len(harness_variants) <= 1:
+                        for harness_idx, harness_variant in enumerate(harness_variants):
+                            persist_row(run_case_for_harness(harness_idx, harness_variant))
+                    else:
+                        with ThreadPoolExecutor(max_workers=worker_count) as pool:
+                            futures = [
+                                pool.submit(run_case_for_harness, harness_idx, harness_variant)
+                                for harness_idx, harness_variant in enumerate(harness_variants)
+                            ]
+                            for fut in as_completed(futures):
+                                persist_row(fut.result())
 
                     emit_otel_event(
                         enabled=args.otel,
@@ -1792,8 +1915,22 @@ def main() -> int:
             )
 
     summary = summarize_rows(rows)
+    otel_endpoint = (args.otel_endpoint or os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT_GRPC") or "http://localhost:4317")
     otel_ids = {
         "run_id": run_id,
+        "otel_enabled": bool(args.otel),
+        "otel_service": args.otel_service,
+        "otel_endpoint": otel_endpoint,
+        "retrieve": {
+            "logs_by_run_id": (
+                f"bin/otel/cmds/search-logs --service {args.otel_service} "
+                f"--contains {run_id} --since 2h --limit 200 --full"
+            ),
+            "case_start_events": (
+                f"bin/otel/cmds/search-logs --service {args.otel_service} "
+                "--contains \"agent_eval.case.start\" --since 2h --limit 200 --full"
+            ),
+        },
         "rows": [
             {
                 "journey_id": row["journey_id"],

@@ -13,7 +13,7 @@
         "input_level": "raw_table",
         "output_depth": "workflow"
       },
-      "prompt": "An analyst is investigating coordinated social-media claim reuse. Provide one concise Python workflow from a posts table to a share-safe graph: normalize claim text into a key, compute claim reuse counts, shape edges+nodes for users and claims, style by reuse risk, and call plot(render=False).",
+      "prompt": "An analyst is investigating coordinated social-media claim reuse. Provide one concise Python workflow from a posts table to a share-safe claim-reuse network: normalize claims, compute reuse frequency, represent users/claims as graph entities, apply risk-oriented styling, and return a non-inline share URL.",
       "checks": {
         "regex": [
           "(claim_text|claim_key|claim)",
@@ -35,17 +35,39 @@
         "input_level": "conceptual",
         "output_depth": "snippet"
       },
-      "prompt": "Provide a compact connector triage snippet for an analyst using Neo4j or Splunk data with a dataframe fallback: mention connector choice, shape with edges(...).nodes(...), set private or organization privacy, and produce plot(render=False).",
+      "prompt": "Provide a compact connector triage snippet for an analyst using Neo4j or Splunk with a dataframe fallback. Explain connector choice, shape a graph, set non-public privacy mode (private or organization), and return a non-inline URL with plot(render=False). Keep auth/privacy handling safe.",
       "checks": {
         "regex": [
           "(?i)(neo4j|splunk|connector)",
           "(?i)dataframe",
           "edges\\(",
-          "\\.nodes\\(",
-          "privacy\\(mode\\s*=\\s*(['\\\"](private|organization)['\\\"]|[A-Za-z_][A-Za-z0-9_]*)\\)",
+          "(\\.nodes\\(|edges\\()",
+          "privacy\\((mode\\s*=\\s*(['\\\"](private|organization)['\\\"]|[A-Za-z_][A-Za-z0-9_]*)|\\*\\*[A-Za-z_][A-Za-z0-9_]*)\\)",
           "plot\\(render\\s*=\\s*False\\)"
         ],
-        "max_lines": 70
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "password\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+          "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
+        ],
+        "max_lines": 110
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer picks Neo4j/Splunk contextually, keeps a dataframe fallback, includes graph shaping and non-inline plotting, and explicitly addresses privacy-safe sharing/auth handling.",
+        "rubric": [
+          "Must include connector triage framing that distinguishes Neo4j and Splunk or explains a connector choice.",
+          "Must include a dataframe fallback path.",
+          "Must include graph shaping and a non-inline plot output pattern.",
+          "Must explicitly include privacy-safe handling (private/organization mode, redaction, or clear safe-sharing equivalent)."
+        ],
+        "required_concepts": [
+          "connector choice rationale",
+          "dataframe fallback",
+          "privacy-safe sharing/auth handling"
+        ]
       }
     },
     {
@@ -57,7 +79,7 @@
         "input_level": "raw_table",
         "output_depth": "e2e_workflow"
       },
-      "prompt": "For a non-fraud, non-cyber operations dataset, provide an end-to-end Python workflow from raw tabular records to a Graphistry visualization: include ingest, light ETL shaping, edges+nodes binding, one metric enrichment, and plot(render=False). Keep it concise.",
+      "prompt": "For a non-fraud, non-cyber operations dataset, provide an end-to-end Python workflow from raw tabular records to a Graphistry visualization. Include pandas ingest, light ETL shaping, graph binding, one metric enrichment, and a non-inline plot URL. Keep it concise.",
       "checks": {
         "regex": [
           "pd\\.(read_csv|DataFrame)\\(",

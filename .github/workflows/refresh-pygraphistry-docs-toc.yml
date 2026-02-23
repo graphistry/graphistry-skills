@@ -1,0 +1,43 @@
+name: Refresh PyGraphistry Docs TOC
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly Monday 09:17 UTC
+    - cron: "17 9 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Refresh TOC snapshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/refresh_pygraphistry_docs_toc.sh
+
+      - name: Commit and push if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- .agents/skills/pygraphistry/references; then
+            echo "No TOC changes to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .agents/skills/pygraphistry/references
+          git commit -m "chore(docs): refresh PyGraphistry ReadTheDocs TOC snapshots"
+          git push origin HEAD:main

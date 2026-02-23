@@ -5,6 +5,13 @@ description: "Apply PyGraphistry graph ML/AI workflows such as UMAP, DBSCAN, emb
 
 # PyGraphistry AI
 
+## Doc routing (local + canonical)
+- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
+- Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
+- In user-facing answers, prefer canonical `https://pygraphistry.readthedocs.io/en/latest/...` links.
+
 ## Typical workflow
 1. Build graph from nodes/edges.
 2. Run feature/embedding method (`umap`, `embed`, optional `dbscan`).

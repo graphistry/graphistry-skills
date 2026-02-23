@@ -27,7 +27,7 @@
     },
     {
       "id": "privacy_private_not_public",
-      "prompt": "Return exactly one Python line for a privacy-safe share workflow, and do not use public mode.",
+      "prompt": "Return a short Python snippet (1-3 lines) for a privacy-safe share workflow, and do not use public mode.",
       "checks": {
         "regex": [
           "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"][^\\)]*\\)"
@@ -35,7 +35,7 @@
         "must_not_regex": [
           "privacy\\(mode\\s*=\\s*['\\\"]public['\\\"][^\\)]*\\)"
         ],
-        "max_lines": 1
+        "max_lines": 3
       }
     },
     {
@@ -43,11 +43,26 @@
       "prompt": "List 3 canonical PyGraphistry ReadTheDocs links you would use to verify GFQL remote execution and query validation behavior. One URL per line.",
       "checks": {
         "regex": [
-          "(?im)^https://pygraphistry\\.readthedocs\\.io/.*/gfql/.*remote.*$",
-          "(?im)^https://pygraphistry\\.readthedocs\\.io/.*/gfql/.*predicates.*$",
-          "(?im)^https://pygraphistry\\.readthedocs\\.io/.*/gfql/.*validation.*$"
+          "(?i)https://pygraphistry\\.readthedocs\\.io/.*/gfql",
+          "(?i)(remote|gfql_remote)",
+          "(?i)(predicate|where|filter|validation|query)"
         ],
-        "min_lines": 3
+        "min_lines": 3,
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer gives canonical ReadTheDocs links for GFQL remote usage plus query/predicate/validation guidance, without off-topic links.",
+        "rubric": [
+          "Must include at least three relevant ReadTheDocs links.",
+          "Must cover remote GFQL and query/predicate validation concerns.",
+          "Should stay concise and link-focused."
+        ],
+        "required_concepts": [
+          "GFQL remote docs",
+          "query/predicate validation docs"
+        ]
       }
     },
     {
@@ -61,16 +76,29 @@
           "edges\\(|nodes\\("
         ],
         "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer contrasts Neo4j and Splunk connector fit, includes a dataframe-first fallback, and gives practical routing guidance rather than token mentions only.",
+        "rubric": [
+          "Must explain when Neo4j vs Splunk is appropriate.",
+          "Must include a dataframe-first fallback path.",
+          "Should remain concise and actionable."
+        ],
+        "required_concepts": [
+          "connector choice rationale",
+          "dataframe fallback"
+        ]
       }
     },
     {
       "id": "gfql_real_methods_only",
-      "prompt": "Provide one short GFQL remote snippet that only uses real PyGraphistry methods. Avoid invented helper names.",
+      "prompt": "Provide one short GFQL remote snippet that only uses real PyGraphistry methods on a remote dataset handle. Avoid invented helper names.",
       "checks": {
         "regex": [
           "gfql_remote\\(",
-          "n\\(",
-          "(e_forward\\(|e\\()"
+          "(bind\\(|dataset_id\\s*=)"
         ],
         "must_not_regex": [
           "query_graph\\(",
@@ -80,6 +108,46 @@
           "\\._[A-Za-z0-9_]+\\("
         ],
         "max_lines": 20
+      }
+    },
+    {
+      "id": "gfql_remote_edge_pattern_real_methods",
+      "prompt": "Provide one short GFQL snippet on a bound remote dataset that explicitly traverses an edge pattern using real methods (prefer n/e/e_forward). Avoid invented helper names.",
+      "checks": {
+        "regex": [
+          "(gfql_remote\\(|\\.gfql\\(|\\bchain\\()",
+          "n\\(",
+          "(e_forward\\(|e\\()",
+          "(bind\\(|dataset_id|remote)"
+        ],
+        "must_not_regex": [
+          "query_graph\\(",
+          "graph_query\\(",
+          "run_gfql\\(",
+          "connect_graphistry\\(",
+          "\\._[A-Za-z0-9_]+\\("
+        ],
+        "max_lines": 24
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.82,
+        "reference_answer": "A strong answer demonstrates a remote GFQL call with explicit node/edge pattern primitives and no invented APIs.",
+        "rubric": [
+          "Must include gfql_remote with explicit node/edge traversal primitives.",
+          "Must avoid hop/chain shorthand and invented helper names.",
+          "Should be concise and syntactically plausible."
+        ],
+        "required_concepts": [
+          "remote GFQL edge-pattern traversal",
+          "real method usage only"
+        ],
+        "forbidden_concepts": [
+          "query_graph(",
+          "graph_query(",
+          "run_gfql(",
+          "connect_graphistry("
+        ]
       }
     }
   ]

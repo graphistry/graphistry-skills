@@ -1,0 +1,86 @@
+{
+  "id": "pygraphistry_router_speed_v1",
+  "description": "Speed-oriented router checks for selecting the right PyGraphistry skill/docs with minimal turns and compact responses.",
+  "eval_intent": "speed_routing",
+  "tags": ["pygraphistry", "router", "speed", "latency"],
+  "cases": [
+    {
+      "id": "speed_route_gfql_temporal_remote",
+      "prompt": "Route this quickly: I need date/time slicing and same-owner traversal in GFQL over a remote dataset. Use canonical `/en/latest/` ReadTheDocs links. Reply in 4 lines max: line 1 selected skill name, remaining lines are top ReadTheDocs URLs only.",
+      "checks": {
+        "regex": [
+          "(?i)(pygraphistry-gfql|\\bgfql\\b)",
+          "https://pygraphistry\\.readthedocs\\.io/en/latest/(gfql|source/pygraphistry/umlfiles/gfql)(/|\\.|#|\\b)"
+        ],
+        "min_lines": 3,
+        "max_lines": 5
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong routing answer quickly picks the GFQL skill and points to canonical en/latest GFQL docs with minimal extra text.",
+        "rubric": [
+          "Must identify a GFQL-focused routing path.",
+          "Must provide useful canonical docs links.",
+          "Should remain concise (routing-first, not deep tutorial)."
+        ],
+        "required_concepts": [
+          "GFQL routing",
+          "canonical docs links"
+        ]
+      }
+    },
+    {
+      "id": "speed_route_viz_geo_icons",
+      "prompt": "Route this quickly: I want geospatial + icon styling + privacy-safe sharing links. Use canonical `/en/latest/` ReadTheDocs links. Reply in 5 lines max: selected skill and the most relevant ReadTheDocs URLs only.",
+      "checks": {
+        "regex": [
+          "(?i)(pygraphistry-visualization|\\bvisualization\\b)",
+          "https://pygraphistry\\.readthedocs\\.io/en/latest/(visualization|source/pygraphistry/umlfiles/plots)(/|\\.|#|\\b)",
+          "(?i)(maps|icons|privacy)"
+        ],
+        "min_lines": 3,
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong routing answer selects visualization, then prioritizes docs for geospatial, icons, and privacy-safe sharing.",
+        "rubric": [
+          "Must route to visualization-oriented guidance.",
+          "Must include geospatial/icon/privacy relevance.",
+          "Should keep links concise and high-signal."
+        ],
+        "required_concepts": [
+          "visualization routing",
+          "geo/icons/privacy relevance"
+        ]
+      }
+    },
+    {
+      "id": "speed_route_connector_auth",
+      "prompt": "Route this quickly: user asks about Neo4j ingestion plus org/api auth setup. Use canonical `/en/latest/` ReadTheDocs links. Reply in 5 lines max with selected skill and top ReadTheDocs docs links only.",
+      "checks": {
+        "regex": [
+          "https://pygraphistry\\.readthedocs\\.io/en/latest/(plugins|plugins\\.connectors|server/register|source/pygraphistry|authentication|auth|notebooks/plugins\\.connectors)(\\.html|/|#|\\b)"
+        ],
+        "min_lines": 3,
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong routing answer for Neo4j+auth maps to connectors + auth/core docs and provides canonical en/latest links.",
+        "rubric": [
+          "Must route connector ingestion and auth setup appropriately.",
+          "Must include docs relevant to both connector and auth concerns.",
+          "Should stay concise for router-speed intent."
+        ],
+        "required_concepts": [
+          "connector + auth routing",
+          "canonical docs links"
+        ]
+      }
+    }
+  ]
+}

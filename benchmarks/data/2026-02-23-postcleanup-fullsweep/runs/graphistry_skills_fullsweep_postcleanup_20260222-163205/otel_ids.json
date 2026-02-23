@@ -1,0 +1,2812 @@
+{
+  "otel_enabled": false,
+  "otel_endpoint": "http://localhost:4317",
+  "otel_service": "agent-eval-runner",
+  "retrieve": {
+    "case_start_events": "bin/otel/cmds/search-logs --service agent-eval-runner --contains \"agent_eval.case.start\" --since 2h --limit 200 --full",
+    "logs_by_run_id": "bin/otel/cmds/search-logs --service agent-eval-runner --contains agent_eval_20260222-163205 --since 2h --limit 200 --full"
+  },
+  "rows": [
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "64f044cc-235d-49ed-ad45-a1b9cbc0aca6",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "578ced47fca045b798d0c7932f7e5735"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87e9-1a21-7471-8588-ac10b0b23012"
+      },
+      "skills_mode": "off",
+      "trace_id": "3218b1c8e5124b3bb6cadcbf22154cfd"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "309defb5-26db-431f-a6b5-6b19502bfcbb",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "5e5d7cd8343a440aac845ac2d399fef3"
+    },
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ea-2a46-77f1-9796-a25c7528e522"
+      },
+      "skills_mode": "on",
+      "trace_id": "0b76cdca297c43d089a8da9a10d893da"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "d525fbd7-7a4c-4f08-9a60-a3c83d3eb95c",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "3b318de1737a42418498b37a419f10ba"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87eb-4955-7761-9500-3536ccd6b7b6"
+      },
+      "skills_mode": "off",
+      "trace_id": "3bd75fce5ef94598991f1ff4c9a72f5e"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "b50944bf-befb-43a5-ab0f-49f63c0e6ef9",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "a5f27406c82b401ca490dd917165ba12"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ed-0005-7d30-958e-5beb98339487"
+      },
+      "skills_mode": "on",
+      "trace_id": "a4b3e66ec6f7489786af2f7723584cc7"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "1ca5e7cf-f059-41bf-b526-3625f3e2abaa",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "ab6406125b5d4e448a8c2e1943feb54e"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ee-1e2e-7ed2-ba13-ce49a28e0e85"
+      },
+      "skills_mode": "off",
+      "trace_id": "bf864cf8105648d6a25c98a6aeeebcac"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "37ee5f91-1061-42dc-8052-c300dcb78a42",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "b35735185b9345458b4bd3020252ae7c"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ef-3047-7db0-aa7a-505009665010"
+      },
+      "skills_mode": "on",
+      "trace_id": "26f878eeec0d487486f03ab609766771"
+    },
+    {
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "7050cbbe-dfb3-487e-b319-d2ab12c8a748",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "b65fbbc0b91145b3b28357a2337ad5b4"
+    },
+    {
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ef-fab0-7c23-b88b-802db315b193"
+      },
+      "skills_mode": "off",
+      "trace_id": "f5933daf3e6a41a4be5515f1855e05a6"
+    },
+    {
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ce2ce39e-6c4f-43a3-a552-7ed3e1a3acac",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "33a32218ccc748ff9ef0a985e02a041a"
+    },
+    {
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87f2-1232-7690-aaf3-4ad5b719234f"
+      },
+      "skills_mode": "on",
+      "trace_id": "5c6e3aed71f341858f9e1e5f7abe3f30"
+    },
+    {
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "b8710df5-1a76-406a-bee3-f73cf9b0fd92",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "aa04638c690c499b90ce7fb0f4ce13d8"
+    },
+    {
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87f3-5560-7e70-b797-5466bba96388"
+      },
+      "skills_mode": "off",
+      "trace_id": "356b18d6b3024b41a55593d6727ecc8e"
+    },
+    {
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "8c928897-59f1-445a-aa18-9d600f816984",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "aeddbacce251433aa265cc9136516e0a"
+    },
+    {
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87f5-a36a-7e83-aef9-46bba4ae42d2"
+      },
+      "skills_mode": "on",
+      "trace_id": "ea2b897a0c814f0bacfebcaa3088160d"
+    },
+    {
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87f7-74c2-7bd1-8889-2cd6811f44c6"
+      },
+      "skills_mode": "off",
+      "trace_id": "7954a1e77799437287e1707464c5d52f"
+    },
+    {
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "759f7f68-23ea-47d9-992a-bd9aa01362b3",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c1de3325970e422586f8b2d84ef9b9ba"
+    },
+    {
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "df0d82d3-bfd0-4f8f-bfaa-1ce1139357ca",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "c1a1c5884c3242268aa7e9a3303b55cf"
+    },
+    {
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87f9-526c-73b0-8c44-1a8b6986a679"
+      },
+      "skills_mode": "on",
+      "trace_id": "419deb75329a4ce28eb686e087e9b7fe"
+    },
+    {
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "26133513-6902-4f3c-bde3-c1f55ef65106",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "59d17a25f0f94dbebf98c944b04a07cd"
+    },
+    {
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87fa-c28e-7e70-aadf-1c84b273ff86"
+      },
+      "skills_mode": "off",
+      "trace_id": "b49d2616f15e44ee96c43748f1a4fba5"
+    },
+    {
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "harness": "claude",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "3ffb20d7-d70f-41d2-9123-e466ed3b1946",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "ce0377e41d354ba5a03116bceca96085"
+    },
+    {
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "harness": "codex",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87fc-7d99-7871-a088-d22cbe0f8cb0"
+      },
+      "skills_mode": "on",
+      "trace_id": "bf44dddafde748fc9976814e9f2251da"
+    },
+    {
+      "case_id": "exec_plot_public_render_false",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0c9963ed-4b29-4366-8b64-0934d9293260",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "340191bdae3c43eeb4f1673bac31173c"
+    },
+    {
+      "case_id": "exec_plot_public_render_false",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87fe-2ab3-7711-b9cb-aaa6610dac9d"
+      },
+      "skills_mode": "off",
+      "trace_id": "66a4c789b65048eb9d93ff0d92dd02d5"
+    },
+    {
+      "case_id": "exec_plot_public_render_false",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0156e0f9-7db0-4025-ba99-5688750b337e",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "fc32cd327bee4286988dee6082eb3ad0"
+    },
+    {
+      "case_id": "exec_plot_public_render_false",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87fe-9cec-7fa0-ba79-c425272b343d"
+      },
+      "skills_mode": "on",
+      "trace_id": "a484d9fcbd474c5892ae9ec3df1d800b"
+    },
+    {
+      "case_id": "exec_plot_private_safe",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "bf29b7b2-518d-4352-9932-d65a01943733",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "17426e77c728444190ba0e540797d84c"
+    },
+    {
+      "case_id": "exec_plot_private_safe",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ff-62d4-7eb0-b42f-d73222cc71f5"
+      },
+      "skills_mode": "off",
+      "trace_id": "1e1893f4eda24db98c434b6b0b909bf7"
+    },
+    {
+      "case_id": "exec_plot_private_safe",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "6b1f0a97-9385-44cf-9d9c-30ad205a37c0",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "3cdfe12eb72c4ed890fefeb1214dba3b"
+    },
+    {
+      "case_id": "exec_plot_private_safe",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c87ff-fed8-78d1-b5c0-dac58c326808"
+      },
+      "skills_mode": "on",
+      "trace_id": "18a8981ed5a94dca9336acece2b237d1"
+    },
+    {
+      "case_id": "exec_schema_type_event_time",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "48449aca-df62-4ebc-b143-fa60b8385da6",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "58f03f42a62b4d22b10ad1427ca90169"
+    },
+    {
+      "case_id": "exec_schema_type_event_time",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8800-53a8-70b0-8591-5c32afa3fa07"
+      },
+      "skills_mode": "off",
+      "trace_id": "57bf0b77974f46aaa1345e27f9af0b64"
+    },
+    {
+      "case_id": "exec_schema_type_event_time",
+      "harness": "claude",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "cfbce196-f902-44e0-a188-de58bb5556b2",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "40ac32c512de450dbc3643484524a77d"
+    },
+    {
+      "case_id": "exec_schema_type_event_time",
+      "harness": "codex",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8800-863e-7ca1-9d4e-41b230e689cb"
+      },
+      "skills_mode": "on",
+      "trace_id": "35f182810c994dab9fe2a1141df12736"
+    },
+    {
+      "case_id": "auth_env_no_literal_creds",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "342a9476-b916-4a14-b292-23370dbad7f5",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "8f3b67a0913149728c722cd35d52e500"
+    },
+    {
+      "case_id": "auth_env_no_literal_creds",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8800-ce0c-7482-ad93-557e841ade61"
+      },
+      "skills_mode": "off",
+      "trace_id": "9d7685a4c2c8420aa8e039917a1ff0d8"
+    },
+    {
+      "case_id": "auth_env_no_literal_creds",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "98777902-cb4d-47c3-b482-d4b9df9862a9",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "af9821e060a94c84bee7e93168e67737"
+    },
+    {
+      "case_id": "auth_env_no_literal_creds",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8801-64f2-7062-8488-9e314741c637"
+      },
+      "skills_mode": "on",
+      "trace_id": "7b2db3313f2c4a48b41960e53ecf661a"
+    },
+    {
+      "case_id": "privacy_private_not_public",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "5d985e0d-9ed8-4c0f-986f-a4951379d586",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c5b1538db49840f1b36bd2208ffa0e17"
+    },
+    {
+      "case_id": "privacy_private_not_public",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8801-b5e3-7843-963d-eb00cdd291ed"
+      },
+      "skills_mode": "off",
+      "trace_id": "35aba86a5be043e086cef8f17f0bd46b"
+    },
+    {
+      "case_id": "privacy_private_not_public",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "06387254-eff4-4e88-b55f-d4f608e48136",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "77b456a1b21d4039a383c5711d2f182c"
+    },
+    {
+      "case_id": "privacy_private_not_public",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8802-3060-7de1-bbb8-3306a04c8b77"
+      },
+      "skills_mode": "on",
+      "trace_id": "cb0ed7940bf54f9db3d68c2932d8d4d4"
+    },
+    {
+      "case_id": "gfql_remote_docs_routing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "21e7ad00-4cd7-458f-b5da-d69a21f02be4",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "2bccb9c1fc8b45e1844b42092eb08cd3"
+    },
+    {
+      "case_id": "gfql_remote_docs_routing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8802-7d28-7a02-b0de-5c1189fe546e"
+      },
+      "skills_mode": "off",
+      "trace_id": "76a50f1e4c5747d38550396b0e3b70df"
+    },
+    {
+      "case_id": "gfql_remote_docs_routing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "5ee7db74-766f-4d31-8d46-8a67a0799d8d",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "fb205f2a47784bc29b3a6f52423c4fea"
+    },
+    {
+      "case_id": "gfql_remote_docs_routing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8803-260b-7a91-8dc0-43363b70b5f8"
+      },
+      "skills_mode": "on",
+      "trace_id": "496dd7d0e66341818400a756fce2891f"
+    },
+    {
+      "case_id": "connector_routing_with_fallback",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "2001e67c-ffb3-4df8-af9e-5010f75b33ae",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "e13c11da81b54de8806b04ba8001f467"
+    },
+    {
+      "case_id": "connector_routing_with_fallback",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8803-c3fa-7343-8e0f-c31550827d2e"
+      },
+      "skills_mode": "off",
+      "trace_id": "330776262166455790ef75bc4bc6fc7c"
+    },
+    {
+      "case_id": "connector_routing_with_fallback",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "4dd9665d-d527-4403-8090-5d5c651dd270",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "3256056ea78e4beab3c7f2f195b7dca6"
+    },
+    {
+      "case_id": "connector_routing_with_fallback",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8804-5c5d-7d23-804b-41d9020d712d"
+      },
+      "skills_mode": "on",
+      "trace_id": "dac991ae070a4acd96a0fa84bb65b592"
+    },
+    {
+      "case_id": "gfql_real_methods_only",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "d81847b6-477b-437e-a853-f02d72d31763",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "bf351f9e7bfc4aa6b3db7247ad2a58e5"
+    },
+    {
+      "case_id": "gfql_real_methods_only",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8804-a9c0-7f62-a0e5-6304147942f5"
+      },
+      "skills_mode": "off",
+      "trace_id": "7bb8a2600b96454fb4c77aa78ee2ed54"
+    },
+    {
+      "case_id": "gfql_real_methods_only",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "33df17ae-4bd1-46c8-aff3-24ea52ed4701",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "0405648cb03e406fad7267d9464c4915"
+    },
+    {
+      "case_id": "gfql_real_methods_only",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8805-d3d3-7d11-b65f-349c86bfac45"
+      },
+      "skills_mode": "on",
+      "trace_id": "f73b9eb6352143468379e47bac04ad8e"
+    },
+    {
+      "case_id": "gfql_remote_edge_pattern_real_methods",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ac867e99-e2ea-4afb-abba-9e9ffeeabbe3",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "09563b4df35b4c5e80e9203e5687e9b3"
+    },
+    {
+      "case_id": "gfql_remote_edge_pattern_real_methods",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8806-692a-71a0-b37f-bb6a4a29da80"
+      },
+      "skills_mode": "off",
+      "trace_id": "c0b909ca8b4948f18c7201658d161b19"
+    },
+    {
+      "case_id": "gfql_remote_edge_pattern_real_methods",
+      "harness": "claude",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "84365f28-d6e6-4769-89f4-2ecf166f64b8",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "af12248863394abab1a47ca970a9f3ce"
+    },
+    {
+      "case_id": "gfql_remote_edge_pattern_real_methods",
+      "harness": "codex",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8807-28bd-7183-af61-f5e139bdea24"
+      },
+      "skills_mode": "on",
+      "trace_id": "7c59338cf30e4e0eb80e3a16185ff7ea"
+    },
+    {
+      "case_id": "louie_privacy_snippet",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "904d7fa8-8695-4c31-92c1-eb3e27b82642",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "b5ee3549a063453b8e25897cdbcd6bdf"
+    },
+    {
+      "case_id": "louie_privacy_snippet",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8807-76de-70f1-80f6-5c284d5e0be1"
+      },
+      "skills_mode": "off",
+      "trace_id": "34cc6b0e172f42b7825f27e0b577e148"
+    },
+    {
+      "case_id": "louie_privacy_snippet",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "213fea92-92f3-4d3c-a92c-abf1f37e92f3",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "12e8347f34b24a028630c54fb5d9eb39"
+    },
+    {
+      "case_id": "louie_privacy_snippet",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8807-c4cb-7a43-927d-d0f579a47f1b"
+      },
+      "skills_mode": "on",
+      "trace_id": "1efd8d96beb746209c31e2a4309d3ddd"
+    },
+    {
+      "case_id": "louie_gfql_remote",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "d8149a3a-0b58-4828-a9f0-dd5e58a91bb5",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "2c424653fd0e4ea28fff056956a0cda9"
+    },
+    {
+      "case_id": "louie_gfql_remote",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8807-ff3e-73f2-91cd-17b1deb5b872"
+      },
+      "skills_mode": "off",
+      "trace_id": "b4cf4c09878f48ae9b04fbfdb569bf27"
+    },
+    {
+      "case_id": "louie_gfql_remote",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "a25d8c1b-59e4-4b10-94d6-1b0a1fdc2002",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "d9cba9dd1a6e4af5a3ca5ccde64ab610"
+    },
+    {
+      "case_id": "louie_gfql_remote",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8808-82ce-7fa3-93ac-24e579e39cdd"
+      },
+      "skills_mode": "on",
+      "trace_id": "fe7f7fe364ed44f89de803fe012f6c67"
+    },
+    {
+      "case_id": "louie_ai_search",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0f14c4eb-8c12-4e52-9c2a-9baa42a8f907",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c3a93e19a2374025b9a55a1511b3d83f"
+    },
+    {
+      "case_id": "louie_ai_search",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8808-e888-7ff0-bde9-b4455b09fcf7"
+      },
+      "skills_mode": "off",
+      "trace_id": "22f087021980440681f540a7ff9ee004"
+    },
+    {
+      "case_id": "louie_ai_search",
+      "harness": "claude",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "02c63a05-de10-4441-86eb-e1527cc7c3f0",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "bd36e895053e4be29e45e1b70c5a1358"
+    },
+    {
+      "case_id": "louie_ai_search",
+      "harness": "codex",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8809-771a-7eb0-b16b-c13551318829"
+      },
+      "skills_mode": "on",
+      "trace_id": "9275f7e08d124c8aaf88e08d8591e323"
+    },
+    {
+      "case_id": "gfql_edge_query_filter",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "f3f22096-b2df-44e7-bfe1-2083dbae563e",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "d9cc68d5dc5245878f9c4a24bcbc8202"
+    },
+    {
+      "case_id": "gfql_edge_query_filter",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8809-ab4a-7773-8a67-204176830416"
+      },
+      "skills_mode": "off",
+      "trace_id": "2c4a4067d622464e90f772c24bc6cc68"
+    },
+    {
+      "case_id": "gfql_edge_query_filter",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "26817ca2-1ca9-4d30-9f8a-50e5c3fb1f27",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "d9d182599c594c3a915cfce1e4962f01"
+    },
+    {
+      "case_id": "gfql_edge_query_filter",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880a-cbf0-7b10-858b-aac26a6a3fa5"
+      },
+      "skills_mode": "on",
+      "trace_id": "54308021de614fe1a6f0c8e11cfc5613"
+    },
+    {
+      "case_id": "gfql_where_owner_compare",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "64ee33d1-c2a8-440b-9a6f-d568bdc22bf3",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "4f6cf052f5e64b7aba6014b5cd96b78c"
+    },
+    {
+      "case_id": "gfql_where_owner_compare",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880b-303a-7350-9a88-341b9a52ffcc"
+      },
+      "skills_mode": "off",
+      "trace_id": "b17f835f65e44bb1b3d4b00baf1071e0"
+    },
+    {
+      "case_id": "gfql_where_owner_compare",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "829c5809-181a-4ad8-892a-4d8eed820e8a",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "5f88da2cfdd94f358ce04b05dd3d8ce1"
+    },
+    {
+      "case_id": "gfql_where_owner_compare",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880b-a85e-7551-b63c-b33d312d628a"
+      },
+      "skills_mode": "on",
+      "trace_id": "4abf58da113b426b89cda48d6d9f387d"
+    },
+    {
+      "case_id": "gfql_output_hop_slicing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "59618321-084c-43e8-8f18-bd31cf506904",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "234f5a97686f44129cd99e8619bd7154"
+    },
+    {
+      "case_id": "gfql_output_hop_slicing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880c-0046-7401-a254-b51d2ca8de6f"
+      },
+      "skills_mode": "off",
+      "trace_id": "1a05bc4616164936828f18b4ae156464"
+    },
+    {
+      "case_id": "gfql_output_hop_slicing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "c49f5a68-825f-4ee1-86b5-1fd101365fa7",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "83bdec71a7db48bdb49b6c57f186a2ec"
+    },
+    {
+      "case_id": "gfql_output_hop_slicing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880c-7eb4-7e92-87d3-41feb6fce450"
+      },
+      "skills_mode": "on",
+      "trace_id": "ebfb4adf06a34023bcd8f0a91d65e89a"
+    },
+    {
+      "case_id": "gfql_remote_nodes_subset",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880c-c5ce-7ff0-afa1-2680cfdd629c"
+      },
+      "skills_mode": "off",
+      "trace_id": "afb6ac65e77b4f918341b6e3aaf9dfdf"
+    },
+    {
+      "case_id": "gfql_remote_nodes_subset",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ebb9bae2-bdac-4615-b5e7-bb66111ba302",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "ea21879219ed4544a99bf6c77542837f"
+    },
+    {
+      "case_id": "gfql_remote_nodes_subset",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "4f51859b-5eb7-4866-b58d-76db3663e802",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "a8de1612860a4101aa38b0986b789717"
+    },
+    {
+      "case_id": "gfql_remote_nodes_subset",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880d-53bc-7681-aadd-9f048fbf1249"
+      },
+      "skills_mode": "on",
+      "trace_id": "de8f91cb090a4caea554263eb121d2b1"
+    },
+    {
+      "case_id": "viz_external_layout_play0",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "2dceb4c6-bf4f-4801-b26a-53357e0be987",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c757a7bcd8bd4d85836048fcd722b83f"
+    },
+    {
+      "case_id": "viz_external_layout_play0",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880d-e1bd-7c11-88c8-cb22232c51f6"
+      },
+      "skills_mode": "off",
+      "trace_id": "7f52c89e326245f9bc2e8505d14cd99b"
+    },
+    {
+      "case_id": "viz_external_layout_play0",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "aff13c24-b009-4205-939d-53ff0ef847b9",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "a4485a9b48c7458391f0eed56e16541c"
+    },
+    {
+      "case_id": "viz_external_layout_play0",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880e-7768-7d02-9fff-79b3660e1e18"
+      },
+      "skills_mode": "on",
+      "trace_id": "690dbd87033943519fa3acc59303e50f"
+    },
+    {
+      "case_id": "viz_icon_and_badge",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "643d09c1-01e3-4a26-8253-d5731246ace3",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "77cee64864f442dcbfb27eb228cb51e2"
+    },
+    {
+      "case_id": "viz_icon_and_badge",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880e-b7ca-7ba2-90a1-58ac5fff3fe8"
+      },
+      "skills_mode": "off",
+      "trace_id": "982183ebaaae44f0b6dd58fd601bcb5a"
+    },
+    {
+      "case_id": "viz_icon_and_badge",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "3efdcd91-110c-4d82-9aad-eae557bcce2c",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "3e2e0a172e17455d8e36a2dbea88850e"
+    },
+    {
+      "case_id": "viz_icon_and_badge",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880f-4e17-7982-955d-f19c21ce8f7b"
+      },
+      "skills_mode": "on",
+      "trace_id": "913e082ea9834da18c5a14d3e95fe5ab"
+    },
+    {
+      "case_id": "viz_schema_hygiene_bullets",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0b5b2efd-4c0d-4639-9048-f79bfdeebe95",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "37eb6868a8d34759922d2e1cbb048299"
+    },
+    {
+      "case_id": "viz_schema_hygiene_bullets",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c880f-ffbb-7b62-acc4-70321b54b82c"
+      },
+      "skills_mode": "off",
+      "trace_id": "73d7d30eb1c141448e3dd908959da3bb"
+    },
+    {
+      "case_id": "viz_schema_hygiene_bullets",
+      "harness": "claude",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ce98b322-7ec3-4950-9250-39c309f0635e",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "725e271be72f493a819469bd13187c0f"
+    },
+    {
+      "case_id": "viz_schema_hygiene_bullets",
+      "harness": "codex",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8810-26f4-7cc0-a488-77cc85193be3"
+      },
+      "skills_mode": "on",
+      "trace_id": "29f67faf06e348a59a216c54150a1495"
+    },
+    {
+      "case_id": "persona_novice_fraud_table_to_viz_algo",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "15beaa2e-1583-450d-9009-ddd110acc461",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "a32fc4524d3a47dc999058a76aa06f8f"
+    },
+    {
+      "case_id": "persona_novice_fraud_table_to_viz_algo",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8810-6c16-7311-a201-27402e871ed3"
+      },
+      "skills_mode": "off",
+      "trace_id": "44d72a0597d94540b1eaf90df141e1d2"
+    },
+    {
+      "case_id": "persona_novice_fraud_table_to_viz_algo",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "9f48a323-109d-4ce1-8573-072dbcd46ee0",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "bcdadc96c10047c4a120209f32126ec8"
+    },
+    {
+      "case_id": "persona_novice_fraud_table_to_viz_algo",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8812-328e-70e1-b068-e5a7189bf2d7"
+      },
+      "skills_mode": "on",
+      "trace_id": "786b78ece72d4792acb7df7ea1710239"
+    },
+    {
+      "case_id": "persona_org_and_api_key_navigation",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "e1efe193-4e7d-4cb5-8d01-0e59d7d10edf",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "918baf00fa854ede9aec59200b60d3be"
+    },
+    {
+      "case_id": "persona_org_and_api_key_navigation",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8813-3ca8-7d52-bca5-09951d5d2a37"
+      },
+      "skills_mode": "off",
+      "trace_id": "722f2b0b978b48f69286da7b70a04770"
+    },
+    {
+      "case_id": "persona_org_and_api_key_navigation",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "56bec3d3-c3aa-48c2-8616-8498337c0a8f",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "80c8b36987a343e782db6d99e720c6f6"
+    },
+    {
+      "case_id": "persona_org_and_api_key_navigation",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8813-fd39-74f1-8cf1-06e442ff0df3"
+      },
+      "skills_mode": "on",
+      "trace_id": "8cb8e071a5be45ef9771c20bc150cd9a"
+    },
+    {
+      "case_id": "persona_advanced_coloring_with_gfql_slices",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8814-b4b5-7e40-b9bf-133cc1805700"
+      },
+      "skills_mode": "off",
+      "trace_id": "21ac32ae8f8e41fcbdf3cea278da5f7c"
+    },
+    {
+      "case_id": "persona_advanced_coloring_with_gfql_slices",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "2f7d20d1-41d4-471a-8c03-330445ea2562",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "dc95f97725c74faeb96256abad1a101d"
+    },
+    {
+      "case_id": "persona_advanced_coloring_with_gfql_slices",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "fb9b63bd-31ef-43e3-ab55-f80f5a71b186",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "61386a513e6d4c329c8e40090ef85f6a"
+    },
+    {
+      "case_id": "persona_advanced_coloring_with_gfql_slices",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8816-c796-78b0-91df-6dc00b169ca4"
+      },
+      "skills_mode": "on",
+      "trace_id": "3beafcba737f42a69affc8b1532cc630"
+    },
+    {
+      "case_id": "persona_umap_text_featurization",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "db350421-ee09-47eb-b942-3a4009bc753b",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "90df9c3c3100426a9335ee2a0b62bde9"
+    },
+    {
+      "case_id": "persona_umap_text_featurization",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8817-6e49-74f2-b878-858aa2d60839"
+      },
+      "skills_mode": "off",
+      "trace_id": "d3b7407638c449679a7a8d3522f88e9c"
+    },
+    {
+      "case_id": "persona_umap_text_featurization",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "b3c0f7c9-a2f0-4c84-8385-638001c2a597",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "2658bfbf712c4e0eae958359ca0835ec"
+    },
+    {
+      "case_id": "persona_umap_text_featurization",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8818-4e56-7221-849d-fc7cee746f7c"
+      },
+      "skills_mode": "on",
+      "trace_id": "98412eb70130402582666ae6353ae4f9"
+    },
+    {
+      "case_id": "persona_precomputed_embeddings_flow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "3589f30c-d9e4-4bb4-82f9-7beea4cf9c5f",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "1c5bd65340d844e7a468e06736743334"
+    },
+    {
+      "case_id": "persona_precomputed_embeddings_flow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8818-aabe-7951-a8a2-22db3aac5866"
+      },
+      "skills_mode": "off",
+      "trace_id": "46e9c45502a84262b5ffdba82dd56fd0"
+    },
+    {
+      "case_id": "persona_precomputed_embeddings_flow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "32c66836-e732-44fb-a408-24eb59966f72",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "07eeaee057ee40d1bdcc962e1a068258"
+    },
+    {
+      "case_id": "persona_precomputed_embeddings_flow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8819-81cf-7300-ba72-63ece62879aa"
+      },
+      "skills_mode": "on",
+      "trace_id": "73ce7fe219f7429c8bb54b2e5bf05051"
+    },
+    {
+      "case_id": "persona_connector_analyst_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "6a7a1ff6-6687-462b-9f5f-bc3d1d97022b",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "94c61f6a64ea45c9aa6d762c111904b5"
+    },
+    {
+      "case_id": "persona_connector_analyst_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8819-c933-7db1-846b-260c95d74c02"
+      },
+      "skills_mode": "off",
+      "trace_id": "7d9bf69d61b5444ab26f181e1f1c751a"
+    },
+    {
+      "case_id": "persona_connector_analyst_workflow",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "b57d6d8f-e333-494d-b28e-15bd2857c81a",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "74b182125bda492bb9258fc1f567f0de"
+    },
+    {
+      "case_id": "persona_connector_analyst_workflow",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881a-df7c-7cf3-92a6-22b7ff304887"
+      },
+      "skills_mode": "on",
+      "trace_id": "83df277c49ed4a1ba03219ca0f2383e8"
+    },
+    {
+      "case_id": "persona_auth_troubleshooting_checklist",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "09abcc7b-fdb7-4fba-9916-7df0d757edb9",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "3cbfc6971b5c491994dd2b84286fcfed"
+    },
+    {
+      "case_id": "persona_auth_troubleshooting_checklist",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881b-a9bf-7411-a580-f6e16e0bf207"
+      },
+      "skills_mode": "off",
+      "trace_id": "0919939a2df947639aa202b23223e385"
+    },
+    {
+      "case_id": "persona_auth_troubleshooting_checklist",
+      "harness": "claude",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "268769f6-601d-4e3d-b6ca-8f5cc21f20ab",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "c28bb12927e44048a6f0e6d3356563a4"
+    },
+    {
+      "case_id": "persona_auth_troubleshooting_checklist",
+      "harness": "codex",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881c-23b2-79b2-8e5a-80f010292d10"
+      },
+      "skills_mode": "on",
+      "trace_id": "11aad1689db8452b8fc3410eff44e3f2"
+    },
+    {
+      "case_id": "speed_route_gfql_temporal_remote",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "a1b65a8b-3681-47a1-aaef-cc2554a6a2be",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "a7fc3c9f04934c8eb2237ac7c7359199"
+    },
+    {
+      "case_id": "speed_route_gfql_temporal_remote",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881c-b105-7e03-8bb5-b492920d7c9e"
+      },
+      "skills_mode": "off",
+      "trace_id": "1c5a5457c80d4d85a97e945bc6ed8ee0"
+    },
+    {
+      "case_id": "speed_route_gfql_temporal_remote",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "50a3b776-57e8-448c-9ea0-41ad096a0f67",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "d718890b004d463099611e3f39c27620"
+    },
+    {
+      "case_id": "speed_route_gfql_temporal_remote",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881e-2072-7971-9504-374b529fa82b"
+      },
+      "skills_mode": "on",
+      "trace_id": "ea2b392ca54c49678a0e2b9f8aafd7aa"
+    },
+    {
+      "case_id": "speed_route_viz_geo_icons",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0b262fcf-9658-4bad-b29d-c81838768eca",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "16b22afa6cde4c6e993b98e84aea8219"
+    },
+    {
+      "case_id": "speed_route_viz_geo_icons",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c881e-b81d-74c0-b4e1-d67c90aae6d7"
+      },
+      "skills_mode": "off",
+      "trace_id": "10ba183db37e4d97a246869b441d6485"
+    },
+    {
+      "case_id": "speed_route_viz_geo_icons",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ee4b5ef3-449f-44b1-b834-45f66d3ad933",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "09be858a76d64ed2a90258614c0c7003"
+    },
+    {
+      "case_id": "speed_route_viz_geo_icons",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8820-4275-7583-877e-fd46f1e0ee9a"
+      },
+      "skills_mode": "on",
+      "trace_id": "dbf9891b776e461c905805cbf9ec7e3e"
+    },
+    {
+      "case_id": "speed_route_connector_auth",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "9c0d8b90-9cd2-4c77-9f21-31dded876156",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "08f3b242d92a4fdd943eafaf8365e5e3"
+    },
+    {
+      "case_id": "speed_route_connector_auth",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8822-067b-7632-bcbe-2340ad0e3915"
+      },
+      "skills_mode": "off",
+      "trace_id": "536a3cb4f9b545d8bd59d9d8147799de"
+    },
+    {
+      "case_id": "speed_route_connector_auth",
+      "harness": "claude",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "c3432bf9-c77e-4301-b83c-59d9da67a564",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "8ec4b28950534489ae9d67720168766d"
+    },
+    {
+      "case_id": "speed_route_connector_auth",
+      "harness": "codex",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8823-a3b2-7010-b96a-745997613c5a"
+      },
+      "skills_mode": "on",
+      "trace_id": "560e7e320d7a4ecc8a7d4ca40bba82bd"
+    },
+    {
+      "case_id": "core_first_plot_with_auth",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "0e8b59eb-ff0a-4a1b-ae84-4c48883c2e16",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "50bbaab03cca425bacb8504c94c103b3"
+    },
+    {
+      "case_id": "core_first_plot_with_auth",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8824-ac8d-7a42-b0fd-f3918cb22081"
+      },
+      "skills_mode": "off",
+      "trace_id": "98d6b7ef70264cd9a6d6e02d4f39cb00"
+    },
+    {
+      "case_id": "core_first_plot_with_auth",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "167559b3-b21b-4ea6-af50-15514a109ce0",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "447b52c1169146628940b44f94d6296d"
+    },
+    {
+      "case_id": "core_first_plot_with_auth",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8825-91a2-7c31-9f5b-bcb2e91e675c"
+      },
+      "skills_mode": "on",
+      "trace_id": "5f01aad49aa14887a370faf56a9bd17c"
+    },
+    {
+      "case_id": "hypergraph_plus_materialize",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "7a538813-1300-4eba-b9db-07f6b0424cd1",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "17aa2d1360f144b5b9412890bc81571a"
+    },
+    {
+      "case_id": "hypergraph_plus_materialize",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8825-e60e-7172-a604-1ad416156b58"
+      },
+      "skills_mode": "off",
+      "trace_id": "d09cc2982a0c4ace86da37cd6eb5b298"
+    },
+    {
+      "case_id": "hypergraph_plus_materialize",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "227dfd9a-5da6-4f47-96b3-3cb87e4f8689",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "d1322f6e04bd412a9941c4fd61d8e21d"
+    },
+    {
+      "case_id": "hypergraph_plus_materialize",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8826-c69f-7d81-9468-03e018da63e9"
+      },
+      "skills_mode": "on",
+      "trace_id": "78a519bccb56472c854f8424516f524c"
+    },
+    {
+      "case_id": "privacy_safe_share_url",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "e2bd49cb-bb05-4b9f-8d8d-2736c582bbf1",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "2c92681ed84e4c849da9094282b3081d"
+    },
+    {
+      "case_id": "privacy_safe_share_url",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8827-a68c-7332-ab92-7a49fa692a61"
+      },
+      "skills_mode": "off",
+      "trace_id": "d630e5ba887d4c0e9c26fe8b8fa8178b"
+    },
+    {
+      "case_id": "privacy_safe_share_url",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "8d1af22e-6eb5-4f48-b82f-82e2312d1e6c",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "a50bcccf7c3541a59f1879556661ab0b"
+    },
+    {
+      "case_id": "privacy_safe_share_url",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8828-4c40-7262-aedd-dadb6af9d15e"
+      },
+      "skills_mode": "on",
+      "trace_id": "dd1ef83a1dfa44d5a9861a429d24227a"
+    },
+    {
+      "case_id": "viz_encodings_and_layout_settings",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "93337dc7-ac6e-4c2a-8105-7f34e1e321e2",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "d3ae752dc9fa4d239f762b9aaffe69a9"
+    },
+    {
+      "case_id": "viz_encodings_and_layout_settings",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8828-8967-7cf3-a383-316ba606916f"
+      },
+      "skills_mode": "off",
+      "trace_id": "684adf60129641b491e4fdae69581ba0"
+    },
+    {
+      "case_id": "viz_encodings_and_layout_settings",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "ef254962-ac31-4775-927e-210bce43c7cd",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "29401be5bd064abe849a6f56b2e82be3"
+    },
+    {
+      "case_id": "viz_encodings_and_layout_settings",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8829-1fea-7661-9032-258847a30385"
+      },
+      "skills_mode": "on",
+      "trace_id": "722071b37f4046d09daddb5161f120ab"
+    },
+    {
+      "case_id": "static_export_text_modes",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8829-82ea-7d40-9c1b-ecfbbc1b68b8"
+      },
+      "skills_mode": "off",
+      "trace_id": "35ad6b290d39432a946222505a4e5379"
+    },
+    {
+      "case_id": "static_export_text_modes",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "7e90bbc9-f3b1-44a0-851d-82e293c8cd2f",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "f36e982a5996479092706cd764a64d55"
+    },
+    {
+      "case_id": "static_export_text_modes",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "dd736470-abff-4b26-b9e5-b20739612625",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "4a05f301a88b40dc8f24f442430f9758"
+    },
+    {
+      "case_id": "static_export_text_modes",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882a-63e2-7373-88fe-5a1927a76977"
+      },
+      "skills_mode": "on",
+      "trace_id": "497d9804dbaa4ffeb3876f047919f794"
+    },
+    {
+      "case_id": "gfql_local_pattern_hops",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882b-6617-7100-9354-173c04e8bf22"
+      },
+      "skills_mode": "off",
+      "trace_id": "2acdfe147a844fbd94371f2d706a43e8"
+    },
+    {
+      "case_id": "gfql_local_pattern_hops",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "a68bae4e-7297-4b67-b1b4-20d18da2b110",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "091e9d018f4948dfb5e3952f4a744426"
+    },
+    {
+      "case_id": "gfql_local_pattern_hops",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "3ce1b47e-b5ab-47aa-8a3a-59725eca2213",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "c9fc41a211144df894f7887102766014"
+    },
+    {
+      "case_id": "gfql_local_pattern_hops",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882c-ba7e-7680-85d7-a44ed7d48c89"
+      },
+      "skills_mode": "on",
+      "trace_id": "630e640d4d5a42df8a9518f1b7a90776"
+    },
+    {
+      "case_id": "gfql_remote_python_remote_postprocess",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882d-4580-7ed3-9d4a-658799d1ceb9"
+      },
+      "skills_mode": "off",
+      "trace_id": "434cf3f714724ac5b6de0989d3d8ff01"
+    },
+    {
+      "case_id": "gfql_remote_python_remote_postprocess",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "22f7e0a0-e92f-4610-84f6-cadf7e444c58",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "49c4e4ef37ac487390823b4e55936f96"
+    },
+    {
+      "case_id": "gfql_remote_python_remote_postprocess",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "2b106273-dcfa-4c31-a370-1ae0dfe08bb2",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "af5509af00e74163beabcebf79348001"
+    },
+    {
+      "case_id": "gfql_remote_python_remote_postprocess",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882d-dfb3-7510-b1e9-b6b0e86fabc9"
+      },
+      "skills_mode": "on",
+      "trace_id": "cd183189708042d2a49a0460c891002a"
+    },
+    {
+      "case_id": "hop_or_chain_for_neighborhood",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "71a3518f-f3c9-4b48-90f1-abb230561495",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "e114b65daf44499b8d09b6031981369a"
+    },
+    {
+      "case_id": "hop_or_chain_for_neighborhood",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c882e-6769-7801-9c86-27131b8fec2c"
+      },
+      "skills_mode": "off",
+      "trace_id": "1d40f3b0dd5d490896fd9896b8fff43c"
+    },
+    {
+      "case_id": "hop_or_chain_for_neighborhood",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "4007a170-705d-43a8-bed4-a265a9c45809",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "9a867ff9e750456aa8d7623515cd4e7b"
+    },
+    {
+      "case_id": "hop_or_chain_for_neighborhood",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8830-3f6d-7652-b9af-b667b72f122c"
+      },
+      "skills_mode": "on",
+      "trace_id": "2c405e603bf74e429d4e30e287b0dd0f"
+    },
+    {
+      "case_id": "ai_umap_dbscan",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "4315e02c-1a89-4d9f-aafd-10ef42836312",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "a12cfeab987340c5ae6ddd64ad71abdf"
+    },
+    {
+      "case_id": "ai_umap_dbscan",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8832-244e-7961-aac7-725c27a86d0c"
+      },
+      "skills_mode": "off",
+      "trace_id": "1de7e7cc9e404e9f86358036a3b112cf"
+    },
+    {
+      "case_id": "ai_umap_dbscan",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "8a496f30-e481-4124-92bb-70c02af58790",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "86bdfb3d5ccf4428b505c9d097442329"
+    },
+    {
+      "case_id": "ai_umap_dbscan",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8832-b4d9-7700-a024-4e5cdf80e64b"
+      },
+      "skills_mode": "on",
+      "trace_id": "e996a2d52d064023bb1c841d415b50cc"
+    },
+    {
+      "case_id": "ai_semantic_search",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8833-0976-7262-a617-56f77d2a67ad"
+      },
+      "skills_mode": "off",
+      "trace_id": "a7cd9cea90ea48f0a3928b06c5a26bfa"
+    },
+    {
+      "case_id": "ai_semantic_search",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "33efca3a-20b8-45ef-8c66-b8ac1b6f2eac",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "a720e0d2249b43d193820f51484ad0ae"
+    },
+    {
+      "case_id": "ai_semantic_search",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "950995d1-7fbd-4987-b1fa-6667b8905560",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "e4180cd20c0e4624ab30705719dd7a6e"
+    },
+    {
+      "case_id": "ai_semantic_search",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8834-2ec1-7981-bdfe-93a78c0c9afd"
+      },
+      "skills_mode": "on",
+      "trace_id": "8110ccbdf25a4302ae5bb20ef35530ba"
+    },
+    {
+      "case_id": "connector_routing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "6adf6cb4-ede1-49b3-a6b3-c3000149f09a",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c2e1d0a414064b46b78af2d2ef29f6ca"
+    },
+    {
+      "case_id": "connector_routing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8834-a487-71e0-b571-417992b34e68"
+      },
+      "skills_mode": "off",
+      "trace_id": "89414c66ce4a4a4fb590205324ec43b1"
+    },
+    {
+      "case_id": "connector_routing",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "d180d772-91a4-4b99-a6d6-654717bdb883",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "72e517eb81674e0bb9896720527ee7b8"
+    },
+    {
+      "case_id": "connector_routing",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8835-4bd2-7eb0-8f20-1e450024c5ef"
+      },
+      "skills_mode": "on",
+      "trace_id": "fff6d955d453473790c9c6e519196e5f"
+    },
+    {
+      "case_id": "auth_safety",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "57d5c680-408c-43a0-a8a1-3f66c1ee6e15",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "c8e61d18ba3d41a08cbde1118048bf61"
+    },
+    {
+      "case_id": "auth_safety",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8835-ae6b-7570-b4b0-16ad3b593f1a"
+      },
+      "skills_mode": "off",
+      "trace_id": "8475bcab531a48c19a2b431dd7c6aec0"
+    },
+    {
+      "case_id": "auth_safety",
+      "harness": "claude",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "e00179d0-0183-4356-8400-bd917b6f6eb9",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "515da9cc020d4ed799d3acd01ae47b62"
+    },
+    {
+      "case_id": "auth_safety",
+      "harness": "codex",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8835-d6b8-78a2-84d5-e79322b2d54a"
+      },
+      "skills_mode": "on",
+      "trace_id": "85c747939a2a4b03a998ff643ece2765"
+    },
+    {
+      "case_id": "echo_token",
+      "harness": "codex",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8836-19da-7de2-ba13-3bbb3e0e85ba"
+      },
+      "skills_mode": "off",
+      "trace_id": "e7df136ab3ca4b0689073e17badb42a7"
+    },
+    {
+      "case_id": "echo_token",
+      "harness": "claude",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "3c0ad661-9e26-48c7-bd8b-fc7dd409de2d",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "f070940b0b43495d866b2aacb52d205b"
+    },
+    {
+      "case_id": "echo_token",
+      "harness": "codex",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8836-2b3e-7610-b04c-755329cd3a45"
+      },
+      "skills_mode": "on",
+      "trace_id": "3ecf537c393e47d9b741e11cc07360a6"
+    },
+    {
+      "case_id": "echo_token",
+      "harness": "claude",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "50cec19f-1ade-4bf6-8ed0-581473eea102",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "9257d36d3eb44bffaa821b1b6a59fa97"
+    },
+    {
+      "case_id": "privacy_snippet",
+      "harness": "claude",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "8702f3db-640c-4de7-b276-3fb4375aa996",
+        "thread_id": null
+      },
+      "skills_mode": "off",
+      "trace_id": "d86ff1f8e860410cbf70bafa0158d6ff"
+    },
+    {
+      "case_id": "privacy_snippet",
+      "harness": "codex",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8836-476f-7771-8797-057c6908a627"
+      },
+      "skills_mode": "off",
+      "trace_id": "45d14066fb3049178d3accb974b385e1"
+    },
+    {
+      "case_id": "privacy_snippet",
+      "harness": "claude",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": "885c3491-85b0-4b5f-b405-32b59115a549",
+        "thread_id": null
+      },
+      "skills_mode": "on",
+      "trace_id": "4afdb4d4377d4107858ecf3ab217bd14"
+    },
+    {
+      "case_id": "privacy_snippet",
+      "harness": "codex",
+      "journey_id": "runtime_smoke",
+      "model": "default",
+      "runtime_ids": {
+        "dthread_id": null,
+        "louie_run_id": null,
+        "session_id": null,
+        "thread_id": "019c8836-6765-7d70-88c5-fb75a91a45b7"
+      },
+      "skills_mode": "on",
+      "trace_id": "0c5a1bf121754d598c25877ff8b8ad76"
+    }
+  ],
+  "run_id": "agent_eval_20260222-163205"
+}

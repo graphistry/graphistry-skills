@@ -5,6 +5,13 @@ description: "Core PyGraphistry workflow for authentication, shaping edges/nodes
 
 # PyGraphistry Core
 
+## Doc routing (local + canonical)
+- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
+- Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
+- In user-facing answers, prefer canonical `https://pygraphistry.readthedocs.io/en/latest/...` links.
+
 ## Quick workflow
 1. Register to a Graphistry server.
 2. Build graph from edges/nodes (or hypergraph from wide rows).
