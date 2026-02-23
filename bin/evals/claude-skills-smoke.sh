@@ -9,6 +9,7 @@ SKILLS_CSV="pygraphistry,pygraphistry-core,pygraphistry-visualization,pygraphist
 PROMPT="What skills are loaded in this session? Reply with comma-separated skill names only. Do not use tool calls."
 REQUIRE_SKILLS_CSV="pygraphistry-core,pygraphistry-gfql,pygraphistry-visualization"
 OUT_DIR="/tmp/claude_skill_smoke_$(date +%Y%m%d-%H%M%S)"
+PERMISSION_MODE="${AGENT_CLAUDE_PERMISSION_MODE:-bypassPermissions}"
 
 show_help() {
   cat <<'EOF'
@@ -76,7 +77,7 @@ fi
 RAW_OUT="${OUT_DIR}/claude.stream.jsonl"
 (
   cd "${ENV_DIR}"
-  claude --verbose -p --output-format stream-json "${PROMPT}"
+  claude --verbose -p --output-format stream-json --permission-mode "${PERMISSION_MODE}" "${PROMPT}"
 ) > "${RAW_OUT}"
 
 LOADED_SKILLS="$(jq -rc 'select(.type=="system" and .subtype=="init") | (.skills // [])' "${RAW_OUT}" | head -n 1)"

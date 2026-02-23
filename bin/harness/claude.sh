@@ -9,6 +9,7 @@ TRACEPARENT=""
 TIMEOUT_S="${AGENT_HARNESS_TIMEOUT_S:-240}"
 WORKDIR="${AGENT_HARNESS_WORKDIR:-$PWD}"
 MODEL=""
+PERMISSION_MODE="${AGENT_CLAUDE_PERMISSION_MODE:-bypassPermissions}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -94,6 +95,9 @@ if [[ -n "$TRACEPARENT" ]]; then
   export TRACEPARENT
 fi
 CLAUDE_CMD=(claude --verbose -p --output-format stream-json)
+if [[ -n "$PERMISSION_MODE" ]]; then
+  CLAUDE_CMD+=(--permission-mode "$PERMISSION_MODE")
+fi
 if [[ -n "$MODEL" ]]; then
   CLAUDE_CMD+=(--model "$MODEL")
 fi

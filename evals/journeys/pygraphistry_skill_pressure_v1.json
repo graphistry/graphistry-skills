@@ -6,7 +6,7 @@
   "cases": [
     {
       "id": "core_first_plot_with_auth",
-      "prompt": "Provide a concise Python snippet for a first PyGraphistry plot from edges and nodes. Include register(api=3) with environment variables, then edges(), nodes(), and plot().",
+      "prompt": "Provide a concise Python snippet for a first PyGraphistry graph from tiny edges/nodes tables with safe auth via environment variables, then produce a plot.",
       "checks": {
         "regex": [
           "register\\(",
@@ -24,7 +24,7 @@
     },
     {
       "id": "hypergraph_plus_materialize",
-      "prompt": "Show a short snippet for turning row-oriented actor/event/location data into a graph with hypergraph(), and then preparing node-centric operations with materialize_nodes().",
+      "prompt": "Show a short snippet for turning row-oriented actor/event/location data into a graph and then preparing node-centric operations.",
       "checks": {
         "regex": [
           "hypergraph\\(",
@@ -37,14 +37,28 @@
       "prompt": "Show a privacy-safe sharing snippet that keeps data private and returns a plot URL without rendering inline.",
       "checks": {
         "regex": [
-          "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"]\\)",
+          "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"]\\)",
           "plot\\(render\\s*=\\s*False\\)"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer shows non-public privacy mode and non-inline plotting to obtain a share URL safely.",
+        "rubric": [
+          "Must keep sharing non-public.",
+          "Must use non-inline plotting for URL output.",
+          "Should be concise and syntactically plausible."
+        ],
+        "required_concepts": [
+          "non-public privacy mode",
+          "non-inline URL workflow"
         ]
       }
     },
     {
       "id": "viz_encodings_and_layout_settings",
-      "prompt": "Provide a short PyGraphistry styling snippet using encode_point_color(), encode_point_size(), and settings(url_params=...) before plotting.",
+      "prompt": "Provide a short PyGraphistry styling snippet that encodes both node color and size, applies URL/layout settings, and then plots.",
       "checks": {
         "regex": [
           "encode_point_color\\(",
@@ -56,7 +70,7 @@
     },
     {
       "id": "static_export_text_modes",
-      "prompt": "Show a snippet for static export with plot_static(), including one text mode output such as graphviz-dot or mermaid-code.",
+      "prompt": "Show a snippet for static export that produces one textual graph format output (for example Graphviz DOT or Mermaid code).",
       "checks": {
         "regex": [
           "plot_static\\(",
@@ -66,19 +80,17 @@
     },
     {
       "id": "gfql_local_pattern_hops",
-      "prompt": "Write a minimal GFQL snippet that imports n/e_forward, runs gfql(), and uses both min_hops and max_hops.",
+      "prompt": "Write a minimal local GFQL traversal snippet that applies explicit hop bounds and returns a focused subgraph.",
       "checks": {
         "regex": [
-          "from\\s+graphistry\\s+import\\s+.*n.*e_forward",
-          "gfql\\(",
-          "min_hops\\s*=\\s*\\d+",
-          "max_hops\\s*=\\s*\\d+"
+          "(gfql\\(|\\bchain\\(|\\bhop\\()",
+          "(min_hops\\s*=|max_hops\\s*=|hops\\s*=)"
         ]
       }
     },
     {
       "id": "gfql_remote_python_remote_postprocess",
-      "prompt": "Provide a concise remote workflow snippet using gfql_remote() and one of python_remote_table/python_remote_g/python_remote_json for result shaping.",
+      "prompt": "Provide a concise remote workflow snippet that queries remotely and then post-processes remote results with one python_remote_* helper.",
       "checks": {
         "regex": [
           "gfql_remote\\(",
@@ -91,8 +103,21 @@
       "prompt": "Show a neighborhood expansion snippet with hop() or chain(), and briefly mention when to use GFQL instead.",
       "checks": {
         "regex": [
-          "\\b(hop|chain)\\(",
-          "(?i)gfql"
+          "\\b(hop|chain)\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A strong answer includes a valid hop()/chain() neighborhood expansion snippet and a short rationale for when GFQL is preferable (multi-step pattern constraints, explicit predicates/where logic, or remote-focused extraction).",
+        "rubric": [
+          "Must include a plausible neighborhood expansion snippet using hop() or chain().",
+          "Must explain when GFQL is preferable, beyond just naming GFQL.",
+          "Prefer concise guidance that distinguishes quick neighborhood expansion from richer pattern matching/query control."
+        ],
+        "required_concepts": [
+          "hop or chain neighborhood expansion",
+          "GFQL when constraints/pattern complexity increase"
         ]
       }
     },
@@ -108,7 +133,7 @@
     },
     {
       "id": "ai_semantic_search",
-      "prompt": "Show a semantic search snippet using g.search(...) after preparing features or embeddings.",
+      "prompt": "Show a semantic search snippet after preparing features or embeddings.",
       "checks": {
         "regex": [
           "search\\(",
@@ -125,6 +150,20 @@
           "(?i)splunk",
           "(?i)dataframe|edges\\("
         ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer compares Neo4j and Splunk connector fit, then gives a practical dataframe-first fallback.",
+        "rubric": [
+          "Must explain connector choice rationale for Neo4j vs Splunk.",
+          "Must include a dataframe fallback path.",
+          "Should be concise and operational."
+        ],
+        "required_concepts": [
+          "connector strategy",
+          "dataframe fallback"
+        ]
       }
     },
     {
@@ -138,6 +177,21 @@
         "must_not_contain": [
           "redacted_test_user",
           "redacted_test_pass"
+        ],
+        "max_lines": 4
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A strong answer gives two practical credential-safety bullets: env vars/secrets management and no hardcoded credentials in code/output.",
+        "rubric": [
+          "Must provide exactly two concise bullets.",
+          "Must emphasize environment/secret-based credential handling.",
+          "Must explicitly discourage hardcoded secrets."
+        ],
+        "required_concepts": [
+          "environment-based credentials",
+          "no hardcoded secrets"
         ]
       }
     }

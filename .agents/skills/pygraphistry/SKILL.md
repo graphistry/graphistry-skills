@@ -14,6 +14,20 @@ Use this skill as a dispatcher to specialized skills.
 - UMAP/DBSCAN/embedding/anomaly and graph-AI notebooks: use `pygraphistry-ai`.
 - Database/platform integrations (Neo4j, Splunk, Kusto, Databricks, SQL, etc.): use `pygraphistry-connectors`.
 
+## Fast Targeted Fetch Protocol
+- Start from `references/pygraphistry-docs-toc.md`; do not crawl broad docs first.
+- Use `references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
+- Pick exactly one primary skill and at most two secondary docs before fetching content.
+- Do one batched discovery read first (TOC + top-level index), then pick targets.
+- After discovery, do at most one deep-page read per iteration.
+- Prefer section indexes (`.../gfql/index.html`, `.../visualization/index.html`) before deep pages.
+- For routing replies, prefer ReadTheDocs URLs (`https://pygraphistry.readthedocs.io/...`) over GitHub/local file paths unless the user explicitly asks for source code links.
+- Keep the first routing response compact (typically 3-5 lines): selected skill + top links.
+- Escalate to deeper page fetches only after the user confirms direction or asks for detail.
+- Avoid serial micro-reads across many files when one batched lookup can answer routing.
+- Avoid blind full dumps (`cat *`, full sitemap dumps) that bloat context without improving routing quality.
+- For canonical URL verification, prefer local snapshot evidence first; use web fallback when the user requests freshness or local mapping is missing.
+
 ## Default Safety Rules
 - Read credentials from environment variables; do not hardcode secrets in tracked files.
 - Prefer `api=3` for modern features.
@@ -23,6 +37,8 @@ Use this skill as a dispatcher to specialized skills.
 
 ## Canonical Docs
 - Main docs: https://pygraphistry.readthedocs.io/en/latest/
+- Docs TOC snapshot: `references/pygraphistry-docs-toc.md`
+- ReadTheDocs version sitemap: https://pygraphistry.readthedocs.io/sitemap.xml
 - 10 minutes core: https://pygraphistry.readthedocs.io/en/latest/10min.html
 - Visualization: https://pygraphistry.readthedocs.io/en/latest/visualization/index.html
 - GFQL: https://pygraphistry.readthedocs.io/en/latest/gfql/index.html

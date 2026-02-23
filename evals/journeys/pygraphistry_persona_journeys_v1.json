@@ -6,17 +6,16 @@
   "cases": [
     {
       "id": "persona_novice_fraud_table_to_viz_algo",
-      "prompt": "A novice fraud analyst only has a transactions table. Provide one concise Python workflow from raw table data to a share-safe graph: include pandas load, graphistry.register(api=3) with env credentials, edges()+nodes() shaping, one enrichment metric (degree or count), one GFQL extraction step using explicit .gfql([...]) (not chain()/hop()), one styling encode call, and plot(render=False).",
+      "prompt": "A novice fraud analyst only has a transactions table. Provide one concise Python workflow from raw table data to a share-safe graph: include table ingest, safe auth setup, graph shaping, one enrichment metric, one focused subgraph extraction step, one styling encode call, and a non-inline plot URL.",
       "checks": {
         "regex": [
           "pd\\.(read_csv|DataFrame)\\(",
           "register\\(",
-          "api\\s*=\\s*3",
           "GRAPHISTRY_",
           "edges\\(",
           "\\.nodes\\(",
           "(groupby\\(|value_counts\\(|degree|in_degree|out_degree)",
-          "gfql\\(",
+          "(gfql\\(|\\bhop\\(|\\bchain\\(|query\\(|edge_query\\s*=|node_query\\s*=|\\.filter\\(|\\[[^\\n]*(isin\\(|>=|<=|==|>|<))",
           "encode_",
           "plot\\(render\\s*=\\s*False\\)"
         ],
@@ -31,11 +30,26 @@
           "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
         "max_lines": 70
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer gives an end-to-end novice-friendly fraud workflow with safe auth, graph shaping, enrichment, focused extraction, styling, and share-safe output.",
+        "rubric": [
+          "Must cover full workflow from ingest to share-safe output.",
+          "Must include safe credential handling and privacy-aware sharing behavior.",
+          "Should remain concise and practical for a novice analyst."
+        ],
+        "required_concepts": [
+          "end-to-end workflow",
+          "safe auth",
+          "focused extraction and styling"
+        ]
       }
     },
     {
       "id": "persona_org_and_api_key_navigation",
-      "prompt": "Provide two short Python auth snippets for a user navigating organizations and API keys: (1) org-scoped login with org_name and optional idp_name, and (2) service-account login with personal_key_id/personal_key_secret. Use environment variables only.",
+      "prompt": "Provide two short Python auth snippets using environment variables only: (1) organization-scoped login (include SSO/IdP-aware org routing fields), and (2) service-account personal key login.",
       "checks": {
         "regex": [
           "register\\(",
@@ -61,21 +75,35 @@
     },
     {
       "id": "persona_advanced_coloring_with_gfql_slices",
-      "prompt": "A user wants more advanced coloring than categorical mapping and needs focused investigation slices. Provide one concise snippet that uses continuous palette coloring (as_continuous=True) and creates at least two GFQL subgraph slices using explicit .gfql([...]) (not chain()/hop()), each producing a share URL with plot(render=False).",
+      "prompt": "A user wants advanced, non-categorical coloring and focused investigation slices. Provide one concise snippet that uses continuous coloring and creates at least two focused subgraph slices, each producing a non-inline share URL.",
       "checks": {
         "regex": [
           "encode_(point|edge)_color\\(",
-          "palette\\s*=\\s*\\[",
-          "as_continuous\\s*=\\s*True",
+          "(as_continuous\\s*=\\s*True|palette\\s*=\\s*\\[|continuous)",
           "gfql\\(",
           "plot\\(render\\s*=\\s*False\\)"
         ],
         "max_lines": 70
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer demonstrates continuous coloring plus at least two focused graph slices and produces non-inline share URLs.",
+        "rubric": [
+          "Must include continuous (non-categorical) color encoding.",
+          "Must create at least two focused slices with valid extraction logic.",
+          "Must produce share-safe non-inline output URLs."
+        ],
+        "required_concepts": [
+          "continuous coloring",
+          "multiple focused slices",
+          "non-inline share URLs"
+        ]
       }
     },
     {
       "id": "persona_umap_text_featurization",
-      "prompt": "Provide a compact text-AI workflow: featurize text columns, run UMAP, optionally DBSCAN, then semantic search. Include featurize(...), umap(...), and search(...).",
+      "prompt": "Provide a compact text-AI workflow from raw text columns to semantic lookup: prepare text features, build a low-dimensional projection, optionally cluster, then run semantic search.",
       "checks": {
         "regex": [
           "featurize\\(",
@@ -83,11 +111,25 @@
           "search\\("
         ],
         "max_lines": 70
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer gives a coherent text-to-search workflow using feature prep, projection, and semantic lookup.",
+        "rubric": [
+          "Must include text feature preparation and projection before search.",
+          "Must include semantic search in a plausible PyGraphistry flow.",
+          "Should remain concise and operational."
+        ],
+        "required_concepts": [
+          "feature preparation",
+          "projection + semantic search"
+        ]
       }
     },
     {
       "id": "persona_precomputed_embeddings_flow",
-      "prompt": "Show a concise workflow for precomputed embeddings already present as columns like emb_0...emb_n: build embedding_cols, run umap(X=embedding_cols), and transform_umap on a new batch.",
+      "prompt": "Show a concise workflow for precomputed embedding-vector columns: select embedding columns, fit UMAP on those vectors, then project a second batch with the learned transform.",
       "checks": {
         "regex": [
           "(embedding_cols|embed_cols|emb_cols|emb_\\d+)",
@@ -95,6 +137,20 @@
           "transform_umap\\("
         ],
         "max_lines": 40
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer uses existing embedding columns, fits UMAP with explicit vector input, and applies transform_umap to new data.",
+        "rubric": [
+          "Must identify/select precomputed embedding columns.",
+          "Must use UMAP with explicit embedding input.",
+          "Must include transform_umap on a second batch."
+        ],
+        "required_concepts": [
+          "embedding column selection",
+          "fit + transform UMAP flow"
+        ]
       }
     },
     {
@@ -117,6 +173,21 @@
           "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
         "max_lines": 70
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer gives a connector-oriented workflow with dataframe fallback, focused extraction, privacy-safe sharing, and env-based auth handling.",
+        "rubric": [
+          "Must include connector-oriented flow and dataframe fallback.",
+          "Must include focused extraction and share-safe output.",
+          "Must keep auth handling safe (no hardcoded secrets)."
+        ],
+        "required_concepts": [
+          "connector + fallback",
+          "privacy-safe share flow",
+          "safe auth handling"
+        ]
       }
     },
     {
@@ -131,7 +202,23 @@
           "personal_key_(id|secret)|GRAPHISTRY_PERSONAL_KEY_(ID|SECRET)|GRAPHISTRY_API_KEY",
           "GRAPHISTRY_"
         ],
+        "min_lines": 5,
         "max_lines": 10
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A strong answer gives five concise, practical auth troubleshooting checks covering api=3, server/protocol, org_name routing, and personal key env variables.",
+        "rubric": [
+          "Must provide exactly five concise troubleshooting bullets.",
+          "Must cover api=3, server/protocol, org_name, and personal key env vars.",
+          "Should be operational diagnostics, not generic statements."
+        ],
+        "required_concepts": [
+          "api=3",
+          "server/protocol",
+          "org_name + personal key env vars"
+        ]
       }
     }
   ]

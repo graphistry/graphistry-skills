@@ -84,3 +84,20 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/ci/runtime_native_smoke.sh
+
+      - name: Validate PyGraphistry docs TOC refresh script
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bash -n scripts/refresh_pygraphistry_docs_toc.sh
+          ./scripts/refresh_pygraphistry_docs_toc.sh --help >/dev/null
+
+          tmp_dir="$(mktemp -d)"
+          ./scripts/refresh_pygraphistry_docs_toc.sh \
+            --output-dir "$tmp_dir" \
+            --timestamp "1970-01-01T00:00:00Z"
+
+          test -s "$tmp_dir/pygraphistry-readthedocs-sitemap.xml"
+          test -s "$tmp_dir/pygraphistry-readthedocs-top-level.tsv"
+          test -s "$tmp_dir/pygraphistry-docs-toc.md"
