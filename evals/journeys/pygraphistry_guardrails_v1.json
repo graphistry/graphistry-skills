@@ -15,8 +15,8 @@
           "GRAPHISTRY_"
         ],
         "must_not_contain": [
-          "redacted_test_user",
-          "redacted_test_pass"
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
         ],
         "must_not_regex": [
           "password\\s*=\\s*['\\\"].+['\\\"]",

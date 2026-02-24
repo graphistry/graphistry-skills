@@ -22,8 +22,8 @@
           "plot\\(render\\s*=\\s*False[^)]*\\)"
         ],
         "must_not_contain": [
-          "redacted_test_user",
-          "redacted_test_pass"
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
         ],
         "max_lines": 90
       },
