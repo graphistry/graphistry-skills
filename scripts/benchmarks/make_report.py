@@ -19,6 +19,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--title", default="Benchmark Report", help="Markdown title")
     parser.add_argument("--out-md", required=True, help="Output markdown path")
     parser.add_argument("--out-json", default="", help="Optional output JSON metrics path")
+    parser.add_argument(
+        "--public-safe",
+        action="store_true",
+        help="Redact source file paths from outputs (for public check-in)",
+    )
     return parser.parse_args()
 
 
@@ -151,7 +156,7 @@ def markdown_table(rows: list[dict[str, Any]], columns: list[str]) -> str:
     return "\n".join([header, sep] + body)
 
 
-def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, Any]:
+def build_metrics(rows: list[dict[str, Any]], sources: list[str], public_safe: bool = False) -> dict[str, Any]:
     total = len(rows)
     passed = sum(1 for r in rows if parse_bool(r.get("pass_bool")))
     harness_mode = group_metrics(rows, ["harness", "skills_mode"])
@@ -171,19 +176,19 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
     for r in rows:
         if parse_bool(r.get("pass_bool")):
             continue
-        failures.append(
-            {
-                "harness": str(r.get("harness", "unknown")),
-                "model": model_name(r),
-                "skills_mode": skills_mode(r),
-                "eval_intent": eval_intent_name(r),
-                "journey_id": str(r.get("journey_id", "")),
-                "case_id": str(r.get("case_id", "")),
-                "score": parse_float(r.get("score")) or 0.0,
-                "latency_ms": parse_float(r.get("latency_ms")) or 0.0,
-                "source": str(r.get("_source", "")),
-            }
-        )
+        failure: dict[str, Any] = {
+            "harness": str(r.get("harness", "unknown")),
+            "model": model_name(r),
+            "skills_mode": skills_mode(r),
+            "eval_intent": eval_intent_name(r),
+            "journey_id": str(r.get("journey_id", "")),
+            "case_id": str(r.get("case_id", "")),
+            "score": parse_float(r.get("score")) or 0.0,
+            "latency_ms": parse_float(r.get("latency_ms")) or 0.0,
+        }
+        if not public_safe:
+            failure["source"] = str(r.get("_source", ""))
+        failures.append(failure)
 
     failures.sort(
         key=lambda f: (
@@ -198,7 +203,9 @@ def build_metrics(rows: list[dict[str, Any]], sources: list[str]) -> dict[str, A
 
     return {
         "generated_at": dt.datetime.now(dt.UTC).isoformat(),
-        "inputs": sources,
+        "inputs": [] if public_safe else sources,
+        "inputs_redacted": public_safe,
+        "input_count": len(sources),
         "overall": {
             "total": total,
             "passed": passed,
@@ -227,9 +234,12 @@ def build_markdown(title: str, metrics: dict[str, Any]) -> str:
     lines.append(f"# {title}")
     lines.append("")
     lines.append(f"- Generated: `{metrics['generated_at']}`")
-    lines.append("- Inputs:")
-    for src in metrics["inputs"]:
-        lines.append(f"  - `{src}`")
+    if metrics.get("inputs"):
+        lines.append("- Inputs:")
+        for src in metrics["inputs"]:
+            lines.append(f"  - `{src}`")
+    elif metrics.get("inputs_redacted"):
+        lines.append(f"- Inputs: redacted (`{metrics.get('input_count', 0)}` file(s))")
     lines.append("")
     lines.append("## Overall")
     lines.append("")
@@ -347,20 +357,22 @@ def build_markdown(title: str, metrics: dict[str, Any]) -> str:
     if not metrics["failures"]:
         lines.append("_None_")
     else:
+        failure_columns = [
+            "harness",
+            "model",
+            "skills_mode",
+            "eval_intent",
+            "journey_id",
+            "case_id",
+            "score",
+            "latency_ms",
+        ]
+        if "source" in metrics["failures"][0]:
+            failure_columns.append("source")
         lines.append(
             markdown_table(
                 metrics["failures"],
-                [
-                    "harness",
-                    "model",
-                    "skills_mode",
-                    "eval_intent",
-                    "journey_id",
-                    "case_id",
-                    "score",
-                    "latency_ms",
-                    "source",
-                ],
+                failure_columns,
             )
         )
     lines.append("")
@@ -371,7 +383,7 @@ def main() -> int:
     args = parse_args()
     rows_paths = [Path(p).resolve() for p in args.rows]
     rows = read_rows(rows_paths)
-    metrics = build_metrics(rows, [str(p) for p in rows_paths])
+    metrics = build_metrics(rows, [str(p) for p in rows_paths], public_safe=args.public_safe)
     report_md = build_markdown(args.title, metrics)
 
     out_md = Path(args.out_md)

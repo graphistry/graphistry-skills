@@ -41,9 +41,9 @@ Branch: `audit/security-public-readiness`
 
 3. Benchmarks include high-risk publication content (privacy/leakage surface)
 - Evidence includes:
-  - absolute local paths (for example `/home/USER/...`) in benchmark manifests
+  - absolute local paths (for example `/home/<user>/...`) in benchmark manifests
   - full prompt/response corpora in checked-in `rows.jsonl`
-  - historical test credential strings in benchmark data (`redacted_test_user`, `redacted_test_pass`)
+  - historical test credential strings in benchmark data (`<test_user>`, `<test_pass>`)
   - runtime metadata/trace identifiers in checked-in artifacts (for example `otel_ids.json`)
 - Risk: leaks workstation identity/pathing, sensitive prompt contents, and potential credential material over time.
 - Required action:
@@ -52,7 +52,7 @@ Branch: `audit/security-public-readiness`
     - raw rows/log/trace artifacts remain private
   - Purge non-compliant benchmark artifacts before public launch
 
-4. Possible credential exposure history for `redacted_test_user/redacted_test_pass`
+4. Possible credential exposure history for historical test credentials
 - Evidence: strings existed in tracked files and benchmark artifacts; they were used in checks and are present in git history.
 - Risk: if those credentials were real at any point, they are compromised.
 - Required action:
@@ -90,7 +90,7 @@ Branch: `audit/security-public-readiness`
 ## Quick Fixes Applied in This Branch
 
 1. Removed personal test credential strings from active journey specs
-- Replaced `redacted_test_user`/`redacted_test_pass` with non-personal sentinel literals.
+- Replaced historical test literals with non-personal sentinel literals.
 
 2. Tightened CI workflow token permissions
 - Added `permissions: contents: read` to `.github/workflows/ci.yml`.
@@ -108,3 +108,32 @@ Minimum gate:
 3. GitHub security scanning + push protection enabled
 4. Main branch protection/ruleset enabled
 
+## Strike List: Operator-Owned
+
+- [ ] Rotate/revoke any potentially exposed credentials (including any prior historical test credential usage if real), then confirm they are dead.
+- [ ] Decide benchmark publication policy for public repo:
+- public-safe summaries only vs full raw eval corpora in-repo.
+- [ ] If policy excludes raw corpora: approve history rewrite strategy (rewrite vs preserve and move private).
+- [ ] In GitHub repo settings, enable:
+- Secret scanning
+- Secret scanning push protection
+- Dependabot security updates
+- Code security / code scanning
+- [ ] Protect `main`:
+- require pull requests
+- require status checks
+- disallow force pushes/deletions
+- [ ] Add/approve org ruleset(s) for default branch governance.
+- [ ] Decide whether README keeps a live tokenized sample URL or switches to redacted placeholder.
+- [ ] Decide CODEOWNERS ownership map for security-sensitive paths.
+
+## Strike List: Agent-Owned
+
+- [ ] Implement benchmark sanitization pipeline (strip local paths, redact tokenized URLs, block credential-like literals).
+- [ ] Apply publication policy to existing benchmark artifacts and produce a clean public-safe benchmark set.
+- [ ] Add CI guard that fails on non-compliant benchmark artifacts.
+- [ ] Pin third-party GitHub Actions to immutable SHAs.
+- [ ] Add `.github/CODEOWNERS` once owner mapping is confirmed.
+- [ ] Redact README live sample URL if operator chooses redaction.
+- [ ] Run full secret/leak scans after sanitization and publish a signed-off audit rerun.
+- [ ] Produce final pre-public checklist report with explicit pass/fail gate status.

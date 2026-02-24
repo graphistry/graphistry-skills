@@ -15,3 +15,11 @@ evals/env/claude/.claude/skills/*
 !evals/env/claude/.claude/skills/.gitkeep
 evals/env/codex/.codex/skills/*
 !evals/env/codex/.codex/skills/.gitkeep
+
+# Local benchmark raw artifacts (keep only sanitized aggregates/reports in repo)
+benchmarks/data/**/rows.jsonl
+benchmarks/data/**/combined_rows.jsonl
+benchmarks/data/**/combined_rows.csv
+benchmarks/data/**/manifest.json
+benchmarks/data/**/otel_ids.json
+benchmarks/data/**/runs/

@@ -28,6 +28,12 @@ jobs:
           set -euo pipefail
           python3 scripts/ci/validate_skills.py
 
+      - name: Validate public benchmark artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/ci/validate_public_benchmarks.sh
+
       - name: List skills with npx
         shell: bash
         run: |

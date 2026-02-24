@@ -4,7 +4,7 @@ This file is for contributors working on skills and eval harnesses.
 
 ## Prerequisites
 
-- Run from repo root: `/home/USER/Work/graphistry-skills`
+- Run from repo root: `graphistry-skills/`
 - CLIs on `PATH`: `codex`, `claude`, `jq`
 - Auth configured for each runtime (`~/.codex`, `~/.claude`)
 
@@ -19,7 +19,7 @@ Optional (for OTel trace capture + inspection):
 - Journeys: `evals/journeys/*.json`
 - Runner: `bin/agent.sh`
 - Core eval engine: `scripts/agent_eval_loop.py`
-- Checked-in benchmark packs: `benchmarks/data/*` and `benchmarks/reports/*`
+- Checked-in benchmark artifacts (public-safe): `benchmarks/data/*/combined_metrics.json` and `benchmarks/reports/*`
 
 ## Validate Skills Before Sweeps
 
@@ -309,6 +309,14 @@ Note:
 Suggested process:
 
 1. Run clean sweeps into `/tmp/...`.
-2. Copy finalized run artifacts into `benchmarks/data/<date-tag>/runs/...`.
-3. Regenerate/refresh combined metrics/report files under `benchmarks/data/<date-tag>/`.
-4. Update or add report markdown under `benchmarks/reports/`.
+2. Keep raw run artifacts local/private (`rows.jsonl`, `manifest.json`, traces, logs).
+3. Generate public-safe outputs only:
+```bash
+python3 scripts/benchmarks/make_report.py \
+  --public-safe \
+  --rows /tmp/<run>/rows.jsonl \
+  --title "<report title>" \
+  --out-md benchmarks/reports/<date-tag>.md \
+  --out-json benchmarks/data/<date-tag>/combined_metrics.json
+```
+4. Check in only sanitized report + `combined_metrics.json`.
