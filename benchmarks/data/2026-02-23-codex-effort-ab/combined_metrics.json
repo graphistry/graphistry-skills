@@ -1,0 +1,632 @@
+{
+  "generated_at": "2026-02-24T10:54:28.892701+00:00",
+  "inputs": [],
+  "inputs_redacted": true,
+  "input_count": 2,
+  "overall": {
+    "total": 200,
+    "passed": 173,
+    "pass_rate": 0.865
+  },
+  "by_harness_and_mode": [
+    {
+      "total": 100,
+      "passed": 82,
+      "pass_rate": 0.82,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 32539.09,
+      "avg_score": 0.9441428571428571,
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 100,
+      "passed": 91,
+      "pass_rate": 0.91,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 22659.51,
+      "avg_score": 0.9797247474747475,
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_harness_model_and_mode": [
+    {
+      "total": 100,
+      "passed": 82,
+      "pass_rate": 0.82,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 32539.09,
+      "avg_score": 0.9441428571428571,
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 100,
+      "passed": 91,
+      "pass_rate": 0.91,
+      "harness_ok": 100,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 22659.51,
+      "avg_score": 0.9797247474747475,
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_eval_intent": [
+    {
+      "total": 28,
+      "passed": 28,
+      "pass_rate": 1.0,
+      "harness_ok": 28,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19903.714285714286,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy"
+    },
+    {
+      "total": 12,
+      "passed": 12,
+      "pass_rate": 1.0,
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15706.583333333334,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade"
+    },
+    {
+      "total": 24,
+      "passed": 22,
+      "pass_rate": 0.9166666666666666,
+      "harness_ok": 24,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 20311.166666666668,
+      "avg_score": 0.9874999999999999,
+      "eval_intent": "guardrail"
+    },
+    {
+      "total": 56,
+      "passed": 43,
+      "pass_rate": 0.7678571428571429,
+      "harness_ok": 56,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 43219.03571428572,
+      "avg_score": 0.9478290558647702,
+      "eval_intent": "realistic_capability"
+    },
+    {
+      "total": 20,
+      "passed": 17,
+      "pass_rate": 0.85,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14864.2,
+      "avg_score": 0.9541666666666666,
+      "eval_intent": "runtime_smoke"
+    },
+    {
+      "total": 48,
+      "passed": 41,
+      "pass_rate": 0.8541666666666666,
+      "harness_ok": 48,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 23918.270833333332,
+      "avg_score": 0.9401041666666666,
+      "eval_intent": "skill_pressure"
+    },
+    {
+      "total": 12,
+      "passed": 10,
+      "pass_rate": 0.8333333333333334,
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 35081.833333333336,
+      "avg_score": 0.9500000000000001,
+      "eval_intent": "speed_routing"
+    }
+  ],
+  "by_eval_intent_harness_and_mode": [
+    {
+      "total": 14,
+      "passed": 14,
+      "pass_rate": 1.0,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 27302.928571428572,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 14,
+      "passed": 14,
+      "pass_rate": 1.0,
+      "harness_ok": 14,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 12504.5,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 6,
+      "passed": 6,
+      "pass_rate": 1.0,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15387.833333333334,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 6,
+      "passed": 6,
+      "pass_rate": 1.0,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 16025.333333333334,
+      "avg_score": 1.0,
+      "eval_intent": "execution_grade",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 12,
+      "passed": 10,
+      "pass_rate": 0.8333333333333334,
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 25303.916666666668,
+      "avg_score": 0.975,
+      "eval_intent": "guardrail",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 12,
+      "passed": 12,
+      "pass_rate": 1.0,
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15318.416666666666,
+      "avg_score": 1.0,
+      "eval_intent": "guardrail",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 28,
+      "passed": 20,
+      "pass_rate": 0.7142857142857143,
+      "harness_ok": 28,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 49598.857142857145,
+      "avg_score": 0.9267006802721088,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 28,
+      "passed": 23,
+      "pass_rate": 0.8214285714285714,
+      "harness_ok": 28,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 36839.21428571428,
+      "avg_score": 0.9689574314574314,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 10,
+      "passed": 8,
+      "pass_rate": 0.8,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 17867.5,
+      "avg_score": 0.9416666666666667,
+      "eval_intent": "runtime_smoke",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 10,
+      "passed": 9,
+      "pass_rate": 0.9,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 11860.9,
+      "avg_score": 0.9666666666666666,
+      "eval_intent": "runtime_smoke",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 24,
+      "passed": 19,
+      "pass_rate": 0.7916666666666666,
+      "harness_ok": 24,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 28487.5,
+      "avg_score": 0.90625,
+      "eval_intent": "skill_pressure",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 24,
+      "passed": 22,
+      "pass_rate": 0.9166666666666666,
+      "harness_ok": 24,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19349.041666666668,
+      "avg_score": 0.9739583333333334,
+      "eval_intent": "skill_pressure",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 6,
+      "passed": 5,
+      "pass_rate": 0.8333333333333334,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 37425.166666666664,
+      "avg_score": 0.9333333333333332,
+      "eval_intent": "speed_routing",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 6,
+      "passed": 5,
+      "pass_rate": 0.8333333333333334,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 32738.5,
+      "avg_score": 0.9666666666666667,
+      "eval_intent": "speed_routing",
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_grading_mode": [
+    {
+      "total": 200,
+      "passed": 173,
+      "pass_rate": 0.865,
+      "harness_ok": 200,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 27599.3,
+      "avg_score": 0.9619338023088023,
+      "grading_mode": "deterministic"
+    }
+  ],
+  "by_grading_source": [
+    {
+      "total": 200,
+      "passed": 173,
+      "pass_rate": 0.865,
+      "harness_ok": 200,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 27599.3,
+      "avg_score": 0.9619338023088023,
+      "grading_source": "deterministic"
+    }
+  ],
+  "kpi": {
+    "intents": [
+      "execution_grade",
+      "realistic_capability"
+    ],
+    "total": 68,
+    "passed": 55,
+    "pass_rate": 0.8088235294117647,
+    "by_harness_and_mode": [
+      {
+        "total": 34,
+        "passed": 26,
+        "pass_rate": 0.7647058823529411,
+        "harness_ok": 34,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 43561.617647058825,
+        "avg_score": 0.9396358543417367,
+        "harness": "codex",
+        "skills_mode": "off"
+      },
+      {
+        "total": 34,
+        "passed": 29,
+        "pass_rate": 0.8529411764705882,
+        "harness_ok": 34,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 33166.17647058824,
+        "avg_score": 0.974435531788473,
+        "harness": "codex",
+        "skills_mode": "on"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "guardrail",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "case_id": "connector_routing_with_fallback",
+      "score": 0.8,
+      "latency_ms": 7548.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "guardrail",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "case_id": "gfql_remote_edge_pattern_real_methods",
+      "score": 0.9,
+      "latency_ms": 31634.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "case_id": "coverage_analyst_connector_triage",
+      "score": 0.9090909090909091,
+      "latency_ms": 67542.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "score": 0.8571428571428571,
+      "latency_ms": 71077.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "score": 0.8571428571428571,
+      "latency_ms": 29965.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "score": 0.9333333333333333,
+      "latency_ms": 51132.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "score": 0.8,
+      "latency_ms": 39690.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "score": 0.45454545454545453,
+      "latency_ms": 102045.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "score": 0.6363636363636364,
+      "latency_ms": 58554.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "case_id": "persona_precomputed_embeddings_flow",
+      "score": 0.5,
+      "latency_ms": 39299.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "runtime_smoke",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "case_id": "louie_ai_search",
+      "score": 0.6666666666666666,
+      "latency_ms": 29285.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "runtime_smoke",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "case_id": "louie_privacy_snippet",
+      "score": 0.75,
+      "latency_ms": 14404.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "core_first_plot_with_auth",
+      "score": 0.875,
+      "latency_ms": 17871.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "core_first_plot_with_auth",
+      "score": 0.875,
+      "latency_ms": 14391.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "privacy_safe_share_url",
+      "score": 0.5,
+      "latency_ms": 38476.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "privacy_safe_share_url",
+      "score": 0.5,
+      "latency_ms": 28697.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "static_export_text_modes",
+      "score": 0.0,
+      "latency_ms": 40210.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "off",
+      "eval_intent": "speed_routing",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "case_id": "speed_route_viz_geo_icons",
+      "score": 0.6,
+      "latency_ms": 15266.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "score": 0.8,
+      "latency_ms": 30266.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "score": 0.8181818181818182,
+      "latency_ms": 75132.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "score": 0.8181818181818182,
+      "latency_ms": 42667.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "score": 0.7777777777777778,
+      "latency_ms": 124013.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "case_id": "persona_connector_analyst_workflow",
+      "score": 0.9166666666666666,
+      "latency_ms": 29240.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "runtime_smoke",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "case_id": "louie_ai_search",
+      "score": 0.6666666666666666,
+      "latency_ms": 18530.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "core_first_plot_with_auth",
+      "score": 0.875,
+      "latency_ms": 21175.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "skill_pressure",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "case_id": "privacy_safe_share_url",
+      "score": 0.5,
+      "latency_ms": 19132.0
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex",
+      "skills_mode": "on",
+      "eval_intent": "speed_routing",
+      "journey_id": "pygraphistry_router_speed_v1",
+      "case_id": "speed_route_viz_geo_icons",
+      "score": 0.8,
+      "latency_ms": 48322.0
+    }
+  ]
+}

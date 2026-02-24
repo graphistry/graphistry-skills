@@ -1,0 +1,662 @@
+{
+  "cases": [
+    {
+      "case_id": "coverage_analyst_social_claim_reuse",
+      "domain": "social-media",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "output_depth": "workflow",
+      "persona": "analyst",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "coverage_analyst_connector_triage",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "output_depth": "snippet",
+      "persona": "analyst",
+      "task_family": "connectors"
+    },
+    {
+      "case_id": "coverage_generic_end_to_end_workflow",
+      "domain": "generic",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_coverage_expansion_v1",
+      "output_depth": "e2e_workflow",
+      "persona": "analyst",
+      "task_family": "ingest_etl"
+    },
+    {
+      "case_id": "e2e_csv_degree_gfql_viz_private",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "engineer",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "e2e_hypergraph_temporal_gfql_layout",
+      "domain": "cybersecurity",
+      "eval_intent": "realistic_capability",
+      "input_level": "events_table",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "unspecified",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "e2e_remote_slim_ai_gfql_viz",
+      "domain": "cybersecurity",
+      "eval_intent": "realistic_capability",
+      "input_level": "remote_dataset",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "engineer",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "e2e_connector_dataframe_to_plot",
+      "domain": "cybersecurity",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_e2e_big_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "unspecified",
+      "task_family": "ingest_etl"
+    },
+    {
+      "case_id": "exec_plot_public_render_false",
+      "domain": "cybersecurity",
+      "eval_intent": "execution_grade",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "exec_plot_private_safe",
+      "domain": "cybersecurity",
+      "eval_intent": "execution_grade",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "output_depth": "snippet",
+      "persona": "admin",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "exec_schema_type_event_time",
+      "domain": "cybersecurity",
+      "eval_intent": "execution_grade",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_execution_grade_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "ingest_etl"
+    },
+    {
+      "case_id": "auth_env_no_literal_creds",
+      "domain": "cybersecurity",
+      "eval_intent": "guardrail",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "safety_guardrail"
+    },
+    {
+      "case_id": "privacy_private_not_public",
+      "domain": "platform",
+      "eval_intent": "guardrail",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "output_depth": "one_liner",
+      "persona": "engineer",
+      "task_family": "safety_guardrail"
+    },
+    {
+      "case_id": "gfql_remote_docs_routing",
+      "domain": "platform",
+      "eval_intent": "guardrail",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "unspecified",
+      "task_family": "safety_guardrail"
+    },
+    {
+      "case_id": "connector_routing_with_fallback",
+      "domain": "platform",
+      "eval_intent": "guardrail",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "unspecified",
+      "task_family": "safety_guardrail"
+    },
+    {
+      "case_id": "gfql_real_methods_only",
+      "domain": "cybersecurity",
+      "eval_intent": "guardrail",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_guardrails_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "safety_guardrail"
+    },
+    {
+      "case_id": "louie_privacy_snippet",
+      "domain": "platform",
+      "eval_intent": "runtime_smoke",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "runtime_smoke"
+    },
+    {
+      "case_id": "louie_gfql_remote",
+      "domain": "platform",
+      "eval_intent": "runtime_smoke",
+      "input_level": "bound_graph",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "output_depth": "one_liner",
+      "persona": "unspecified",
+      "task_family": "runtime_smoke"
+    },
+    {
+      "case_id": "louie_ai_search",
+      "domain": "platform",
+      "eval_intent": "runtime_smoke",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_louie_subset_v1",
+      "output_depth": "one_liner",
+      "persona": "unspecified",
+      "task_family": "runtime_smoke"
+    },
+    {
+      "case_id": "gfql_edge_query_filter",
+      "domain": "cybersecurity",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "gfql_where_owner_compare",
+      "domain": "cybersecurity",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "gfql_output_hop_slicing",
+      "domain": "cybersecurity",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "gfql_remote_nodes_subset",
+      "domain": "platform",
+      "eval_intent": "alignment_legacy",
+      "input_level": "remote_dataset",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "ingest_etl"
+    },
+    {
+      "case_id": "viz_external_layout_play0",
+      "domain": "cybersecurity",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "other"
+    },
+    {
+      "case_id": "viz_icon_and_badge",
+      "domain": "cybersecurity",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "viz_schema_hygiene_bullets",
+      "domain": "platform",
+      "eval_intent": "alignment_legacy",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_moltbook_alignment_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "unspecified",
+      "task_family": "other"
+    },
+    {
+      "case_id": "persona_novice_fraud_table_to_viz_algo",
+      "domain": "fraud",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "novice",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "persona_org_and_api_key_navigation",
+      "domain": "cybersecurity",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "snippet",
+      "persona": "admin",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "persona_advanced_coloring_with_gfql_slices",
+      "domain": "cybersecurity",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "persona_umap_text_featurization",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "engineer",
+      "task_family": "ai_ml"
+    },
+    {
+      "case_id": "persona_precomputed_embeddings_flow",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "workflow",
+      "persona": "engineer",
+      "task_family": "ai_ml"
+    },
+    {
+      "case_id": "persona_connector_analyst_workflow",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "snippet",
+      "persona": "admin",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "persona_auth_troubleshooting_checklist",
+      "domain": "platform",
+      "eval_intent": "realistic_capability",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_persona_journeys_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "admin",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "core_first_plot_with_auth",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "hypergraph_plus_materialize",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "other"
+    },
+    {
+      "case_id": "privacy_safe_share_url",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "other"
+    },
+    {
+      "case_id": "viz_encodings_and_layout_settings",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "shaping_viz"
+    },
+    {
+      "case_id": "static_export_text_modes",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "other"
+    },
+    {
+      "case_id": "gfql_local_pattern_hops",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "gfql_remote_python_remote_postprocess",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "remote_dataset",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "workflow",
+      "persona": "engineer",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "hop_or_chain_for_neighborhood",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "gfql_query"
+    },
+    {
+      "case_id": "ai_umap_dbscan",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "ai_ml"
+    },
+    {
+      "case_id": "ai_semantic_search",
+      "domain": "cybersecurity",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "ai_ml"
+    },
+    {
+      "case_id": "connector_routing",
+      "domain": "platform",
+      "eval_intent": "skill_pressure",
+      "input_level": "raw_table",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "unspecified",
+      "task_family": "ingest_etl"
+    },
+    {
+      "case_id": "auth_safety",
+      "domain": "platform",
+      "eval_intent": "skill_pressure",
+      "input_level": "conceptual",
+      "journey_id": "pygraphistry_skill_pressure_v1",
+      "output_depth": "bullets_or_links",
+      "persona": "unspecified",
+      "task_family": "auth"
+    },
+    {
+      "case_id": "echo_token",
+      "domain": "platform",
+      "eval_intent": "runtime_smoke",
+      "input_level": "conceptual",
+      "journey_id": "runtime_smoke",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "runtime_smoke"
+    },
+    {
+      "case_id": "privacy_snippet",
+      "domain": "platform",
+      "eval_intent": "runtime_smoke",
+      "input_level": "conceptual",
+      "journey_id": "runtime_smoke",
+      "output_depth": "snippet",
+      "persona": "unspecified",
+      "task_family": "runtime_smoke"
+    }
+  ],
+  "distributions": {
+    "domain": [
+      {
+        "bucket": "fraud",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "cybersecurity",
+        "count": 25,
+        "pct": 54.3
+      },
+      {
+        "bucket": "social-media",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "platform",
+        "count": 18,
+        "pct": 39.1
+      },
+      {
+        "bucket": "generic",
+        "count": 1,
+        "pct": 2.2
+      }
+    ],
+    "input_level": [
+      {
+        "bucket": "raw_table",
+        "count": 9,
+        "pct": 19.6
+      },
+      {
+        "bucket": "events_table",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "bound_graph",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "remote_dataset",
+        "count": 3,
+        "pct": 6.5
+      },
+      {
+        "bucket": "conceptual",
+        "count": 32,
+        "pct": 69.6
+      }
+    ],
+    "output_depth": [
+      {
+        "bucket": "one_liner",
+        "count": 3,
+        "pct": 6.5
+      },
+      {
+        "bucket": "snippet",
+        "count": 27,
+        "pct": 58.7
+      },
+      {
+        "bucket": "workflow",
+        "count": 9,
+        "pct": 19.6
+      },
+      {
+        "bucket": "e2e_workflow",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "bullets_or_links",
+        "count": 6,
+        "pct": 13.0
+      }
+    ],
+    "persona": [
+      {
+        "bucket": "novice",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "analyst",
+        "count": 3,
+        "pct": 6.5
+      },
+      {
+        "bucket": "engineer",
+        "count": 6,
+        "pct": 13.0
+      },
+      {
+        "bucket": "admin",
+        "count": 4,
+        "pct": 8.7
+      },
+      {
+        "bucket": "unspecified",
+        "count": 32,
+        "pct": 69.6
+      }
+    ],
+    "task_family": [
+      {
+        "bucket": "runtime_smoke",
+        "count": 5,
+        "pct": 10.9
+      },
+      {
+        "bucket": "safety_guardrail",
+        "count": 5,
+        "pct": 10.9
+      },
+      {
+        "bucket": "auth",
+        "count": 7,
+        "pct": 15.2
+      },
+      {
+        "bucket": "ingest_etl",
+        "count": 5,
+        "pct": 10.9
+      },
+      {
+        "bucket": "shaping_viz",
+        "count": 7,
+        "pct": 15.2
+      },
+      {
+        "bucket": "gfql_query",
+        "count": 7,
+        "pct": 15.2
+      },
+      {
+        "bucket": "ai_ml",
+        "count": 4,
+        "pct": 8.7
+      },
+      {
+        "bucket": "connectors",
+        "count": 1,
+        "pct": 2.2
+      },
+      {
+        "bucket": "other",
+        "count": 5,
+        "pct": 10.9
+      }
+    ]
+  },
+  "generated_at": "2026-02-21T21:09:13.871699+00:00",
+  "journey_dir": "evals/journeys",
+  "persona_task_matrix": {
+    "admin": {
+      "auth": 3,
+      "shaping_viz": 1
+    },
+    "analyst": {
+      "connectors": 1,
+      "ingest_etl": 1,
+      "shaping_viz": 1
+    },
+    "engineer": {
+      "ai_ml": 2,
+      "auth": 1,
+      "gfql_query": 2,
+      "safety_guardrail": 1
+    },
+    "novice": {
+      "auth": 1
+    },
+    "unspecified": {
+      "ai_ml": 2,
+      "auth": 2,
+      "gfql_query": 5,
+      "ingest_etl": 4,
+      "other": 5,
+      "runtime_smoke": 5,
+      "safety_guardrail": 4,
+      "shaping_viz": 5
+    }
+  },
+  "total_cases": 46,
+  "total_journeys": 9,
+  "under_covered": {
+    "domain": [],
+    "input_level": [],
+    "output_depth": [],
+    "persona": [],
+    "task_family": []
+  }
+}
