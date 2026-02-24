@@ -1,6 +1,7 @@
 # Security Public-Readiness Audit
 
 Audit date: 2026-02-24  
+Last refreshed: 2026-02-24 (post-`main` history rewrite + live GitHub status check)  
 Branch: `audit/security-public-readiness`
 
 ## Scope
@@ -24,41 +25,44 @@ Branch: `audit/security-public-readiness`
 
 ## Critical Before Public
 
-1. GitHub security analysis features are disabled
-- Evidence: repo `security_and_analysis` shows disabled for code security, Dependabot security updates, secret scanning, and push protection.
-- Risk: no server-side leak/vuln detection on PRs or pushes.
+1. GitHub security analysis features are still incomplete
+- Live evidence (`gh api repos/graphistry/graphistry-skills`):
+  - `dependabot_security_updates=enabled`
+  - `secret_scanning=disabled`
+  - `secret_scanning_push_protection=disabled`
+  - `code_security=disabled`
+- Risk: no server-side secret leak prevention and weaker security scanning coverage.
 - Required action:
-  - Enable secret scanning + push protection
-  - Enable Dependabot security updates
-  - Enable code scanning / code security
+  - Enable secret scanning
+  - Enable secret scanning push protection
+  - Enable code security / code scanning
 
-2. `main` is not protected and no rulesets are configured
-- Evidence: branch protection API returns `Branch not protected`; rulesets list is empty.
-- Risk: accidental direct pushes, no required checks/review gates, weaker change control.
+2. Branch governance is only partially configured
+- Live evidence:
+  - `main` branch protection exists with PR review requirement (`required_approving_review_count=1`)
+  - force-push/delete disabled
+  - required status checks list is currently empty
+  - repository rulesets list is empty (`[]`)
+- Risk: changes can merge without CI gates; missing repository-level policy controls.
 - Required action:
-  - Protect `main` (require PR + required status checks + disallow force-push)
-  - Add at least one ruleset for repository-wide branch policy
+  - Configure required status checks on `main`
+  - Add at least one repository ruleset
 
-3. Benchmarks include high-risk publication content (privacy/leakage surface)
-- Evidence includes:
-  - absolute local paths (for example `/home/<user>/...`) in benchmark manifests
-  - full prompt/response corpora in checked-in `rows.jsonl`
-  - historical test credential strings in benchmark data (`<test_user>`, `<test_pass>`)
-  - runtime metadata/trace identifiers in checked-in artifacts (for example `otel_ids.json`)
-- Risk: leaks workstation identity/pathing, sensitive prompt contents, and potential credential material over time.
+3. Historical test credential rotation confirmation is still pending
+- Evidence: historical test credential literals previously appeared in history before rewrite.
+- Risk: if those credentials were ever real, they are compromised.
 - Required action:
-  - Define and enforce a benchmark publication policy:
-    - public repo keeps only sanitized summaries/aggregates
-    - raw rows/log/trace artifacts remain private
-  - Purge non-compliant benchmark artifacts before public launch
+  - Confirm whether they were real
+  - Rotate/revoke if applicable, and confirm invalidation
 
-4. Possible credential exposure history for historical test credentials
-- Evidence: strings existed in tracked files and benchmark artifacts; they were used in checks and are present in git history.
-- Risk: if those credentials were real at any point, they are compromised.
-- Required action:
-  - Treat as exposed and rotate/revoke immediately
-  - Remove all remaining occurrences from tracked files
-  - Decide whether to rewrite history before going public
+## Critical Items Closed Since Initial Audit
+
+1. Benchmark publication surface hardened
+- Raw benchmark corpora and run artifacts removed from checked-in state/history.
+- Public-safe benchmark policy now enforced via CI (`scripts/ci/validate_public_benchmarks.sh`).
+
+2. Git history rewrite completed on default branch
+- `origin/main` now points to rewritten scrubbed history (`c342f9d`).
 
 ## Important Hardening (Should Do)
 
@@ -111,18 +115,17 @@ Minimum gate:
 ## Strike List: Operator-Owned
 
 - [ ] Rotate/revoke any potentially exposed credentials (including any prior historical test credential usage if real), then confirm they are dead.
-- [ ] Decide benchmark publication policy for public repo:
+- [x] Decide benchmark publication policy for public repo:
 - public-safe summaries only vs full raw eval corpora in-repo.
-- [ ] If policy excludes raw corpora: approve history rewrite strategy (rewrite vs preserve and move private).
+- [x] If policy excludes raw corpora: approve history rewrite strategy (rewrite vs preserve and move private).
 - [ ] In GitHub repo settings, enable:
 - Secret scanning
 - Secret scanning push protection
-- Dependabot security updates
 - Code security / code scanning
-- [ ] Protect `main`:
+- [x] Protect `main`:
 - require pull requests
-- require status checks
 - disallow force pushes/deletions
+- [ ] Protect `main`: require status checks
 - [ ] Add/approve org ruleset(s) for default branch governance.
 - [ ] Decide whether README keeps a live tokenized sample URL or switches to redacted placeholder.
 - [ ] Decide CODEOWNERS ownership map for security-sensitive paths.
@@ -154,3 +157,21 @@ Minimum gate:
   - `scripts/ci/validate_public_benchmarks.sh` passed
   - `scripts/ci/validate_skills.py` passed
   - `git fsck --full` passed
+
+## Live Status Recheck (2026-02-24)
+
+Checked with GitHub API:
+- `gh api repos/graphistry/graphistry-skills`
+- `gh api repos/graphistry/graphistry-skills/branches/main/protection`
+- `gh api repos/graphistry/graphistry-skills/rulesets`
+
+Observed:
+- Repo still private (`private=true`)
+- Default branch is `main`
+- `main` branch protection enabled (PR review required, force-push/delete blocked)
+- Required status checks list currently empty
+- Rulesets list empty
+- `dependabot_security_updates=enabled`
+- `secret_scanning=disabled`
+- `secret_scanning_push_protection=disabled`
+- `code_security=disabled`
