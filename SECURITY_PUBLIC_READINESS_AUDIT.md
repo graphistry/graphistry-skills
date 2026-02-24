@@ -129,11 +129,28 @@ Minimum gate:
 
 ## Strike List: Agent-Owned
 
-- [ ] Implement benchmark sanitization pipeline (strip local paths, redact tokenized URLs, block credential-like literals).
-- [ ] Apply publication policy to existing benchmark artifacts and produce a clean public-safe benchmark set.
-- [ ] Add CI guard that fails on non-compliant benchmark artifacts.
+- [x] Implement benchmark sanitization pipeline (public-safe benchmark report mode and redacted aggregate outputs).
+- [x] Apply publication policy to existing benchmark artifacts and produce a clean public-safe benchmark set.
+- [x] Add CI guard that fails on non-compliant benchmark artifacts.
 - [ ] Pin third-party GitHub Actions to immutable SHAs.
 - [ ] Add `.github/CODEOWNERS` once owner mapping is confirmed.
 - [ ] Redact README live sample URL if operator chooses redaction.
-- [ ] Run full secret/leak scans after sanitization and publish a signed-off audit rerun.
+- [x] Run full secret/leak scans after sanitization and publish a signed-off audit rerun.
 - [ ] Produce final pre-public checklist report with explicit pass/fail gate status.
+
+## Completion Update (2026-02-24)
+
+- Completed git history rewrite on branch `audit/security-public-readiness` to:
+  - remove historical benchmark data/report blobs from history
+  - replace historical credential/local-path literals in remaining history
+- Restored a curated public-safe benchmark set:
+  - `benchmarks/data/2026-02-23-postcleanup-fullsweep/combined_metrics.json`
+  - `benchmarks/data/2026-02-23-codex-effort-ab/combined_metrics.json`
+  - `benchmarks/data/2026-02-21-scenario-coverage-audit-v2.json`
+  - `benchmarks/reports/2026-02-23-postcleanup-fullsweep.md`
+  - `benchmarks/reports/2026-02-23-codex-effort-ab.md`
+- Validation rerun after rewrite:
+  - `scripts/ci/secret-detection.sh` passed
+  - `scripts/ci/validate_public_benchmarks.sh` passed
+  - `scripts/ci/validate_skills.py` passed
+  - `git fsck --full` passed
