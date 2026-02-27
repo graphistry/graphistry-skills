@@ -11,7 +11,7 @@ ROBOTS_URL="https://pygraphistry.readthedocs.io/robots.txt"
 
 SITEMAP_SNAPSHOT="${REF_DIR}/pygraphistry-readthedocs-sitemap.xml"
 TOPLEVEL_TSV="${REF_DIR}/pygraphistry-readthedocs-top-level.tsv"
-TOC_MD="${REF_DIR}/pygraphistry-docs-toc.md"
+TOC_MD="${REF_DIR}/pygraphistry-readthedocs-toc.md"
 
 OUTPUT_DIR="${REF_DIR}"
 TIMESTAMP_OVERRIDE=""
@@ -53,7 +53,7 @@ mkdir -p "${OUTPUT_DIR}"
 
 SITEMAP_SNAPSHOT="${OUTPUT_DIR}/pygraphistry-readthedocs-sitemap.xml"
 TOPLEVEL_TSV="${OUTPUT_DIR}/pygraphistry-readthedocs-top-level.tsv"
-TOC_MD="${OUTPUT_DIR}/pygraphistry-docs-toc.md"
+TOC_MD="${OUTPUT_DIR}/pygraphistry-readthedocs-toc.md"
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
@@ -87,6 +87,12 @@ perl -ne 'while (/<li class="toctree-l1[^>]*><a class="reference internal" href=
   echo "## Top-Level Docs Sections (latest)"
   sed 's/&amp;/\&/g' "${TOPLEVEL_TSV}" \
     | awk -F '\t' '{printf "- [%s](https://pygraphistry.readthedocs.io/en/latest/%s)\n", $2, $1}'
+  echo
+  echo "## RTD -> GitHub Translation (Best Effort)"
+  echo "- Source repo: https://github.com/graphistry/pygraphistry"
+  echo "- For \`/en/latest/<path>.html\`, try \`docs/source/<path>.rst\`, then \`docs/source/<path>.md\`."
+  echo "- For \`/en/latest/demos/<path>.html\`, try \`demos/<path>.ipynb\`, then \`demos/<path>.html\`."
+  echo "- Some Sphinx-generated pages do not map 1:1 to a single repo file."
   echo
   echo "## Saved Snapshots"
   echo "- Version sitemap snapshot: \`pygraphistry-readthedocs-sitemap.xml\`"

@@ -1,0 +1,85 @@
+{
+  "id": "pygraphistry_docs_source_policy_v1",
+  "description": "Eval journey for RTD->GitHub/clone cascade policy. Tests fallback behavior under simulated RTD failures and clone permission scenarios. Trace checks focus on command behavior (clone/no-clone); URL policy is validated via response text regex.",
+  "eval_intent": "policy_behavior",
+  "tags": ["pygraphistry", "docs", "fallback", "policy"],
+  "cases": [
+    {
+      "id": "light_rtd_first",
+      "prompt": "I need one quick GFQL remote doc link and one validation link. Just give me the URLs, no explanation needed.",
+      "checks": {
+        "regex": [
+          "pygraphistry\\.readthedocs\\.io"
+        ],
+        "must_not_regex": [
+          "git clone"
+        ],
+        "max_lines": 10
+      },
+      "trace_checks": {
+        "must_not_command_regex": ["git clone"]
+      }
+    },
+    {
+      "id": "light_rtd_blocked_fallback_github",
+      "prompt": "I need GFQL remote docs links. IMPORTANT: ReadTheDocs returns HTTP 403 in my environment, so do NOT use pygraphistry.readthedocs.io URLs. Give me GitHub-based alternatives instead (raw.githubusercontent.com or github.com/graphistry/pygraphistry paths).",
+      "checks": {
+        "regex": [
+          "github\\.com/graphistry/pygraphistry|raw\\.githubusercontent\\.com.*graphistry/pygraphistry"
+        ],
+        "must_not_regex": [
+          "pygraphistry\\.readthedocs\\.io"
+        ],
+        "max_lines": 12
+      },
+      "trace_checks": {
+        "must_not_command_regex": ["git clone"]
+      }
+    },
+    {
+      "id": "heavy_clone_allowed_master",
+      "prompt": "I need a comprehensive overview of GFQL capabilities, remote execution patterns, and validation approaches. You ARE allowed to clone the pygraphistry repo locally to read docs/demos if that helps. Use --depth 1 for efficiency. Summarize key patterns you find.",
+      "checks": {
+        "regex": [
+          "(?i)(gfql|chain|hop|remote)",
+          "(?i)(validation|predicate|filter)"
+        ],
+        "min_lines": 5
+      },
+      "trace_checks": {
+        "must_command_regex": ["git clone.*--depth 1.*github.*pygraphistry|git clone.*github.*pygraphistry.*--depth 1"]
+      }
+    },
+    {
+      "id": "heavy_clone_allowed_tag",
+      "prompt": "I'm using pygraphistry version 0.33.5. Clone the repo at that tag (v0.33.5) and summarize the GFQL remote API from the docs at that version. You ARE allowed to clone. Use --depth 1.",
+      "checks": {
+        "regex": [
+          "(?i)(gfql|remote)",
+          "(?i)(0\\.33\\.5|v0\\.33\\.5|tag)"
+        ],
+        "min_lines": 3
+      },
+      "trace_checks": {
+        "must_command_regex": ["git clone.*--depth 1|git checkout.*v?0\\.33\\.5"]
+      }
+    },
+    {
+      "id": "heavy_clone_disallowed_fallback",
+      "prompt": "I need comprehensive GFQL docs coverage. IMPORTANT: Do NOT clone any repos or write any files - I'm in a read-only environment. Use web-based docs only (ReadTheDocs or GitHub web URLs).",
+      "checks": {
+        "regex": [
+          "(?i)(gfql|remote|chain)",
+          "(readthedocs\\.io|github\\.com)"
+        ],
+        "must_not_regex": [
+          "git clone"
+        ],
+        "min_lines": 3
+      },
+      "trace_checks": {
+        "must_not_command_regex": ["git clone"]
+      }
+    }
+  ]
+}

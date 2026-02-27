@@ -6,7 +6,7 @@ description: "Build PyGraphistry visualizations with bindings, encodings, layout
 # PyGraphistry Visualization
 
 ## Doc routing (local + canonical)
-- First route with `../pygraphistry/references/pygraphistry-docs-toc.md`.
+- First route with `../pygraphistry/references/pygraphistry-readthedocs-toc.md`.
 - Use `../pygraphistry/references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
 - Only scan `../pygraphistry/references/pygraphistry-readthedocs-sitemap.xml` when a needed page is missing.
 - Use one batched discovery read before deep-page reads; avoid `cat *` and serial micro-reads.
@@ -31,6 +31,80 @@ g2.plot()
 # nodes_df contains x/y layout columns
 g2 = graphistry.edges(edges_df, 'src', 'dst').nodes(nodes_df, 'id').bind(point_x='x', point_y='y').settings(url_params={'play': 0})
 g2.plot()
+```
+
+## URL parameters reference
+Use `settings(url_params={...})` to control visualization behavior. Full reference: https://hub.graphistry.com/docs/api/1/rest/url/#urloptions
+
+### Layout
+| Param | Type | Default | Range | Description |
+|-------|------|---------|-------|-------------|
+| `play` | int | 5000 | 0-10000 (0, 1000, 2000, 5000) | Layout duration ms. 0=fixed |
+| `lockedX` | bool | false | | Lock X axis (with `bind(point_x=...)`) |
+| `lockedY` | bool | false | | Lock Y axis (with `bind(point_y=...)`) |
+| `lockedR` | bool | false | | Lock radial position |
+| `linLog` | bool | false | | Strong separation; good for <1000 nodes |
+| `scalingRatio` | float | 1.0 | 0.1-10 (0.5, 1, 2, 5) | Expansion ratio. Combine with `linLog` |
+| `strongGravity` | bool | false | | Compact layout with pull to center |
+| `dissuadeHubs` | bool | false | | Reduce hub dominance in layout |
+| `gravity` | float | 1.0 | 0.1-10 (0.1, 1, 2, 10) | Pull strength toward center |
+| `edgeInfluence` | float | 1.0 | 0-10 (0, 0.7, 1, 2, 5, 7) | Edge weight impact on layout |
+| `precisionVsSpeed` | float | 1.0 | 0.1-10 (0.1, 1, 10) | Higher=precise but slower |
+| `left/right/top/bottom` | int | auto | | Manual camera bounds on load |
+
+### Scene / Rendering
+| Param | Type | Default | Range | Description |
+|-------|------|---------|-------|-------------|
+| `pointSize` | float | 1.0 | 0.1-10 (0.3, 0.5, 1, 2, 3) | Point size multiplier (not encoding) |
+| `pointOpacity` | float | 1.0 | 0-1 (0.3, 0.5, 0.8, 1) | Node transparency |
+| `pointStrokeWidth` | float | 0 | 0-5 (0, 1, 2) | Node border width |
+| `edgeCurvature` | float | 0 | 0-1 (0, 0.5, 1) | Edge bending amount |
+| `edgeOpacity` | float | 1.0 | 0-1 (0.3, 0.5, 0.8, 1) | Edge transparency |
+| `showArrows` | bool | true | | Show edge direction arrows |
+| `neighborhoodHighlight` | str | both | incoming/outgoing/both/node | Hover highlight mode |
+| `neighborhoodHighlightHops` | int | 1 | 1-5 (1, 2, 3) | Hops in hover highlight |
+
+### Labels / Points of Interest
+| Param | Type | Default | Range | Description |
+|-------|------|---------|-------|-------------|
+| `showLabels` | bool | true | | Toggle all label visibility |
+| `showLabelOnHover` | bool | true | | Show labels only on hover |
+| `showPointsOfInterest` | bool | true | | Highlight key nodes as POI |
+| `showPointsOfInterestLabel` | bool | true | | Show labels on POI nodes |
+| `pointsOfInterestMax` | int | 5 | 0-100 (0, 5, 10, 20) | Max POIs. 0=disable |
+| `shortenLabels` | bool | true | | Truncate long labels |
+| `showLabelPropertiesOnHover` | bool | false | | Show extra properties on hover |
+| `labelOpacity` | float | 1.0 | 0-1 (0.5, 0.8, 1) | Label transparency |
+| `labelColor` | str | | hex no # (000000, FFFFFF) | Label text color |
+| `labelBackground` | str | | hex no # (000000, FFFFFF) | Label bg color |
+
+Note: URL params use hex **without** `#`. Python API (`encode_*`, `palette`) uses `#` prefix.
+
+### UI Controls
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `menu` | bool | true | Show all menus |
+| `info` | bool | true | Show graph size stats |
+| `showHistograms` | bool | true | Show histogram panel |
+| `showInspector` | bool | true | Show entity inspector |
+| `showCollections` | bool | false | Show collections panel |
+
+### Examples
+```python
+# Ring layout with strong separation for small graphs (<1000 nodes)
+g2 = g.settings(url_params={'play': 3000, 'linLog': True, 'scalingRatio': 2.0})
+
+# Fixed position layout (external coordinates)
+g2 = g.bind(point_x='x', point_y='y').settings(url_params={'play': 0, 'lockedX': True, 'lockedY': True})
+
+# Disable POI labels entirely
+g2 = g.settings(url_params={'showLabels': False, 'pointsOfInterestMax': 0})
+
+# Larger points, more transparent edges
+g2 = g.settings(url_params={'pointSize': 3.0, 'edgeOpacity': 0.3})
+
+# Minimal UI for embedding
+g2 = g.settings(url_params={'menu': False, 'info': False, 'showHistograms': False, 'showInspector': False})
 ```
 
 ## Icon/badge pattern
@@ -88,6 +162,7 @@ plot_url = g.plot(render=False)
 - 10min visualization: https://pygraphistry.readthedocs.io/en/latest/visualization/10min.html
 - Layout guide: https://pygraphistry.readthedocs.io/en/latest/visualization/layout/intro.html
 - Layout catalog: https://pygraphistry.readthedocs.io/en/latest/visualization/layout/catalog.html
+- URL parameters reference: https://hub.graphistry.com/docs/api/1/rest/url/#urloptions
 - Privacy/sharing: https://pygraphistry.readthedocs.io/en/latest/server/privacy.html
 - Visualization notebooks index: https://pygraphistry.readthedocs.io/en/latest/notebooks/visualization.html
 - Icon lookup reference: `references/fa-icons.md`

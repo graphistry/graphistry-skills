@@ -32,6 +32,12 @@ Freshness guidance:
 - [Contribute](https://pygraphistry.readthedocs.io/en/latest/CONTRIBUTING.html)
 - [Development Setup](https://pygraphistry.readthedocs.io/en/latest/DEVELOP.html)
 
+## RTD -> GitHub Translation (Best Effort)
+- Source repo: https://github.com/graphistry/pygraphistry
+- For `/en/latest/<path>.html`, try `docs/source/<path>.rst`, then `docs/source/<path>.md`.
+- For `/en/latest/demos/<path>.html`, try `demos/<path>.ipynb`, then `demos/<path>.html`.
+- Some Sphinx-generated pages do not map 1:1 to a single repo file.
+
 ## Saved Snapshots
 - Version sitemap snapshot: `pygraphistry-readthedocs-sitemap.xml`
 - Top-level TOC extraction snapshot: `pygraphistry-readthedocs-top-level.tsv`
