@@ -827,6 +827,169 @@ def grade_response_oracle(
     }
 
 
+def extract_trace_features(raw_ref: str | None) -> dict[str, Any]:
+    """Extract behavioral features from raw harness log for trace assertions."""
+    features: dict[str, Any] = {
+        "commands": [],
+        "domains_used": set(),
+        "git_clone_count": 0,
+        "web_search_count": 0,
+        "open_page_count": 0,
+        "open_page_empty_count": 0,
+    }
+
+    if not raw_ref:
+        return features
+
+    raw_path = Path(raw_ref)
+    if not raw_path.exists():
+        return features
+
+    try:
+        raw_text = raw_path.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return features
+
+    for line in raw_text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            payload = json.loads(line)
+        except Exception:
+            continue
+
+        # Codex format: item.completed with function_call or command_execution
+        if payload.get("type") == "item.completed":
+            item = payload.get("item") or {}
+            item_type = item.get("type") or ""
+
+            # Codex command_execution events
+            if item_type == "command_execution":
+                cmd = item.get("command") or ""
+                if cmd:
+                    features["commands"].append(cmd)
+                    if re.search(r"\bgit\s+clone\b", cmd):
+                        features["git_clone_count"] += 1
+
+            # function_call events (other harnesses)
+            elif item_type == "function_call":
+                name = item.get("name") or ""
+                args_raw = item.get("arguments") or "{}"
+                try:
+                    args = json.loads(args_raw) if isinstance(args_raw, str) else args_raw
+                except Exception:
+                    args = {}
+
+                if name == "shell":
+                    cmd = args.get("command") or args.get("cmd") or ""
+                    if cmd:
+                        features["commands"].append(cmd)
+                        if re.search(r"\bgit\s+clone\b", cmd):
+                            features["git_clone_count"] += 1
+
+                elif name in {"web_search", "webSearch"}:
+                    features["web_search_count"] += 1
+
+                elif name in {"open_page", "openPage", "web_fetch", "webFetch"}:
+                    features["open_page_count"] += 1
+                    url = args.get("url") or ""
+                    if not url.strip():
+                        features["open_page_empty_count"] += 1
+                    else:
+                        try:
+                            from urllib.parse import urlparse
+                            parsed = urlparse(url)
+                            if parsed.netloc:
+                                features["domains_used"].add(parsed.netloc.lower())
+                        except Exception:
+                            pass
+
+    # Convert set to sorted list for JSON serialization
+    features["domains_used"] = sorted(features["domains_used"])
+    return features
+
+
+def grade_trace_checks(
+    trace_checks: dict[str, Any],
+    trace_features: dict[str, Any],
+) -> tuple[bool, float, dict[str, Any]]:
+    """Grade trace-level assertions against extracted features."""
+    details: dict[str, Any] = {
+        "must_command_regex": [],
+        "must_not_command_regex": [],
+        "must_domain_used": [],
+        "must_not_domain_used": [],
+        "max_empty_open_page_events": [],
+    }
+
+    total = 0
+    passed = 0
+    commands = trace_features.get("commands") or []
+    domains = set(trace_features.get("domains_used") or [])
+    commands_joined = "\n".join(commands)
+
+    # must_command_regex: at least one command must match
+    for pattern in trace_checks.get("must_command_regex") or []:
+        total += 1
+        ok = False
+        error = None
+        try:
+            ok = re.search(pattern, commands_joined, re.IGNORECASE) is not None
+        except re.error as exc:
+            error = str(exc)
+        details["must_command_regex"].append({"pattern": pattern, "ok": ok, "error": error})
+        if ok:
+            passed += 1
+
+    # must_not_command_regex: no command should match
+    for pattern in trace_checks.get("must_not_command_regex") or []:
+        total += 1
+        ok = False
+        error = None
+        try:
+            ok = re.search(pattern, commands_joined, re.IGNORECASE) is None
+        except re.error as exc:
+            error = str(exc)
+        details["must_not_command_regex"].append({"pattern": pattern, "ok": ok, "error": error})
+        if ok:
+            passed += 1
+
+    # must_domain_used: domain should appear in domains_used
+    for domain in trace_checks.get("must_domain_used") or []:
+        total += 1
+        domain_lower = domain.lower()
+        ok = any(domain_lower in d for d in domains)
+        details["must_domain_used"].append({"domain": domain, "ok": ok, "observed": sorted(domains)})
+        if ok:
+            passed += 1
+
+    # must_not_domain_used: domain should NOT appear
+    for domain in trace_checks.get("must_not_domain_used") or []:
+        total += 1
+        domain_lower = domain.lower()
+        ok = not any(domain_lower in d for d in domains)
+        details["must_not_domain_used"].append({"domain": domain, "ok": ok, "observed": sorted(domains)})
+        if ok:
+            passed += 1
+
+    # max_empty_open_page_events
+    max_empty = trace_checks.get("max_empty_open_page_events")
+    if isinstance(max_empty, int):
+        total += 1
+        actual = trace_features.get("open_page_empty_count") or 0
+        ok = actual <= max_empty
+        details["max_empty_open_page_events"].append({"max": max_empty, "actual": actual, "ok": ok})
+        if ok:
+            passed += 1
+
+    if total == 0:
+        return True, 1.0, details
+
+    score = passed / total
+    return passed == total, score, details
+
+
 def grade_response(response_text: str, checks: dict[str, Any]) -> tuple[bool, float, dict[str, Any]]:
     details: dict[str, Any] = {
         "must_contain": [],
@@ -1681,6 +1844,12 @@ def main() -> int:
                         response_text = str(result.get("response_text") or "")
                         det_pass_bool, det_score, det_breakdown = grade_response(response_text, checks)
 
+                        # Trace-level checks
+                        trace_checks = case.get("trace_checks") if isinstance(case.get("trace_checks"), dict) else {}
+                        raw_ref = result.get("raw_ref")
+                        trace_features = extract_trace_features(raw_ref)
+                        trace_pass_bool, trace_score, trace_breakdown = grade_trace_checks(trace_checks, trace_features)
+
                         oracle_cfg = normalize_oracle_cfg(case, default_min_score=args.oracle_min_score_default)
                         oracle_requested = args.grading in {"oracle", "hybrid"} and bool(oracle_cfg.get("enabled"))
                         oracle_grade: dict[str, Any] = {"attempted": False, "ok": False}
@@ -1727,11 +1896,16 @@ def main() -> int:
                                 harness_env=oracle_env,
                             )
 
-                        pass_bool = det_pass_bool
-                        score = det_score
-                        grading_source = "deterministic"
+                        # Combine deterministic + trace checks
+                        combined_pass = det_pass_bool and trace_pass_bool
+                        combined_score = (det_score + trace_score) / 2.0 if trace_checks else det_score
+
+                        pass_bool = combined_pass
+                        score = combined_score
+                        grading_source = "deterministic" if not trace_checks else "deterministic+trace"
                         breakdown: dict[str, Any] = {
                             "deterministic": det_breakdown,
+                            "trace": trace_breakdown if trace_checks else {},
                         }
 
                         if args.grading == "oracle":
@@ -1820,6 +1994,9 @@ def main() -> int:
                             "oracle_model": oracle_grade.get("model"),
                             "oracle_trace_id": oracle_grade.get("trace_id"),
                             "check_breakdown": breakdown,
+                            "trace_pass_bool": trace_pass_bool,
+                            "trace_score": trace_score,
+                            "trace_features": trace_features,
                             "latency_ms": int(result.get("latency_ms") or 0),
                             "raw_ref": result.get("raw_ref"),
                             "runtime_ids": {

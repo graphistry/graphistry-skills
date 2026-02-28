@@ -15,7 +15,7 @@ Use this skill as a dispatcher to specialized skills.
 - Database/platform integrations (Neo4j, Splunk, Kusto, Databricks, SQL, etc.): use `pygraphistry-connectors`.
 
 ## Fast Targeted Fetch Protocol
-- Start from `references/pygraphistry-docs-toc.md`; do not crawl broad docs first.
+- Start from `references/pygraphistry-readthedocs-toc.md`; do not crawl broad docs first.
 - Use `references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
 - Pick exactly one primary skill and at most two secondary docs before fetching content.
 - Do one batched discovery read first (TOC + top-level index), then pick targets.
@@ -37,7 +37,7 @@ Use this skill as a dispatcher to specialized skills.
 
 ## Canonical Docs
 - Main docs: https://pygraphistry.readthedocs.io/en/latest/
-- Docs TOC snapshot: `references/pygraphistry-docs-toc.md`
+- Docs TOC snapshot: `references/pygraphistry-readthedocs-toc.md`
 - ReadTheDocs version sitemap: https://pygraphistry.readthedocs.io/sitemap.xml
 - 10 minutes core: https://pygraphistry.readthedocs.io/en/latest/10min.html
 - Visualization: https://pygraphistry.readthedocs.io/en/latest/visualization/index.html

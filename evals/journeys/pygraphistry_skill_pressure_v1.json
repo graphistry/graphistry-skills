@@ -69,6 +69,40 @@
       }
     },
     {
+      "id": "url_params_layout_and_labels",
+      "prompt": "Show a PyGraphistry snippet that: 1) uses linLog for strong node separation with a higher scalingRatio, 2) sets play time to 3 seconds, 3) disables POI labels by setting pointsOfInterestMax to 0, and 4) increases pointSize. Use settings(url_params={...}).",
+      "checks": {
+        "regex": [
+          "url_params",
+          "linLog",
+          "scalingRatio",
+          "play",
+          "pointsOfInterestMax",
+          "pointSize"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A strong answer uses settings(url_params={...}) with linLog=True for separation, scalingRatio > 1 for expansion, play=3000 for 3s layout, pointsOfInterestMax=0 to disable POI labels, and pointSize > 1 for larger nodes.",
+        "rubric": [
+          "Must use settings(url_params={...}) syntax.",
+          "Must set linLog to True or true for strong separation.",
+          "Must set scalingRatio to a value > 1 for expansion.",
+          "Must set play to 3000 (3 seconds in milliseconds).",
+          "Must set pointsOfInterestMax to 0 to disable POI labels.",
+          "Must set pointSize to a value > 1 for larger points."
+        ],
+        "required_concepts": [
+          "linLog separation",
+          "scalingRatio expansion",
+          "play duration",
+          "pointsOfInterestMax disable",
+          "pointSize scaling"
+        ]
+      }
+    },
+    {
       "id": "static_export_text_modes",
       "prompt": "Show a snippet for static export that produces one textual graph format output (for example Graphviz DOT or Mermaid code).",
       "checks": {

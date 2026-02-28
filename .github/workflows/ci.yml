@@ -109,4 +109,4 @@ jobs:
 
           test -s "$tmp_dir/pygraphistry-readthedocs-sitemap.xml"
           test -s "$tmp_dir/pygraphistry-readthedocs-top-level.tsv"
-          test -s "$tmp_dir/pygraphistry-docs-toc.md"
+          test -s "$tmp_dir/pygraphistry-readthedocs-toc.md"
