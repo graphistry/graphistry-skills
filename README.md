@@ -57,18 +57,19 @@ These skills are regularly benchmarked and tuned against standard Graphistry use
 
 For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
-Current checked-in benchmark packs show skills improving pass rates and speed:
+Current checked-in benchmark packs show skills improving pass rates significantly:
 
-- Cross-runtime post-cleanup full sweep (`codex+claude`, `skills=both`):
-  - `skills=on`: `88/100` pass, avg `28.0s`
-  - `skills=off`: `81/100` pass, avg `39.4s`
-- Codex effort A/B (`gpt-5.3-codex`, all journeys, `skills=both`):
-  - `high`: `87/100` pass, avg `34.0s`
-  - `medium`: `86/100` pass, avg `21.2s`
+- Fresh eval sweep with isolated baseline (`codex`, `skills=both`, 56 cases × 2):
+  - `skills=on`: **98.2% pass (55/56)**, avg `47.4s`
+  - `skills=off`: **67.9% pass (38/56)**, avg `46.4s`
+  - **Delta: +30.4pp pass rate improvement**
+- Prior sweep for reference (note: had baseline contamination bug):
+  - `skills=on`: `88/100` pass
+  - `skills=off`: `81/100` pass
 
 See:
-- [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md)
-- [benchmarks/reports/2026-02-23-codex-effort-ab.md](benchmarks/reports/2026-02-23-codex-effort-ab.md)
+- [plans/fresh-eval-sweep-2026-02-28/plan.md](plans/fresh-eval-sweep-2026-02-28/plan.md) - Latest sweep with baseline fix
+- [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md) - Prior sweep
 
 ## Docs
 
@@ -80,4 +81,4 @@ See:
 - [Report generator](scripts/benchmarks/make_report.py)
 - [Scenario coverage audit tool](scripts/benchmarks/scenario_coverage_audit.py)
 - [Benchmark artifact structure](benchmarks/README.md)
-- [Latest checked-in benchmark report](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md)
+- [Latest eval sweep plan](plans/fresh-eval-sweep-2026-02-28/plan.md)
