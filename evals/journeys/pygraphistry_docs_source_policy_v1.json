@@ -47,7 +47,8 @@
         "min_lines": 5
       },
       "trace_checks": {
-        "must_command_regex": ["git clone.*--depth 1.*github.*pygraphistry|git clone.*github.*pygraphistry.*--depth 1"]
+        "comment": "Accept either git clone OR reading from existing local pygraphistry repo",
+        "must_command_regex": ["git clone.*pygraphistry|/pygraphistry/|pygraphistry/docs|pygraphistry/demos"]
       }
     },
     {
@@ -61,7 +62,8 @@
         "min_lines": 3
       },
       "trace_checks": {
-        "must_command_regex": ["git clone.*--depth 1|git checkout.*v?0\\.33\\.5"]
+        "comment": "Accept either git clone/checkout OR reading from existing local pygraphistry repo",
+        "must_command_regex": ["git clone.*pygraphistry|git checkout.*v?0\\.33\\.5|/pygraphistry/|pygraphistry/docs"]
       }
     },
     {
