@@ -3,7 +3,11 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
-- Post-cleanup full sweep:
+- Baseline isolation sweep (2026-03-01):
+  - Data: `data/2026-03-01-baseline-isolation-sweep`
+  - Report: `reports/2026-03-01-baseline-isolation-sweep.md`
+  - Skills ON: 91% pass (51/56), Skills OFF: 52% pass (29/56), **+39pp delta**
+- Post-cleanup full sweep (2026-02-23, had baseline contamination):
   - Data: `data/2026-02-23-postcleanup-fullsweep`
   - Report: `reports/2026-02-23-postcleanup-fullsweep.md`
 - Codex effort A/B (`gpt-5.3-codex`, high vs medium):

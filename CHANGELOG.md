@@ -29,9 +29,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Tests
 - **Evals / fresh sweep**: Ran 112 eval rows across 11 journeys with proper baseline isolation.
-  - Skills ON: 98.2% pass (55/56), 47.4s avg latency
-  - Skills OFF: 67.9% pass (38/56), 46.4s avg latency
-  - Delta: +30.4pp pass rate improvement
+  - Skills ON: 91% pass (51/56), 47.4s avg latency
+  - Skills OFF: 52% pass (29/56), 46.4s avg latency
+  - Delta: +39pp pass rate improvement
 
 ---
 

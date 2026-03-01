@@ -60,15 +60,15 @@ For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 Current checked-in benchmark packs show skills improving pass rates significantly:
 
 - Fresh eval sweep with isolated baseline (`codex`, `skills=both`, 56 cases × 2):
-  - `skills=on`: **98.2% pass (55/56)**, avg `47.4s`
-  - `skills=off`: **67.9% pass (38/56)**, avg `46.4s`
-  - **Delta: +30.4pp pass rate improvement**
+  - `skills=on`: **91% pass (51/56)**, avg `47.4s`
+  - `skills=off`: **52% pass (29/56)**, avg `46.4s`
+  - **Delta: +39pp pass rate improvement**
 - Prior sweep for reference (note: had baseline contamination bug):
   - `skills=on`: `88/100` pass
   - `skills=off`: `81/100` pass
 
 See:
-- [plans/fresh-eval-sweep-2026-02-28/plan.md](plans/fresh-eval-sweep-2026-02-28/plan.md) - Latest sweep with baseline fix
+- [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - Latest sweep with baseline fix
 - [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md) - Prior sweep
 
 ## Docs
