@@ -310,7 +310,7 @@ Suggested process:
 
 1. Run clean sweeps into `/tmp/...`.
 2. Keep raw run artifacts local/private (`rows.jsonl`, `manifest.json`, traces, logs).
-3. Generate public-safe outputs only:
+3. Generate public-safe outputs:
 ```bash
 python3 scripts/benchmarks/make_report.py \
   --public-safe \
@@ -319,4 +319,12 @@ python3 scripts/benchmarks/make_report.py \
   --out-md benchmarks/reports/<date-tag>.md \
   --out-json benchmarks/data/<date-tag>/combined_metrics.json
 ```
-4. Check in only sanitized report + `combined_metrics.json`.
+4. Generate README snippet:
+```bash
+python3 scripts/benchmarks/readme_snippet.py \
+  --rows "/tmp/<run>/rows.jsonl" \
+  --title "Fresh eval sweep with isolated baseline"
+```
+5. Update `README.md` Evals section with the generated snippet.
+6. Update `benchmarks/README.md` with the new pack reference.
+7. Check in sanitized report, `combined_metrics.json`, and README updates.
