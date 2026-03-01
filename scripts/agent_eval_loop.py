@@ -227,6 +227,31 @@ def prepare_native_skill_env(
     harness: str,
     skill_names: list[str],
 ) -> str:
+    """Prepare a native skill environment for codex/claude harnesses.
+
+    For skills=off (empty skill_names), creates a fully isolated /tmp directory
+    with no symlinks or paths back to the repo. This prevents models from
+    discovering skill files via filesystem browsing or path inference.
+
+    For skills=on, creates env in out_dir with skills symlinked/copied.
+    """
+    # For baseline (skills=off), use a truly isolated /tmp directory with no
+    # repo path references. This prevents path inference attacks where the
+    # model extracts repo paths from symlinks and searches for .agents/skills/.
+    if not skill_names:
+        import tempfile
+        env_dir = Path(tempfile.mkdtemp(prefix=f"baseline_{harness}_", dir="/tmp"))
+        if harness == "claude":
+            target_skills_dir = env_dir / ".claude" / "skills"
+        elif harness == "codex":
+            target_skills_dir = env_dir / ".codex" / "skills"
+        else:
+            return str(env_dir)
+        target_skills_dir.mkdir(parents=True, exist_ok=True)
+        # Empty skills dir, no symlinks, no repo paths - true baseline
+        return str(env_dir)
+
+    # Skills=on: create env in out_dir with skills
     env_dir = out_dir / "native_env" / f"{profile_name}-{mode_name}-{harness}"
     env_dir.mkdir(parents=True, exist_ok=True)
 
@@ -274,6 +299,7 @@ def prepare_native_skill_env(
     context_links = {
         "evals": ROOT / "evals",
         "README.md": ROOT / "README.md",
+        ".agents": ROOT / ".agents",
     }
 
     if mount_mode == "copy":
@@ -284,8 +310,8 @@ def prepare_native_skill_env(
         local_skills = local_agents / "skills"
         _remove_path(local_skills)
         local_skills.symlink_to(target_skills_dir, target_is_directory=True)
-    else:
-        context_links[".agents"] = ROOT / ".agents"
+        # Remove .agents from context_links since we created it manually
+        context_links.pop(".agents", None)
 
     local_docs_ref = target_skills_dir / "pygraphistry" / "references"
     if mount_mode == "copy" and not _is_web_only_docs_mode(docs_mode) and local_docs_ref.exists():
