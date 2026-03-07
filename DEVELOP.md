@@ -24,7 +24,7 @@ Optional (for OTel trace capture + inspection):
 ## Skill Scope Conventions
 
 - User-facing/published skills are the `pygraphistry*` set.
-- Internal maintainer skills are `plan`, `eval-otel`, and namespaced `internal/*` directory entries such as `.agents/skills/internal/benchmarks` (flagged with `metadata.internal: true`).
+- Internal maintainer skills live under `.agents/skills/internal/` (for example: `.agents/skills/internal/plan`, `.agents/skills/internal/eval-otel`, `.agents/skills/internal/benchmarks`) and are flagged with `metadata.internal: true`.
 - Keep internal maintainer skills out of default end-user install snippets.
 
 ## Validate Skills Before Sweeps
