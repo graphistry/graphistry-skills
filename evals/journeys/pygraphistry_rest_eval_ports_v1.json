@@ -1,0 +1,152 @@
+{
+  "id": "pygraphistry_rest_eval_ports_v1",
+  "description": "Ports of existing PyGraphistry eval behavior into REST-focused prompts grounded in current hub docs and local nexus templates.",
+  "eval_intent": "alignment_legacy",
+  "tags": ["pygraphistry", "rest", "ports", "alignment"],
+  "cases": [
+    {
+      "id": "rest_auth_env_or_token_no_literals",
+      "prompt": "Provide a short curl-based Graphistry REST auth snippet that only uses environment variables (no literal credentials), obtains a JWT, and demonstrates one Bearer-authenticated follow-up call.",
+      "checks": {
+        "regex": [
+          "export\\s+GRAPHISTRY_",
+          "api-token-auth/",
+          "Authorization:\\s*Bearer",
+          "/api/v2/files/"
+        ],
+        "must_not_regex": [
+          "GRAPHISTRY_(USERNAME|PASSWORD)\\s*=\\s*['\\\"].+['\\\"]",
+          "password\\s*=\\s*['\\\"].+['\\\"]",
+          "username\\s*=\\s*['\\\"].+['\\\"]"
+        ],
+        "max_lines": 24
+      }
+    },
+    {
+      "id": "rest_org_and_personal_key_navigation",
+      "prompt": "In 3-5 concise bullets, explain how org users exchange a Personal Key for JWT and then call REST endpoints.",
+      "checks": {
+        "regex": [
+          "(?i)PersonalKey",
+          "/api/v2/auth/pkey/jwt/",
+          "(?i)Authorization:\\s*Bearer",
+          "(?i)org_name|organization"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_auth_troubleshooting_checklist",
+      "prompt": "Give a 4-bullet troubleshooting checklist for REST auth failures covering token creation, refresh/verify, and expiration behavior.",
+      "checks": {
+        "regex": [
+          "api-token-auth/",
+          "api-token-refresh/",
+          "api-token-verify/",
+          "(?i)expire|expiration|1\\s*hour|24\\s*hours|daily"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_privacy_and_share_url",
+      "prompt": "Show a concise safe-share guidance snippet for REST uploads: keep visibility non-public and return a graph URL pattern users can open.",
+      "checks": {
+        "regex": [
+          "(?i)private|organization",
+          "graph\\.html\\?dataset="
+        ],
+        "must_not_regex": [
+          "(?i)mode\\s*=\\s*['\\\"]public['\\\"]",
+          "(?i)privacy\\s*=\\s*public"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_url_params_layout_and_labels",
+      "prompt": "Provide one Graphistry URL example that uses dataset, play for 3 seconds, linLog, scalingRatio, pointsOfInterestMax=0, and pointSize.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play",
+          "linLog",
+          "scalingRatio",
+          "pointsOfInterestMax",
+          "pointSize"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "rest_url_params_layout_and_encoding_bridge",
+      "prompt": "Provide a concise /api/v2/upload/datasets/ payload fragment that sets color/size-style encodings, and mention one URL parameter tweak for first render.",
+      "checks": {
+        "regex": [
+          "/api/v2/upload/datasets/",
+          "(encodings|node_encodings|edge_encodings)",
+          "(?i)color|size|pointSize",
+          "(play|linLog|scalingRatio|pointsOfInterestMax)"
+        ],
+        "max_lines": 14
+      }
+    },
+    {
+      "id": "rest_docs_route_hub_api_pages",
+      "prompt": "List 3 canonical hub docs links, one per line: REST auth, REST upload, and URL control.",
+      "checks": {
+        "regex": [
+          "https://hub\\.graphistry\\.com/docs/api/1/rest/auth/?",
+          "https://hub\\.graphistry\\.com/docs/api/2/rest/upload/?",
+          "https://hub\\.graphistry\\.com/docs/api/1/rest/url/?"
+        ],
+        "min_lines": 3,
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "rest_docs_fallback_policy_nexus",
+      "prompt": "In 3 concise bullets, describe a docs fallback policy when a hub REST docs page is missing, including the local nexus template fallback path.",
+      "checks": {
+        "regex": [
+          "(?i)hub\\.graphistry\\.com/docs/api/",
+          "/home/lmeyerov/Work/graphistry/apps/core/nexus",
+          "(?i)legacy-docs/api/rest"
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_no_token_in_query_params",
+      "prompt": "Give 3 REST sharing safety bullets including one explicit rule that JWTs must never appear in URL query parameters.",
+      "checks": {
+        "regex": [
+          "(?i)Authorization:\\s*Bearer|Bearer\\s+\\$?GRAPHISTRY_TOKEN",
+          "graph\\.html\\?dataset=",
+          "(?i)never|do not"
+        ],
+        "must_not_regex": [
+          "graph\\.html\\?[^\\n]*token="
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_real_endpoints_only",
+      "prompt": "Provide one short REST workflow snippet using only documented auth/upload endpoints. Avoid invented endpoint names.",
+      "checks": {
+        "regex": [
+          "(api-token-auth/|/api/v2/auth/pkey/jwt/)",
+          "/api/v2/(files|upload/files|upload/datasets)"
+        ],
+        "must_not_regex": [
+          "/api/v2/query",
+          "/api/v2/graph/query",
+          "/api/v2/gfql/query",
+          "/api/v2/render"
+        ],
+        "max_lines": 20
+      }
+    }
+  ]
+}

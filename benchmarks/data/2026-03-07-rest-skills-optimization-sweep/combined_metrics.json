@@ -1,0 +1,332 @@
+{
+  "generated_at": "2026-03-07T21:15:30.196845+00:00",
+  "inputs": [],
+  "inputs_redacted": true,
+  "input_count": 1,
+  "overall": {
+    "total": 40,
+    "passed": 26,
+    "pass_rate": 0.65
+  },
+  "by_harness_and_mode": [
+    {
+      "total": 20,
+      "passed": 7,
+      "pass_rate": 0.35,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 20387.8,
+      "avg_score": 0.7560714285714286,
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 20,
+      "passed": 19,
+      "pass_rate": 0.95,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14225.6,
+      "avg_score": 0.99,
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_harness_model_and_mode": [
+    {
+      "total": 20,
+      "passed": 7,
+      "pass_rate": 0.35,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 20387.8,
+      "avg_score": 0.7560714285714286,
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off"
+    },
+    {
+      "total": 20,
+      "passed": 19,
+      "pass_rate": 0.95,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 14225.6,
+      "avg_score": 0.99,
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on"
+    }
+  ],
+  "by_eval_intent": [
+    {
+      "total": 20,
+      "passed": 11,
+      "pass_rate": 0.55,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15687.45,
+      "avg_score": 0.8228571428571427,
+      "eval_intent": "alignment_legacy"
+    },
+    {
+      "total": 20,
+      "passed": 15,
+      "pass_rate": 0.75,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 18925.95,
+      "avg_score": 0.9232142857142858,
+      "eval_intent": "realistic_capability"
+    }
+  ],
+  "by_eval_intent_harness_and_mode": [
+    {
+      "total": 10,
+      "passed": 2,
+      "pass_rate": 0.2,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19184.9,
+      "avg_score": 0.6657142857142857,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 10,
+      "passed": 9,
+      "pass_rate": 0.9,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 12190.0,
+      "avg_score": 0.9800000000000001,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 10,
+      "passed": 5,
+      "pass_rate": 0.5,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 21590.7,
+      "avg_score": 0.8464285714285713,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 10,
+      "passed": 10,
+      "pass_rate": 1.0,
+      "harness_ok": 10,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 16261.2,
+      "avg_score": 1.0,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_grading_mode": [
+    {
+      "total": 40,
+      "passed": 26,
+      "pass_rate": 0.65,
+      "harness_ok": 40,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 17306.7,
+      "avg_score": 0.8730357142857142,
+      "grading_mode": "deterministic"
+    }
+  ],
+  "by_grading_source": [
+    {
+      "total": 40,
+      "passed": 26,
+      "pass_rate": 0.65,
+      "harness_ok": 40,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 17306.7,
+      "avg_score": 0.8730357142857142,
+      "grading_source": "deterministic"
+    }
+  ],
+  "kpi": {
+    "intents": [
+      "execution_grade",
+      "realistic_capability"
+    ],
+    "total": 20,
+    "passed": 15,
+    "pass_rate": 0.75,
+    "by_harness_and_mode": [
+      {
+        "total": 10,
+        "passed": 5,
+        "pass_rate": 0.5,
+        "harness_ok": 10,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 21590.7,
+        "avg_score": 0.8464285714285713,
+        "harness": "codex",
+        "skills_mode": "off"
+      },
+      {
+        "total": 10,
+        "passed": 10,
+        "pass_rate": 1.0,
+        "harness_ok": 10,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 16261.2,
+        "avg_score": 1.0,
+        "harness": "codex",
+        "skills_mode": "on"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_auth_env_or_token_no_literals",
+      "score": 0.75,
+      "latency_ms": 22382.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_auth_troubleshooting_checklist",
+      "score": 0.4,
+      "latency_ms": 6328.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_docs_fallback_policy_nexus",
+      "score": 0.25,
+      "latency_ms": 27560.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_no_token_in_query_params",
+      "score": 0.8,
+      "latency_ms": 4625.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_org_and_personal_key_navigation",
+      "score": 0.2,
+      "latency_ms": 12213.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_privacy_and_share_url",
+      "score": 0.8,
+      "latency_ms": 12298.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_real_endpoints_only",
+      "score": 0.8571428571428571,
+      "latency_ms": 47681.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_url_params_layout_and_encoding_bridge",
+      "score": 0.6,
+      "latency_ms": 33404.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_collections_url_param_guidance",
+      "score": 0.75,
+      "latency_ms": 23419.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_dataset_lifecycle_endpoints",
+      "score": 0.5,
+      "latency_ms": 13762.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_password_to_jwt_then_list_files",
+      "score": 0.7142857142857143,
+      "latency_ms": 6840.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_sessions_experimental_behavior",
+      "score": 0.75,
+      "latency_ms": 27419.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_single_use_token_gateway_flow",
+      "score": 0.75,
+      "latency_ms": 27902.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_url_params_layout_and_encoding_bridge",
+      "score": 0.8,
+      "latency_ms": 12988.0
+    }
+  ]
+}

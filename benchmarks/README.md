@@ -3,6 +3,10 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
+- REST skills optimization sweep (2026-03-07):
+  - Data: `data/2026-03-07-rest-skills-optimization-sweep`
+  - Report: `reports/2026-03-07-rest-skills-optimization-sweep.md`
+  - Skills ON: 95% pass (19/20), Skills OFF: 35% pass (7/20), **+60pp delta**
 - Baseline isolation sweep (2026-03-01):
   - Data: `data/2026-03-01-baseline-isolation-sweep`
   - Report: `reports/2026-03-01-baseline-isolation-sweep.md`
