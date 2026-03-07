@@ -112,7 +112,7 @@ def main() -> int:
         print(f"ERROR: Skills directory not found: {SKILLS_DIR}", file=sys.stderr)
         return 1
 
-    skill_dirs = sorted(d for d in SKILLS_DIR.iterdir() if d.is_dir())
+    skill_dirs = sorted(d.parent for d in SKILLS_DIR.rglob("SKILL.md") if d.is_file())
     if not skill_dirs:
         print(f"ERROR: No skill directories found in {SKILLS_DIR}", file=sys.stderr)
         return 1
