@@ -1,6 +1,8 @@
 ---
 name: eval-otel
 description: Validate eval telemetry capture and retrieval for Codex, Claude, and Louie runs. Use when proving prompt input/output recording, trace correlation, and OTel/log inspection for agent evals. (project)
+metadata:
+  internal: true
 ---
 
 # Eval OTel Skill

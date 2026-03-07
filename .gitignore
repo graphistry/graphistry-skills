@@ -11,6 +11,7 @@ bin/otel/.venv/
 bin/otel/.venv.lock
 .tmp/
 tmp/
+runs/
 evals/env/claude/.claude/skills/*
 !evals/env/claude/.claude/skills/.gitkeep
 evals/env/codex/.codex/skills/*

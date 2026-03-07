@@ -21,6 +21,15 @@ npx skills add graphistry/graphistry-skills \
   --yes
 ```
 
+## Skill Scope
+
+This repository intentionally includes two skill tiers:
+
+- User-facing published skills: `pygraphistry*` (the install snippet above lists these).
+- Internal maintainer skills live under `.agents/skills/internal/` (for example: `.agents/skills/internal/plan`, `.agents/skills/internal/eval-otel`, `.agents/skills/internal/benchmarks`) and are marked `metadata.internal: true`.
+
+Internal maintainer skills are kept in-repo for contributor workflows and are not part of the default end-user install set.
+
 ## Claude Code Example (Live URL)
 
 Run from a project where these skills are installed and `graphistry` + `pandas` are available.

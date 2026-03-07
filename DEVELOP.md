@@ -21,6 +21,12 @@ Optional (for OTel trace capture + inspection):
 - Core eval engine: `scripts/agent_eval_loop.py`
 - Checked-in benchmark artifacts (public-safe): `benchmarks/data/*/combined_metrics.json` and `benchmarks/reports/*`
 
+## Skill Scope Conventions
+
+- User-facing/published skills are the `pygraphistry*` set.
+- Internal maintainer skills live under `.agents/skills/internal/` (for example: `.agents/skills/internal/plan`, `.agents/skills/internal/eval-otel`, `.agents/skills/internal/benchmarks`) and are flagged with `metadata.internal: true`.
+- Keep internal maintainer skills out of default end-user install snippets.
+
 ## Validate Skills Before Sweeps
 
 ```bash
