@@ -1,6 +1,6 @@
 {
   "id": "pygraphistry_rest_eval_ports_v1",
-  "description": "Ports of existing PyGraphistry eval behavior into REST-focused prompts grounded in current hub docs and local nexus templates.",
+  "description": "Ports of existing PyGraphistry eval behavior into REST-focused prompts grounded in canonical Hub docs.",
   "eval_intent": "alignment_legacy",
   "tags": ["pygraphistry", "rest", "ports", "alignment"],
   "cases": [
@@ -92,6 +92,22 @@
       }
     },
     {
+      "id": "rest_iframe_collections_tricky_url_api",
+      "prompt": "Provide one iframe src URL that includes dataset, play=0, showCollections=true, info=false, a URL-encoded collections value, and one collections global color fallback.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "showCollections=true",
+          "info=false",
+          "collections=",
+          "(%5B|%7B)",
+          "(collectionsGlobalNodeColor|collectionsGlobalEdgeColor)"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
       "id": "rest_docs_route_hub_api_pages",
       "prompt": "List 3 canonical hub docs links, one per line: REST auth, REST upload, and URL control.",
       "checks": {
@@ -105,13 +121,40 @@
       }
     },
     {
-      "id": "rest_docs_fallback_policy_nexus",
-      "prompt": "In 3 concise bullets, describe a docs fallback policy when a hub REST docs page is missing, including the local nexus template fallback path.",
+      "id": "rest_docs_fallback_policy_canonical",
+      "prompt": "In 3 concise bullets, describe a user-facing docs fallback policy when a hub REST docs page is missing.",
       "checks": {
         "regex": [
           "(?i)hub\\.graphistry\\.com/docs/api/",
-          "/home/lmeyerov/Work/graphistry/apps/core/nexus",
-          "(?i)legacy-docs/api/rest"
+          "(?i)closest|canonical|same\\s*api|same\\s*version",
+          "(?i)inference|documented"
+        ],
+        "must_not_regex": [
+          "/home/lmeyerov/Work/graphistry/apps/core/nexus"
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_admin_healthchecks_compact",
+      "prompt": "Give 4 concise bullets listing core Graphistry healthcheck routes and one service health route, with a deployment/admin scope note.",
+      "checks": {
+        "regex": [
+          "(healthcheck/|/ht/|healthz)",
+          "(streamgl-viz/health|pivot/health|streamgl-sessions/health|streamgl-gpu/primary/health)",
+          "(?i)admin|on-?prem|deployment"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_boundary_remote_gfql_python",
+      "prompt": "In 3 concise bullets, clarify the boundary between REST endpoint guidance and Python/GFQL SDK workflows.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(",
+          "(?i)rest\\s*endpoint|rest\\s*guidance|/api/v2/",
+          "(?i)/api/v2/gfql/query|no\\s*generic\\s*rest\\s*gfql\\s*endpoint|invented\\s*generic\\s*rest\\s*query\\s*endpoint"
         ],
         "max_lines": 7
       }

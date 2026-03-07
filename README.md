@@ -102,6 +102,10 @@ For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
 Current checked-in benchmark packs show skills improving pass rates significantly:
 
+- REST gapfix final sweep (`codex`, REST journeys, `skills=both`, 26 cases × 2):
+  - `skills=on`: **92.3% pass (24/26)**, avg `13.1s`
+  - `skills=off`: **30.8% pass (8/26)**, avg `18.9s`
+  - **Delta: +61.5pp pass rate improvement**
 - REST-focused eval sweep (`codex`, REST journeys, `skills=both`, 20 cases × 2):
   - `skills=on`: **95% pass (19/20)**, avg `14.2s`
   - `skills=off`: **35% pass (7/20)**, avg `20.4s`
@@ -115,6 +119,7 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=off`: `81/100` pass
 
 See:
+- [benchmarks/reports/2026-03-07-rest-gapfix-final-sweep.md](benchmarks/reports/2026-03-07-rest-gapfix-final-sweep.md) - Latest REST gapfix sweep
 - [benchmarks/reports/2026-03-07-rest-skills-optimization-sweep.md](benchmarks/reports/2026-03-07-rest-skills-optimization-sweep.md) - Latest REST-focused sweep
 - [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - Latest sweep with baseline fix
 - [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md) - Prior sweep

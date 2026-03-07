@@ -31,6 +31,19 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - Single-use gateway:
   - `/api/v2/generate/single-use-url/`
   - `/api/v2/logout-user/username/{username}/`
+- Sessions API:
+  - `/api/experimental/viz/sessions/`
+  - `/api/experimental/viz/sessions/{session_id}/`
+- Health/readiness checks (deployment/admin scope):
+  - `/healthcheck/`
+  - `/ht/`
+  - `/healthz`
+  - `/streamgl-viz/health`
+  - `/pivot/health`
+  - `/streamgl-sessions/health`
+  - `/streamgl-gpu/primary/health`
+  - `/streamgl-gpu/secondary/cpu/health`
+  - `/streamgl-gpu/secondary/gpu/health`
 
 ## Response Discipline
 - Keep snippets short and directly runnable.
@@ -39,6 +52,13 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - For sessions summaries, keep to <=7 lines when asked for concise output.
 - For auth snippets that require env-vars-only usage, include explicit `export GRAPHISTRY_*` lines and avoid quoted assignment values.
 - For upload/dataset bridge asks, include a literal `/api/v2/upload/datasets/` line.
+- For upload/encoding bridge asks, avoid fenced JSON and keep to <=14 lines.
+- For file upload lifecycle endpoint-sequence asks, output exactly 3 endpoint lines and include `/api/v2/files/`, `/api/v2/upload/files/`, `/api/v2/upload/datasets/` (do not prepend auth in that list).
+- For nodes/edges format-pattern asks, include literal tokens: `nodes/json`, `edges/json`, `nodes/csv`, `edges/csv`, `nodes/parquet`, `edges/parquet`, `nodes/orc`, `edges/orc`, `nodes/arrow`, `edges/arrow`.
+- For REST-vs-SDK boundary asks, explicitly state there is no generic REST GFQL endpoint and route Python/GFQL asks to the SDK workflow.
+- For healthcheck asks, label deployment/admin scope and avoid implying every route is public on hosted tenants.
+- For sessions-summary asks, prefer the deterministic 4-line sessions form (Adapter K) unless the user explicitly asks for extra detail.
+- For the prompt pattern "Summarize the experimental sessions workflow and show how session appears in the graph URL.", output Adapter K exactly (4 lines, no preface, no code fences).
 - If a response includes any preface line, still satisfy strict line limits by shortening the body.
 - For constrained prompts, avoid code fences unless explicitly requested.
 - For bridge prompts, do not return a standalone JSON block; include endpoint + URL guidance as compact text/bullets.
@@ -115,6 +135,41 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - Workflow: auth/upload/open base URL, then continue/share via session URL.
 - Output formatting: exactly 4 lines, no blank lines, no code fences, no lead-in sentence.
 
+### Adapter L: admin healthchecks (4-6 bullets)
+- Docs route: `/docs/api/2/rest/health/`.
+- Core checks: `/healthcheck/`, `/ht/`, `/healthz`.
+- Service checks: `/streamgl-viz/health`, `/pivot/health`, `/streamgl-sessions/health`.
+- GPU service checks: `/streamgl-gpu/primary/health`, `/streamgl-gpu/secondary/cpu/health` (optional `/secondary/gpu/health` is heavier).
+- Scope note: some checks are deployment/admin routes and may not be exposed on all hosted tenants.
+
+### Adapter M: REST vs Python/GFQL boundary (3 bullets)
+- REST skill is for auth/upload/url/session/health endpoints and `graph.html` URL controls.
+- Python/GFQL tasks (`.gfql()`, query chaining, Python dataframe logic) should route to `pygraphistry` / `pygraphistry-gfql`.
+- Do not invent generic endpoints like `/api/v2/gfql/query` for SDK workflows.
+
+### Adapter N: iframe URL API with collections + tricky settings (<=4 lines)
+- `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>&play=0&bg=%23000000&linLog=true&showCollections=true&info=false&pointsOfInterestMax=0&collections=%5B%7B%22name%22%3A%22risk%22%7D%5D&collectionsGlobalNodeColor=00FF00`
+- Keep `collections` whitespace-free before URL encoding.
+- Use `collectionsGlobalNodeColor`/`collectionsGlobalEdgeColor` for non-collection fallbacks.
+
+### Adapter O: file upload lifecycle endpoints (exact 3 lines)
+1. `/api/v2/files/`
+2. `/api/v2/upload/files/`
+3. `/api/v2/upload/datasets/`
+
+### Adapter P: encoding bridge compact form (<=10 lines, no fences)
+- `/api/v2/upload/datasets/` with `node_encodings.bindings` + `edge_encodings.bindings`.
+- Example keys: `node_color`, `node_size`, `edge_color`, `source`, `destination`.
+- First-render URL tweak: append `&play=0` (or `&linLog=true`).
+
+### Adapter Q: nodes/edges format endpoint patterns
+- `nodes/json`, `edges/json`
+- `nodes/csv`, `edges/csv`
+- `nodes/parquet`, `edges/parquet`
+- `nodes/orc`, `edges/orc`
+- `nodes/arrow`, `edges/arrow`
+- Pair with upload lifecycle references: `/api/v2/upload/files/` then `/api/v2/upload/datasets/`.
+
 ## Minimal Auth Snippet (env-var-only)
 ```bash
 export GRAPHISTRY_HOST=${GRAPHISTRY_HOST:-https://hub.graphistry.com}
@@ -150,7 +205,7 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - Safe viewer URL pattern: `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>`.
 - Never include JWTs in URL query params (for example, do not add `token=`).
 - Send tokens only in headers, for example `Authorization: Bearer <token>`.
-- Useful URL knobs: `play`, `linLog`, `scalingRatio`, `pointsOfInterestMax`, `pointSize`.
+- Useful URL knobs: `play`, `linLog`, `scalingRatio`, `pointsOfInterestMax`, `pointSize`, `showCollections`, `info`, `collectionsGlobalNodeColor`, `collectionsGlobalEdgeColor`.
 
 ## Collections URL Guidance
 - `collections` should be a URL encoded JSON value.
@@ -164,6 +219,7 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 
 ## Policy Guardrails
 - Use documented endpoints only; avoid invented endpoints like `/api/v2/query`, `/api/v2/graph/query`, `/api/v2/render`, `/api/v2/graphql`.
+- Do not present SDK/GFQL behavior as a generic REST endpoint (for example avoid `/api/v2/gfql/query` claims).
 - Keep credentials in environment variables; never hardcode literals.
 
 ## Canonical Docs
@@ -171,3 +227,4 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - Upload: https://hub.graphistry.com/docs/api/2/rest/upload/
 - URL controls: https://hub.graphistry.com/docs/api/1/rest/url/
 - Sessions: https://hub.graphistry.com/docs/api/experimental/rest/sessions/
+- Health: https://hub.graphistry.com/docs/api/2/rest/health/

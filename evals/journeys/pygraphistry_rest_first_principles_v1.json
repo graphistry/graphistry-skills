@@ -101,6 +101,22 @@
       }
     },
     {
+      "id": "fp_iframe_collections_tricky_settings",
+      "prompt": "Provide one iframe src URL for graph.html that includes dataset, play=0, showCollections=true, info=false, URL-encoded collections, and collectionsGlobalNodeColor.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "showCollections=true",
+          "info=false",
+          "collections=",
+          "(%5B|%7B)",
+          "collectionsGlobalNodeColor"
+        ],
+        "max_lines": 5
+      }
+    },
+    {
       "id": "fp_sessions_experimental_behavior",
       "prompt": "Summarize the experimental sessions workflow and show how session appears in the graph URL.",
       "checks": {
@@ -122,6 +138,31 @@
           "(?i)admin|staff|superuser"
         ],
         "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_admin_healthcheck_routes",
+      "prompt": "Give 4 concise bullets with core healthcheck routes and at least one service-specific health route, plus a deployment/admin scope note.",
+      "checks": {
+        "regex": [
+          "(healthcheck/|/ht/|healthz)",
+          "(streamgl-viz/health|pivot/health|streamgl-sessions/health|streamgl-gpu/primary/health)",
+          "(?i)admin|on-?prem|deployment"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_rest_vs_python_gfql_boundary",
+      "prompt": "In 3 concise bullets, distinguish REST endpoint tasks from Python/GFQL SDK tasks and include one concrete do-not pattern.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(",
+          "(?i)rest\\s*endpoint|/api/v2/",
+          "(?i)avoid|do\\W*not",
+          "(?i)/api/v2/gfql/query|no\\s*generic\\s*rest\\s*gfql\\s*endpoint"
+        ],
+        "max_lines": 7
       }
     },
     {

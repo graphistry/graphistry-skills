@@ -1,0 +1,392 @@
+{
+  "generated_at": "2026-03-07T22:31:39.199421+00:00",
+  "inputs": [],
+  "inputs_redacted": true,
+  "input_count": 1,
+  "overall": {
+    "total": 52,
+    "passed": 32,
+    "pass_rate": 0.6153846153846154
+  },
+  "by_harness_and_mode": [
+    {
+      "total": 26,
+      "passed": 8,
+      "pass_rate": 0.3076923076923077,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 18907.80769230769,
+      "avg_score": 0.7796703296703297,
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 26,
+      "passed": 24,
+      "pass_rate": 0.9230769230769231,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 13129.5,
+      "avg_score": 0.9573426573426573,
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_harness_model_and_mode": [
+    {
+      "total": 26,
+      "passed": 8,
+      "pass_rate": 0.3076923076923077,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 18907.80769230769,
+      "avg_score": 0.7796703296703297,
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off"
+    },
+    {
+      "total": 26,
+      "passed": 24,
+      "pass_rate": 0.9230769230769231,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 13129.5,
+      "avg_score": 0.9573426573426573,
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on"
+    }
+  ],
+  "by_eval_intent": [
+    {
+      "total": 26,
+      "passed": 16,
+      "pass_rate": 0.6153846153846154,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 16079.615384615385,
+      "avg_score": 0.8692307692307693,
+      "eval_intent": "alignment_legacy"
+    },
+    {
+      "total": 26,
+      "passed": 16,
+      "pass_rate": 0.6153846153846154,
+      "harness_ok": 26,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 15957.692307692309,
+      "avg_score": 0.8677822177822178,
+      "eval_intent": "realistic_capability"
+    }
+  ],
+  "by_eval_intent_harness_and_mode": [
+    {
+      "total": 13,
+      "passed": 3,
+      "pass_rate": 0.23076923076923078,
+      "harness_ok": 13,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19217.23076923077,
+      "avg_score": 0.7384615384615384,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 13,
+      "passed": 13,
+      "pass_rate": 1.0,
+      "harness_ok": 13,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 12942.0,
+      "avg_score": 1.0,
+      "eval_intent": "alignment_legacy",
+      "harness": "codex",
+      "skills_mode": "on"
+    },
+    {
+      "total": 13,
+      "passed": 5,
+      "pass_rate": 0.38461538461538464,
+      "harness_ok": 13,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 18598.384615384617,
+      "avg_score": 0.8208791208791208,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "off"
+    },
+    {
+      "total": 13,
+      "passed": 11,
+      "pass_rate": 0.8461538461538461,
+      "harness_ok": 13,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 13317.0,
+      "avg_score": 0.9146853146853147,
+      "eval_intent": "realistic_capability",
+      "harness": "codex",
+      "skills_mode": "on"
+    }
+  ],
+  "by_grading_mode": [
+    {
+      "total": 52,
+      "passed": 32,
+      "pass_rate": 0.6153846153846154,
+      "harness_ok": 52,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 16018.653846153846,
+      "avg_score": 0.8685064935064936,
+      "grading_mode": "deterministic"
+    }
+  ],
+  "by_grading_source": [
+    {
+      "total": 52,
+      "passed": 32,
+      "pass_rate": 0.6153846153846154,
+      "harness_ok": 52,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 16018.653846153846,
+      "avg_score": 0.8685064935064936,
+      "grading_source": "deterministic"
+    }
+  ],
+  "kpi": {
+    "intents": [
+      "execution_grade",
+      "realistic_capability"
+    ],
+    "total": 26,
+    "passed": 16,
+    "pass_rate": 0.6153846153846154,
+    "by_harness_and_mode": [
+      {
+        "total": 13,
+        "passed": 5,
+        "pass_rate": 0.38461538461538464,
+        "harness_ok": 13,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 18598.384615384617,
+        "avg_score": 0.8208791208791208,
+        "harness": "codex",
+        "skills_mode": "off"
+      },
+      {
+        "total": 13,
+        "passed": 11,
+        "pass_rate": 0.8461538461538461,
+        "harness_ok": 13,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 13317.0,
+        "avg_score": 0.9146853146853147,
+        "harness": "codex",
+        "skills_mode": "on"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_admin_healthchecks_compact",
+      "score": 0.75,
+      "latency_ms": 9736.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_auth_env_or_token_no_literals",
+      "score": 0.875,
+      "latency_ms": 16192.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_auth_troubleshooting_checklist",
+      "score": 0.4,
+      "latency_ms": 7944.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_boundary_remote_gfql_python",
+      "score": 0.5,
+      "latency_ms": 6254.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_docs_fallback_policy_canonical",
+      "score": 0.6,
+      "latency_ms": 6301.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_iframe_collections_tricky_url_api",
+      "score": 0.875,
+      "latency_ms": 20987.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_no_token_in_query_params",
+      "score": 0.6,
+      "latency_ms": 5188.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_org_and_personal_key_navigation",
+      "score": 0.6,
+      "latency_ms": 38517.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_privacy_and_share_url",
+      "score": 0.6,
+      "latency_ms": 9803.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "alignment_legacy",
+      "journey_id": "pygraphistry_rest_eval_ports_v1",
+      "case_id": "rest_url_params_layout_and_encoding_bridge",
+      "score": 0.8,
+      "latency_ms": 37622.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_admin_healthcheck_routes",
+      "score": 0.75,
+      "latency_ms": 14395.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_collections_url_param_guidance",
+      "score": 0.5,
+      "latency_ms": 13811.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_dataset_lifecycle_endpoints",
+      "score": 0.75,
+      "latency_ms": 18954.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_no_fake_rest_endpoints",
+      "score": 0.8571428571428571,
+      "latency_ms": 12646.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_password_to_jwt_then_list_files",
+      "score": 0.7142857142857143,
+      "latency_ms": 15622.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_rest_vs_python_gfql_boundary",
+      "score": 0.6,
+      "latency_ms": 5998.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_sessions_experimental_behavior",
+      "score": 0.75,
+      "latency_ms": 24576.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_single_use_token_gateway_flow",
+      "score": 0.75,
+      "latency_ms": 21129.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_nodes_edges_format_endpoints",
+      "score": 0.09090909090909091,
+      "latency_ms": 23364.0
+    },
+    {
+      "harness": "codex",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_rest_first_principles_v1",
+      "case_id": "fp_rest_vs_python_gfql_boundary",
+      "score": 0.8,
+      "latency_ms": 15148.0
+    }
+  ]
+}
