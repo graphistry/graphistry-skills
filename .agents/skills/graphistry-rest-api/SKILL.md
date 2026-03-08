@@ -66,6 +66,7 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - For "find files older than 90 days" asks, output concise bullets only (no script), include `/api/v2/files/?limit=100`, `created_at`, and a client-side age filter.
 - For "files for a specific user" asks, include `/api/v2/files/?limit=100`, ownership field `author`, and a do-not-invent endpoint warning.
 - For "list users endpoint" asks, explicitly state no documented REST list-users endpoint and route to admin/IDP/support workflow.
+- For single-use gateway and experimental sessions asks, call out deployment/tenant gating when availability is uncertain.
 
 ## Deterministic Prompt Adapters
 Use these compact patterns when prompts closely match.
@@ -100,14 +101,15 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - Keep auth in `Authorization: Bearer`; do not put tokens in URL params.
 
 ### Adapter E: safe-share snippet (<=8 lines)
-UPLOAD_JSON="$(curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' -d '{"privacy":"private","node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/")"
+UPLOAD_JSON="$(curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' -d '{"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/")"
 DATASET_ID="$(jq -r '.dataset_id // .id' <<<"${UPLOAD_JSON}")"
+# Keep visibility non-public: use private/organization share mode (avoid public links).
 echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 
 ### Adapter F: single-use gateway flow (3 bullets)
-- Admin/staff/superuser generates a one-time URL via `POST /api/v2/generate/single-use-url/`.
+- Admin/staff/superuser generates a one-time URL via `/api/v2/generate/single-use-url/` (method/availability may be deployment-specific).
 - Client uses the returned single-use gateway URL once for the target graph/session.
-- Revoke access with `POST /api/v2/logout-user/username/{username}/` when needed.
+- Revoke access with `/api/v2/logout-user/username/{username}/` when needed.
 
 ### Adapter G: org + PersonalKey flow (3-5 bullets)
 - Create a PersonalKey for the organization user and capture key id/secret.
