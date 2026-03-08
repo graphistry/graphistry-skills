@@ -333,7 +333,14 @@ def prepare_codex_home(
     otel_enabled: bool = False,
     otel_endpoint: str = "",
 ) -> str:
-    codex_home = env_dir / ".codex"
+    # Keep CODEX_HOME outside harness workspaces and out of /tmp to reduce
+    # accidental discoverability from model-generated shell probes.
+    codex_root_env = os.environ.get("AGENT_EVAL_CODEX_HOME_ROOT", "").strip()
+    if codex_root_env:
+        codex_root = Path(codex_root_env).expanduser()
+    else:
+        codex_root = Path.home() / ".cache" / "graphistry-skills" / "eval-codex-home"
+    codex_home = codex_root / f"{env_dir.name}-{uuid.uuid4().hex[:12]}"
     codex_home.mkdir(parents=True, exist_ok=True)
 
     source_home = Path(os.environ.get("CODEX_HOME") or (Path.home() / ".codex"))
@@ -343,11 +350,18 @@ def prepare_codex_home(
     except Exception:
         pass
 
-    for name in ("auth.json", "config.toml", "version.json"):
+    # Copy auth/version only; avoid inheriting full user config (which may
+    # include unrelated MCP/env secrets). A minimal config can be generated
+    # below when OTel is enabled.
+    for name in ("auth.json", "version.json"):
         src = source_home / name
         dst = codex_home / name
         if src.exists():
             shutil.copy2(src, dst)
+            try:
+                dst.chmod(0o600)
+            except Exception:
+                pass
 
     if otel_enabled:
         cfg_path = codex_home / "config.toml"
@@ -375,14 +389,18 @@ def spawn_codex_home_instance(
     base = Path(base_codex_home)
     slug = re.sub(r"[^A-Za-z0-9._-]", "_", instance_id)[:24] or "instance"
     suffix = f"{slug}-{uuid.uuid4().hex[:12]}"
-    target = out_dir / "codex_home_instances" / f"{mode}-{suffix}"
+    target = base.parent / "instances" / f"{mode}-{suffix}"
     target.mkdir(parents=True, exist_ok=True)
 
-    for name in ("auth.json", "config.toml", "version.json"):
+    for name in ("auth.json", "version.json", "config.toml"):
         src = base / name
         dst = target / name
         if src.exists():
             shutil.copy2(src, dst)
+            try:
+                dst.chmod(0o600)
+            except Exception:
+                pass
 
     src_skills = base / "skills"
     dst_skills = target / "skills"
@@ -1661,6 +1679,7 @@ def main() -> int:
 
     native_envs: dict[str, dict[str, str]] = {mode: {} for mode in modes}
     codex_homes: dict[str, str] = {}
+    codex_home_paths_to_cleanup: set[str] = set()
     env_harnesses = list(harnesses)
     if args.grading in {"oracle", "hybrid"} and args.oracle_harness in {"claude", "codex"}:
         if args.oracle_harness not in env_harnesses:
@@ -1682,6 +1701,7 @@ def main() -> int:
                         otel_enabled=bool(args.otel),
                         otel_endpoint=args.otel_endpoint or "http://localhost:4317",
                     )
+                    codex_home_paths_to_cleanup.add(codex_homes[mode])
     manifest["native_envs"] = native_envs
     manifest["codex_homes"] = codex_homes
 
@@ -1852,6 +1872,7 @@ def main() -> int:
                                             mode=mode,
                                             instance_id=f"{journey_id}-{case_id}-{harness_idx}-{uuid.uuid4().hex[:8]}",
                                         )
+                                        codex_home_paths_to_cleanup.add(codex_home)
                                     harness_env["CODEX_HOME"] = codex_home
 
                             result = run_harness(
@@ -1906,6 +1927,7 @@ def main() -> int:
                                                 f"{uuid.uuid4().hex[:8]}"
                                             ),
                                         )
+                                        codex_home_paths_to_cleanup.add(codex_home)
                                     oracle_env["CODEX_HOME"] = codex_home
 
                             oracle_grade = grade_response_oracle(
@@ -2151,6 +2173,11 @@ def main() -> int:
     write_json(out_dir / "manifest.json", manifest)
     write_json(out_dir / "summary.json", summary)
     write_json(out_dir / "otel_ids.json", otel_ids)
+
+    # Best-effort cleanup of temporary CODEX_HOME clones to avoid leaving
+    # auth-bearing files on disk after the run completes.
+    for codex_home_path in sorted(codex_home_paths_to_cleanup):
+        _remove_path(Path(codex_home_path))
 
     emit_otel_event(
         enabled=args.otel,
