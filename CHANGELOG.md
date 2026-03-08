@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Skills / graphistry-rest-api**: Added explicit admin healthcheck coverage (`/healthcheck/`, `/ht/`, `healthz`, service health routes), REST vs Python/GFQL boundary guidance, and advanced iframe URL API patterns (`showCollections`, collections global colors).
 - **Evals / REST journeys**: Added deterministic REST cases for advanced iframe+collections URL API, admin healthchecks, and REST-vs-GFQL/Python boundaries.
 - **Benchmarks**: Added new benchmark pack `2026-03-07-rest-gapfix-final-sweep` with public-safe metrics + report.
+- **Benchmarks**: Added new benchmark pack `2026-03-07-rest-phase2-full-sweep` with public-safe metrics + report.
 
 ### Fixed
 - **Evals / docs fallback policy**: Replaced local Nexus path dependency with user-facing canonical Hub docs fallback checks.
@@ -20,8 +21,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - **README / benchmarks docs**: Updated published REST benchmark claims and links to include the new gapfix final sweep.
+- **README / benchmarks docs**: Updated published REST benchmark claims and links to include the REST phase2 full sweep.
 
 ### Tests
+- **Evals / full REST phase2 sweep (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (66 rows).
+  - Skills ON: 90.9% pass (30/33), 13.0s avg latency
+  - Skills OFF: 27.3% pass (9/33), 17.0s avg latency
+  - Delta: +63.6pp pass-rate improvement and lower latency with skills
 - **Evals / full REST sweep (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (52 rows).
   - Skills ON: 92.3% pass (24/26), 13.1s avg latency
   - Skills OFF: 30.8% pass (8/26), 18.9s avg latency

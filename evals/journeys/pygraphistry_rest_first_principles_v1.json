@@ -181,6 +181,36 @@
         ],
         "max_lines": 16
       }
+    },
+    {
+      "id": "fp_gfql_to_rest_viz_handoff_example",
+      "prompt": "Provide a minimal two-part answer: one line for Python GFQL extraction context, one line for REST-side graph URL/iframe usage.",
+      "checks": {
+        "regex": [
+          "(\\.gfql\\(|gfql_remote\\()",
+          "graph\\.html\\?dataset=",
+          "(?i)iframe|src=",
+          "(?i)rest"
+        ],
+        "must_not_regex": [
+          "/api/v2/gfql/query"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "fp_author_field_user_scoping_caveat",
+      "prompt": "In 3-5 bullets, explain user-scoped admin audits using files/datasets author fields and key caveats.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/\\?limit=100",
+          "/api/v2/datasets/\\?limit=100",
+          "author",
+          "(?i)username|identity|idp",
+          "(?i)caveat|mapping|not\\s+documented"
+        ],
+        "max_lines": 9
+      }
     }
   ]
 }

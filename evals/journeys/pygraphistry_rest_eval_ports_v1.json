@@ -190,6 +190,85 @@
         ],
         "max_lines": 20
       }
+    },
+    {
+      "id": "rest_viz_gfql_handoff_boundary",
+      "prompt": "In 4 concise bullets, explain how to handle: \"run GFQL then share an iframe\" by separating Python/GFQL vs REST/URL responsibilities.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(|gfql_remote\\(",
+          "(?i)rest\\s*endpoint|/api/v2/",
+          "graph\\.html\\?dataset=",
+          "(?i)no\\s*generic\\s*rest\\s*gfql(\\s*query)?\\s*endpoint|do\\W*not\\s*invent\\s*/api/v2/gfql/query"
+        ],
+        "must_not_regex": [
+          "POST\\s+/api/v2/gfql/query",
+          "GET\\s+/api/v2/gfql/query"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_viz_url_debug_blank_graph",
+      "prompt": "Give a 5-step REST URL-debug checklist when an embedded graph renders blank or unreadable on first load.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "(linLog|scalingRatio|pointSize|pointsOfInterestMax)",
+          "(showCollections|info|collections=|\\bcollections\\b)",
+          "(?i)url\\s*param|encode|collections"
+        ],
+        "max_lines": 16
+      }
+    },
+    {
+      "id": "rest_admin_find_old_files_runbook",
+      "prompt": "Provide a concise admin runbook to find files older than 90 days using documented REST endpoints only.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/\\?limit=",
+          "created_at",
+          "(?i)sort|filter",
+          "(?i)older\\s+than|90\\s*days"
+        ],
+        "max_lines": 10
+      }
+    },
+    {
+      "id": "rest_admin_files_for_specific_user",
+      "prompt": "In 4 concise bullets, explain how to locate files for a specific user without inventing undocumented user-list endpoints.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/",
+          "(?i)author|creator|uploader",
+          "(?i)user\\s*id|username",
+          "(?i)filter|client-?side",
+          "(?i)do\\W*not\\s*invent|not\\s+documented|no\\s+documented\\s+user\\s+list"
+        ],
+        "must_not_regex": [
+          "(?i)\\b(GET|POST|PUT|DELETE)\\s+/api/v2/users/",
+          "(?i)\\b(GET|POST|PUT|DELETE)\\s+/api/v2/members/"
+        ],
+        "max_lines": 9
+      }
+    },
+    {
+      "id": "rest_admin_list_users_boundary",
+      "prompt": "A user asks for a REST endpoint to list users. Answer in <=4 bullets with documented-boundary guidance and next steps.",
+      "checks": {
+        "regex": [
+          "(?i)no\\s+documented.*rest\\s+endpoint|not\\s+documented",
+          "(?i)admin|idp|sso|directory",
+          "(?i)verify|docs|support|ops"
+        ],
+        "must_not_regex": [
+          "(?i)curl[^\\n]*/api/v2/users/",
+          "(?i)curl[^\\n]*/api/v2/members/",
+          "(?i)curl[^\\n]*/api/v2/orgs/.*/users"
+        ],
+        "max_lines": 8
+      }
     }
   ]
 }

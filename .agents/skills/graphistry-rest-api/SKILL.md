@@ -62,6 +62,10 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - If a response includes any preface line, still satisfy strict line limits by shortening the body.
 - For constrained prompts, avoid code fences unless explicitly requested.
 - For bridge prompts, do not return a standalone JSON block; include endpoint + URL guidance as compact text/bullets.
+- For the prompt pattern `run GFQL then share an iframe`, output exactly 4 bullets and include the exact phrase `no generic REST GFQL query endpoint`.
+- For "find files older than 90 days" asks, output concise bullets only (no script), include `/api/v2/files/?limit=100`, `created_at`, and a client-side age filter.
+- For "files for a specific user" asks, include `/api/v2/files/?limit=100`, ownership field `author`, and a do-not-invent endpoint warning.
+- For "list users endpoint" asks, explicitly state no documented REST list-users endpoint and route to admin/IDP/support workflow.
 
 ## Deterministic Prompt Adapters
 Use these compact patterns when prompts closely match.
@@ -169,6 +173,31 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - `nodes/orc`, `edges/orc`
 - `nodes/arrow`, `edges/arrow`
 - Pair with upload lifecycle references: `/api/v2/upload/files/` then `/api/v2/upload/datasets/`.
+
+### Adapter R: GFQL -> REST iframe handoff (4 bullets)
+- Python/GFQL layer: run extraction in SDK (`.gfql(...)` / `gfql_remote(...)`).
+- REST layer: use auth/upload/dataset/session endpoints (`/api-token-auth/`, `/api/v2/upload/datasets/`).
+- Boundary: no generic REST GFQL query endpoint; do not invent `/api/v2/gfql/query`.
+- Share/render: use `graph.html?dataset=<dataset_id>` (optionally `&session=<session_id>`), keep JWT out of URL params.
+
+### Adapter S: find old files runbook (<=6 bullets, no code)
+- Authenticate (`/api-token-auth/`) and call `GET /api/v2/files/?limit=100` with pagination.
+- Use `created_at` from each result row.
+- Client-side filter/sort for `created_at <= now-90d`.
+- Export matching `file_id`, `name`, `created_at` for review.
+- Optional cleanup should be admin-scoped and follow explicit approval.
+
+### Adapter T: files for specific user (4 bullets)
+- List files via `GET /api/v2/files/?limit=100` (paginate).
+- Filter by ownership metadata, starting with `author` (and deployment-specific mappings to username if available).
+- If needed, cross-check with `GET /api/v2/datasets/?limit=100` for dataset ownership context.
+- Do not invent user-list endpoints; use documented APIs and escalate mapping gaps to admin/support.
+
+### Adapter U: list users boundary (<=4 bullets)
+- No documented public REST endpoint to list users in canonical Hub docs.
+- Do not claim concrete routes like `GET /api/v2/users/` without a private admin API contract.
+- Use admin/IDP directory workflow (SSO/IdP export or deployment owner process) for user enumeration.
+- Verify against `https://hub.graphistry.com/docs/api/` and escalate to support/deployment owner if needed.
 
 ## Minimal Auth Snippet (env-var-only)
 ```bash
