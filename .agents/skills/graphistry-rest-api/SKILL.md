@@ -52,6 +52,7 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - For sessions summaries, keep to <=7 lines when asked for concise output.
 - For auth snippets that require env-vars-only usage, include explicit `export GRAPHISTRY_*` lines and avoid quoted assignment values.
 - For upload/dataset bridge asks, include a literal `/api/v2/upload/datasets/` line.
+- For `/api/v2/upload/datasets/` examples, always include `metadata` (use `{}` when no custom metadata is needed).
 - For upload/encoding bridge asks, avoid fenced JSON and keep to <=14 lines.
 - For file upload lifecycle endpoint-sequence asks, output exactly 3 endpoint lines and include `/api/v2/files/`, `/api/v2/upload/files/`, `/api/v2/upload/datasets/` (do not prepend auth in that list).
 - For nodes/edges format-pattern asks, include literal tokens: `nodes/json`, `edges/json`, `nodes/csv`, `edges/csv`, `nodes/parquet`, `edges/parquet`, `nodes/orc`, `edges/orc`, `nodes/arrow`, `edges/arrow`.
@@ -84,7 +85,7 @@ curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" "${GRAPHISTRY_HOST%/}/ap
 ```bash
 # /api/v2/upload/datasets/ payload fragment with encodings
 curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' \
-  -d '{"node_encodings":{"bindings":{"node":"id","node_color":"risk","node_size":"score"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst","edge_color":"etype"}}}' \
+  -d '{"metadata":{},"node_encodings":{"bindings":{"node":"id","node_color":"risk","node_size":"score"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst","edge_color":"etype"}}}' \
   "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/"
 # first-render URL tweak: append &play=0 (or &linLog=true)
 ```
@@ -101,7 +102,7 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - Keep auth in `Authorization: Bearer`; do not put tokens in URL params.
 
 ### Adapter E: safe-share snippet (<=8 lines)
-UPLOAD_JSON="$(curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' -d '{"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/")"
+UPLOAD_JSON="$(curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' -d '{"metadata":{},"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/")"
 DATASET_ID="$(jq -r '.dataset_id // .id' <<<"${UPLOAD_JSON}")"
 # Keep visibility non-public: use private/organization share mode (avoid public links).
 echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
@@ -201,6 +202,12 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - Use admin/IDP directory workflow (SSO/IdP export or deployment owner process) for user enumeration.
 - Verify against `https://hub.graphistry.com/docs/api/` and escalate to support/deployment owner if needed.
 
+### Adapter V: privacy via share-link API (4 bullets)
+- Create dataset first via `/api/v2/upload/datasets/` with required `metadata`, `node_encodings`, and `edge_encodings`.
+- Set visibility with `POST /api/v2/share/link/` body: `{"obj_pk":"<dataset_id>","obj_type":"dataset","mode":"private","notify":false,"message":"","invited_users":[]}`.
+- If inviting users, include entries like `{"email":"user@example.com","action":"10"}` (`10` view, `20` edit).
+- Deployment/plan caveat: private/organization requests can be downgraded to `public` when sharing entitlements are unavailable.
+
 ## Minimal Auth Snippet (env-var-only)
 ```bash
 export GRAPHISTRY_HOST=${GRAPHISTRY_HOST:-https://hub.graphistry.com}
@@ -227,7 +234,7 @@ curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" "${GRAPHISTRY_HOST%/}/ap
 curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -F "file=@graph.csv" "${GRAPHISTRY_HOST%/}/api/v2/upload/files/"
 # 2) Create dataset with encodings
 curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' \
-  -d '{"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' \
+  -d '{"metadata":{},"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' \
   "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/"
 # 3) First render tweak: append one URL knob, e.g. &play=0
 ```
