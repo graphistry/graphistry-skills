@@ -10,6 +10,8 @@ TIMEOUT_S="${AGENT_HARNESS_TIMEOUT_S:-240}"
 WORKDIR="${AGENT_HARNESS_WORKDIR:-$PWD}"
 MODEL=""
 REASONING_EFFORT="${AGENT_CODEX_REASONING_EFFORT:-high}"
+SANDBOX_MODE="${AGENT_CODEX_SANDBOX_MODE:-workspace-write}"
+EPHEMERAL_MODE="${AGENT_CODEX_EPHEMERAL_MODE:-true}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -94,7 +96,17 @@ set +e
 if [[ -n "$TRACEPARENT" ]]; then
   export TRACEPARENT
 fi
-CODEX_CMD=(codex exec --json --skip-git-repo-check --color never --cd "$WORKDIR")
+CODEX_CMD=(
+  codex exec
+  --json
+  --skip-git-repo-check
+  --color never
+  --sandbox "$SANDBOX_MODE"
+  --cd "$WORKDIR"
+)
+if [[ "$EPHEMERAL_MODE" == "true" ]]; then
+  CODEX_CMD+=(--ephemeral)
+fi
 if [[ -n "$MODEL" ]]; then
   CODEX_CMD+=(--model "$MODEL")
   # Explicit model selections often conflict with profile defaults like reasoning.effort=xhigh.
@@ -110,6 +122,7 @@ latency_ms=$((end_ms - start_ms))
 
 python3 - "$RAW_OUT" "$exit_code" "$latency_ms" "$TRACEPARENT" <<'PY'
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -126,6 +139,44 @@ error = None
 raw_text = ""
 if raw_path.exists():
     raw_text = raw_path.read_text(encoding="utf-8", errors="replace")
+
+
+def redact_secrets(text: str) -> str:
+    # JWT-like blobs
+    text = re.sub(
+        r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9._-]{10,}\.[A-Za-z0-9._-]{10,}",
+        "[REDACTED_JWT]",
+        text,
+    )
+    # Authorization headers
+    text = re.sub(
+        r"(?i)(Authorization:\s*Bearer\s+)([A-Za-z0-9._-]+)",
+        r"\1[REDACTED_TOKEN]",
+        text,
+    )
+    text = re.sub(
+        r"(?i)(Authorization:\s*PersonalKey\s+)([A-Za-z0-9._:-]+)",
+        r"\1[REDACTED_PERSONAL_KEY]",
+        text,
+    )
+    # Generic key/token/password assignments in JSON/TOML/shell-style output.
+    text = re.sub(
+        r'(?i)(["\']?[A-Za-z0-9_]*(token|secret|password|api[_-]?key|key)[A-Za-z0-9_]*["\']?\s*[:=]\s*["\'])([^"\']+)(["\'])',
+        r"\1[REDACTED]\4",
+        text,
+    )
+    text = re.sub(
+        r'(?i)(\b[A-Za-z0-9_]*(token|secret|password|api[_-]?key|key)[A-Za-z0-9_]*\b\s*[:=]\s*)([^\s,]+)',
+        r"\1[REDACTED]",
+        text,
+    )
+    return text
+
+
+sanitized_text = redact_secrets(raw_text)
+if sanitized_text != raw_text and raw_path.exists():
+    raw_path.write_text(sanitized_text, encoding="utf-8")
+raw_text = sanitized_text
 
 for line in raw_text.splitlines():
     line = line.strip()
