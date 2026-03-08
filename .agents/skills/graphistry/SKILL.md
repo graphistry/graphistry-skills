@@ -27,3 +27,6 @@ Use this skill as the shared entrypoint across Graphistry interfaces.
 - PyGraphistry docs: https://pygraphistry.readthedocs.io/en/latest/
 - REST auth docs: https://hub.graphistry.com/docs/api/1/rest/auth/
 - REST upload docs: https://hub.graphistry.com/docs/api/2/rest/upload/
+- REST SSO/single-use gateway docs: https://hub.graphistry.com/docs/api/2/rest/sso/
+- REST GFQL UDF docs: https://hub.graphistry.com/docs/UDF/gfql-udf-api/
+- REST Python UDF docs: https://hub.graphistry.com/docs/UDF/py-udf-api/

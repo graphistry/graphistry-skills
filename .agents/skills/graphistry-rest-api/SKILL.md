@@ -29,8 +29,8 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
   - `/api/v2/upload/datasets/`
   - `/api/v2/datasets/{dataset_id}/`
 - Single-use gateway:
-  - `/api/v2/generate/single-use-url/`
-  - `/api/v2/logout-user/username/{username}/`
+  - `GET /api/v2/generate/single-use-url/?username=<username>&dataset_id=<dataset_id>`
+  - `GET /api/v2/logout-user/username/<username>/`
 - Sessions API:
   - `/api/experimental/viz/sessions/`
   - `/api/experimental/viz/sessions/{session_id}/`
@@ -54,21 +54,17 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - Keep snippets short and directly runnable.
 - Prefer deterministic literal endpoint references.
 - For checklist asks, keep to requested bullet counts.
-- For sessions summaries, keep to <=7 lines when asked for concise output.
+- For sessions summaries, keep them concise when requested.
 - For auth snippets that require env-vars-only usage, include explicit `export GRAPHISTRY_*` lines and avoid quoted assignment values.
 - For upload/dataset bridge asks, include a literal `/api/v2/upload/datasets/` line.
 - For `/api/v2/upload/datasets/` examples, always include `metadata` (use `{}` when no custom metadata is needed).
-- For upload/encoding bridge asks, avoid fenced JSON and keep to <=14 lines.
-- For file upload lifecycle endpoint-sequence asks, output exactly 3 endpoint lines and include `/api/v2/files/`, `/api/v2/upload/files/`, `/api/v2/upload/datasets/` (do not prepend auth in that list).
+- For upload/encoding bridge asks, avoid large standalone JSON blocks when concise bullets or short snippets are enough.
+- For file upload lifecycle endpoint-sequence asks, prefer listing `/api/v2/files/`, `/api/v2/upload/files/`, `/api/v2/upload/datasets/` in order.
 - For nodes/edges format-pattern asks, include literal tokens: `nodes/json`, `edges/json`, `nodes/csv`, `edges/csv`, `nodes/parquet`, `edges/parquet`, `nodes/orc`, `edges/orc`, `nodes/arrow`, `edges/arrow`.
-- For REST-vs-SDK boundary asks, explicitly state there is no generic REST GFQL endpoint and route Python/GFQL asks to the SDK workflow.
+- For REST-vs-SDK boundary asks, distinguish between named-endpoint REST flows (`/functions` + `/run`) and ad-hoc SDK GFQL flows (no generic REST query endpoint).
 - For healthcheck asks, label deployment/admin scope and avoid implying every route is public on hosted tenants.
-- For sessions-summary asks, prefer the deterministic 4-line sessions form (Adapter K) unless the user explicitly asks for extra detail.
-- For the prompt pattern "Summarize the experimental sessions workflow and show how session appears in the graph URL.", output Adapter K exactly (4 lines, no preface, no code fences).
-- If a response includes any preface line, still satisfy strict line limits by shortening the body.
 - For constrained prompts, avoid code fences unless explicitly requested.
 - For bridge prompts, do not return a standalone JSON block; include endpoint + URL guidance as compact text/bullets.
-- For the prompt pattern `run GFQL then share an iframe`, output exactly 4 bullets and include the exact phrase `no generic REST GFQL query endpoint`.
 - For "find files older than 90 days" asks, output concise bullets only (no script), include `/api/v2/files/?limit=100`, `created_at`, and a client-side age filter.
 - For "files for a specific user" asks, include `/api/v2/files/?limit=100`, ownership field `author`, and a do-not-invent endpoint warning.
 - For "list users endpoint" asks, explicitly state no documented REST list-users endpoint and route to admin/IDP/support workflow.
@@ -87,7 +83,7 @@ GRAPHISTRY_TOKEN="$(curl -sS -X POST -H 'Content-Type: application/json' -d "{\"
 curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" "${GRAPHISTRY_HOST%/}/api/v2/files/"
 ```
 
-### Adapter B: concise upload + URL bridge (<=14 lines)
+### Adapter B: concise upload + URL bridge
 ```bash
 # /api/v2/upload/datasets/ payload fragment with encodings
 curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' \
@@ -101,76 +97,76 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - Remove raw whitespace before encoding. Include the literal word `whitespace`.
 - Example: `collections=%5B%22teamA%22%2C%22fraud%22%5D`.
 
-### Adapter D: sessions summary (<=7 lines)
+### Adapter D: sessions summary
 - `https://hub.graphistry.com/docs/api/experimental/rest/sessions/` documents the flow.
 - Start from `graph.html?dataset=<dataset_id>`.
 - Sessionized URL is `graph.html?dataset=<dataset_id>&session=<session_id>`.
 - Keep auth in `Authorization: Bearer`; do not put tokens in URL params.
 
-### Adapter E: safe-share snippet (<=8 lines)
+### Adapter E: safe-share snippet
 UPLOAD_JSON="$(curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' -d '{"metadata":{},"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/")"
 DATASET_ID="$(jq -r '.dataset_id // .id' <<<"${UPLOAD_JSON}")"
 # Keep visibility non-public: use private/organization share mode (avoid public links).
 echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 
-### Adapter F: single-use gateway flow (3 bullets)
-- Admin/staff/superuser generates a one-time URL via `/api/v2/generate/single-use-url/` (method/availability may be deployment-specific).
+### Adapter F: single-use gateway flow
+- Admin/staff/superuser generates a one-time URL via `GET /api/v2/generate/single-use-url/?username=<username>&dataset_id=<dataset_id>` (availability may be deployment-specific).
 - Client uses the returned single-use gateway URL once for the target graph/session.
-- Revoke access with `/api/v2/logout-user/username/{username}/` when needed.
+- Revoke access with `GET /api/v2/logout-user/username/<username>/` when needed.
 
-### Adapter G: org + PersonalKey flow (3-5 bullets)
+### Adapter G: org + PersonalKey flow
 - Create a PersonalKey for the organization user and capture key id/secret.
 - Exchange credentials at `POST /api/v2/auth/pkey/jwt/` using `Authorization: PersonalKey <id>:<secret>`.
 - If required by deployment, include the organization identifier (for example `org_name`) in auth context.
 - Call protected REST endpoints with `Authorization: Bearer <jwt>`.
 
-### Adapter H: docs fallback policy (3 bullets)
+### Adapter H: docs fallback policy
 - Prefer canonical Hub REST docs at `https://hub.graphistry.com/docs/api/`.
 - If a specific page is missing, use the closest available canonical Hub REST page in the same API/version section.
 - Clearly label any inference and avoid fabricating undocumented endpoints or parameters.
 
-### Adapter I: URL params + encodings bridge (<=14 lines)
+### Adapter I: URL params + encodings bridge
 - POST encodings to `/api/v2/upload/datasets/` using `node_encodings.bindings` and `edge_encodings.bindings`.
 - Keep first render deterministic with one URL knob, for example `&play=0` (or `&linLog=true`).
 - For `collections`, use a URL encoded JSON value and strip whitespace before encoding.
 
-### Adapter J: experimental sessions workflow (hard cap 6 lines body)
+### Adapter J: experimental sessions workflow
 - `https://hub.graphistry.com/docs/api/experimental/rest/sessions/` is the workflow reference.
 - Base URL: `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>`.
 - Session URL: `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>&session=<session_id>`.
 - Workflow: auth/upload/open base URL, then share/continue on the session URL.
 - Keep JWT in `Authorization: Bearer` headers; never use URL token params.
 
-### Adapter K: sessions deterministic min form (for strict max-lines checks)
+### Adapter K: sessions minimal form
 - `/docs/api/experimental/rest/sessions/` is the reference path.
 - Base URL: `graph.html?dataset=<dataset_id>`.
 - Session URL: `graph.html?dataset=<dataset_id>&session=<session_id>`.
 - Workflow: auth/upload/open base URL, then continue/share via session URL.
-- Output formatting: exactly 4 lines, no blank lines, no code fences, no lead-in sentence.
+- Keep output compact; include base URL and session URL forms.
 
-### Adapter L: admin healthchecks (4-6 bullets)
+### Adapter L: admin healthchecks
 - Docs route: `/docs/api/2/rest/health/`.
 - Core checks: `/healthcheck/`, `/ht/`, `/healthz`.
 - Service checks: `/streamgl-viz/health`, `/pivot/health`, `/streamgl-sessions/health`.
 - GPU service checks: `/streamgl-gpu/primary/health`, `/streamgl-gpu/secondary/cpu/health` (optional `/secondary/gpu/health` is heavier).
 - Scope note: some checks are deployment/admin routes and may not be exposed on all hosted tenants.
 
-### Adapter M: REST vs Python/GFQL boundary (3 bullets)
+### Adapter M: REST vs Python/GFQL boundary
 - REST skill is for auth/upload/url/session/health endpoints and `graph.html` URL controls.
-- Python/GFQL tasks (`.gfql()`, query chaining, Python dataframe logic) should route to `pygraphistry` / `pygraphistry-gfql`.
-- Do not invent generic endpoints like `/api/v2/gfql/query` for SDK workflows.
+- Named-endpoint REST flows are valid via `/api/v2/o/<org>/functions/{gfql|python}/...` and `/api/v2/o/<org>/run/{gfql|python}/...`.
+- For ad-hoc SDK GFQL tasks (`.gfql()`, query chaining, Python dataframe logic), route to `pygraphistry` / `pygraphistry-gfql`; do not invent generic endpoints like `/api/v2/gfql/query`.
 
-### Adapter N: iframe URL API with collections + tricky settings (<=4 lines)
+### Adapter N: iframe URL API with collections + tricky settings
 - `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>&play=0&bg=%23000000&linLog=true&showCollections=true&info=false&pointsOfInterestMax=0&collections=%5B%7B%22name%22%3A%22risk%22%7D%5D&collectionsGlobalNodeColor=00FF00`
 - Keep `collections` whitespace-free before URL encoding.
 - Use `collectionsGlobalNodeColor`/`collectionsGlobalEdgeColor` for non-collection fallbacks.
 
-### Adapter O: file upload lifecycle endpoints (exact 3 lines)
+### Adapter O: file upload lifecycle endpoint sequence
 1. `/api/v2/files/`
 2. `/api/v2/upload/files/`
 3. `/api/v2/upload/datasets/`
 
-### Adapter P: encoding bridge compact form (<=10 lines, no fences)
+### Adapter P: encoding bridge compact form
 - `/api/v2/upload/datasets/` with `node_encodings.bindings` + `edge_encodings.bindings`.
 - Example keys: `node_color`, `node_size`, `edge_color`, `source`, `destination`.
 - First-render URL tweak: append `&play=0` (or `&linLog=true`).
@@ -183,55 +179,44 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - `nodes/arrow`, `edges/arrow`
 - Pair with upload lifecycle references: `/api/v2/upload/files/` then `/api/v2/upload/datasets/`.
 
-### Adapter R: GFQL -> REST iframe handoff (4 bullets)
+### Adapter R: GFQL -> REST iframe handoff
 - Python/GFQL layer: run extraction in SDK (`.gfql(...)` / `gfql_remote(...)`).
 - REST layer: use auth/upload/dataset/session endpoints (`/api-token-auth/`, `/api/v2/upload/datasets/`).
 - Boundary: no generic REST GFQL query endpoint; do not invent `/api/v2/gfql/query`.
 - Share/render: use `graph.html?dataset=<dataset_id>` (optionally `&session=<session_id>`), keep JWT out of URL params.
 
-### Adapter S: find old files runbook (<=6 bullets, no code)
+### Adapter S: find old files runbook
 - Authenticate (`/api-token-auth/`) and call `GET /api/v2/files/?limit=100` with pagination.
 - Use `created_at` from each result row.
 - Client-side filter/sort for `created_at <= now-90d`.
 - Export matching `file_id`, `name`, `created_at` for review.
 - Optional cleanup should be admin-scoped and follow explicit approval.
 
-### Adapter T: files for specific user (4 bullets)
+### Adapter T: files for specific user
 - List files via `GET /api/v2/files/?limit=100` (paginate).
 - Filter by ownership metadata, starting with `author` (and deployment-specific mappings to username if available).
 - If needed, cross-check with `GET /api/v2/datasets/?limit=100` for dataset ownership context.
 - Do not invent user-list endpoints; use documented APIs and escalate mapping gaps to admin/support.
 
-### Adapter U: list users boundary (<=4 bullets)
+### Adapter U: list users boundary
 - No documented public REST endpoint to list users in canonical Hub docs.
 - Do not claim concrete routes like `GET /api/v2/users/` without a private admin API contract.
 - Use admin/IDP directory workflow (SSO/IdP export or deployment owner process) for user enumeration.
 - Verify against `https://hub.graphistry.com/docs/api/` and escalate to support/deployment owner if needed.
 
-### Adapter V: privacy via share-link API (4 bullets)
+### Adapter V: privacy via share-link API
 - Create dataset first via `/api/v2/upload/datasets/` with required `metadata`, `node_encodings`, and `edge_encodings`.
 - Set visibility with `POST /api/v2/share/link/` body: `{"obj_pk":"<dataset_id>","obj_type":"dataset","mode":"private","notify":false,"message":"","invited_users":[]}`.
 - If inviting users, include entries like `{"email":"user@example.com","action":"10"}` (`10` view, `20` edit).
 - Deployment/plan caveat: private/organization requests can be downgraded to `public` when sharing entitlements are unavailable.
 
-### Adapter W: named-endpoint architecture boundary (3 bullets)
+### Adapter W: named-endpoint architecture boundary
 - Manage named endpoint definitions via `/api/v2/o/<org>/functions/{gfql|python}/...`.
 - Execute named endpoints via `/api/v2/o/<org>/run/{gfql|python}/...`.
 - Keep guidance on documented external REST routes; avoid internal/backend route details.
 
-## Minimal Auth Snippet (env-var-only)
-```bash
-export GRAPHISTRY_HOST=${GRAPHISTRY_HOST:-https://hub.graphistry.com}
-export GRAPHISTRY_USERNAME=${GRAPHISTRY_USERNAME:?set GRAPHISTRY_USERNAME}
-export GRAPHISTRY_PASSWORD=${GRAPHISTRY_PASSWORD:?set GRAPHISTRY_PASSWORD}
-
-GRAPHISTRY_TOKEN="$(curl -sS -X POST \
-  -H 'Content-Type: application/json' \
-  -d "{\"username\":\"${GRAPHISTRY_USERNAME}\",\"password\":\"${GRAPHISTRY_PASSWORD}\"}" \
-  "${GRAPHISTRY_HOST%/}/api-token-auth/" | jq -r '.token')"
-
-curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" "${GRAPHISTRY_HOST%/}/api/v2/files/"
-```
+## Minimal Auth Snippet
+Use Adapter A.
 
 ## Auth Troubleshooting Template (4 bullets)
 - Verify token creation with `/api-token-auth/` (or `/api/v2/auth/pkey/jwt/` for PersonalKey flow).
@@ -239,16 +224,8 @@ curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" "${GRAPHISTRY_HOST%/}/ap
 - Verify token integrity and expiry with `/api-token-verify/` and check clock skew.
 - Confirm `Authorization: Bearer <token>` on protected calls and log HTTP status/body.
 
-## Upload + URL Bridge Template (concise)
-```bash
-# 1) Upload bytes and get file_id
-curl -sS -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -F "file=@graph.csv" "${GRAPHISTRY_HOST%/}/api/v2/upload/files/"
-# 2) Create dataset with encodings
-curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type: application/json' \
-  -d '{"metadata":{},"node_encodings":{"bindings":{"node":"id"}},"edge_encodings":{"bindings":{"source":"src","destination":"dst"}}}' \
-  "${GRAPHISTRY_HOST%/}/api/v2/upload/datasets/"
-# 3) First render tweak: append one URL knob, e.g. &play=0
-```
+## Upload + URL Bridge Template
+Use Adapter B for snippet form or Adapter I for compact bullet form.
 
 ## URL and Sharing Safety
 - Safe viewer URL pattern: `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>`.
@@ -278,3 +255,6 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 - URL controls: https://hub.graphistry.com/docs/api/1/rest/url/
 - Sessions: https://hub.graphistry.com/docs/api/experimental/rest/sessions/
 - Health: https://hub.graphistry.com/docs/api/2/rest/health/
+- SSO + single-use gateway: https://hub.graphistry.com/docs/api/2/rest/sso/
+- GFQL UDF endpoints: https://hub.graphistry.com/docs/UDF/gfql-udf-api/
+- Python UDF endpoints: https://hub.graphistry.com/docs/UDF/py-udf-api/
