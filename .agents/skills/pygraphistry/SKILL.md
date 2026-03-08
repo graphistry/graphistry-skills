@@ -6,15 +6,18 @@ description: "TOC router for PyGraphistry tasks. Use when a request involves PyG
 # PyGraphistry Router
 
 Use this skill as a dispatcher to specialized skills.
+Treat this as the Python SDK entrypoint; for a cross-interface entrypoint use `graphistry`.
 
 ## Route By Intent
 - Setup/auth/first plot from tables: use `pygraphistry-core`.
+- Direct Graphistry REST endpoint requests (`curl`, `/api/v2/...`, JWT/Bearer, upload/session/url params): immediately use `graphistry-rest-api` and skip ReadTheDocs discovery.
 - Styling/layout/static output/privacy and sharing: use `pygraphistry-visualization`.
 - Pattern matching, hops/chains, predicates, remote graph queries: use `pygraphistry-gfql`.
 - UMAP/DBSCAN/embedding/anomaly and graph-AI notebooks: use `pygraphistry-ai`.
 - Database/platform integrations (Neo4j, Splunk, Kusto, Databricks, SQL, etc.): use `pygraphistry-connectors`.
 
 ## Fast Targeted Fetch Protocol
+- REST-intent exception: do not run this protocol for REST tasks routed to `graphistry-rest-api`.
 - Start from `references/pygraphistry-readthedocs-toc.md`; do not crawl broad docs first.
 - Use `references/pygraphistry-readthedocs-top-level.tsv` for section-level shortcuts.
 - Pick exactly one primary skill and at most two secondary docs before fetching content.

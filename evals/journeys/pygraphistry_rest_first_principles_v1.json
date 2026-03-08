@@ -1,0 +1,216 @@
+{
+  "id": "pygraphistry_rest_first_principles_v1",
+  "description": "First-principles REST capability checks centered on auth, upload lifecycle, URL control, sessions, and safety boundaries.",
+  "eval_intent": "realistic_capability",
+  "tags": ["pygraphistry", "rest", "first_principles", "capability"],
+  "cases": [
+    {
+      "id": "fp_password_to_jwt_then_list_files",
+      "prompt": "Write a minimal shell flow that authenticates via /api-token-auth/ and then lists files via a Bearer token call.",
+      "checks": {
+        "regex": [
+          "GRAPHISTRY_(HOST|USERNAME|PASSWORD|TOKEN)",
+          "api-token-auth/",
+          "Authorization:\\s*Bearer",
+          "/api/v2/files/"
+        ],
+        "must_not_regex": [
+          "username\\s*=\\s*['\\\"].+['\\\"]",
+          "password\\s*=\\s*['\\\"].+['\\\"]"
+        ],
+        "max_lines": 22
+      }
+    },
+    {
+      "id": "fp_personal_key_to_jwt_exchange",
+      "prompt": "Provide a minimal curl request that exchanges PersonalKey credentials for JWT.",
+      "checks": {
+        "regex": [
+          "(?i)Authorization:\\s*PersonalKey",
+          "/api/v2/auth/pkey/jwt/"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_file_upload_lifecycle",
+      "prompt": "List the 3-step endpoint sequence for uploading file bytes and then creating a visualization dataset from that file.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/",
+          "/api/v2/upload/files/",
+          "/api/v2/upload/datasets/"
+        ],
+        "max_lines": 10
+      }
+    },
+    {
+      "id": "fp_dataset_lifecycle_endpoints",
+      "prompt": "Provide concise endpoint references for dataset list, dataset create, and dataset delete in the REST API.",
+      "checks": {
+        "regex": [
+          "/api/v2/datasets/\\?limit=100",
+          "/api/v2/upload/datasets/",
+          "/api/v2/datasets/"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_nodes_edges_format_endpoints",
+      "prompt": "Provide endpoint patterns for uploading nodes and edges in JSON, CSV, Parquet, ORC, and Arrow formats.",
+      "checks": {
+        "regex": [
+          "nodes/json",
+          "edges/json",
+          "nodes/csv",
+          "edges/csv",
+          "nodes/parquet",
+          "edges/parquet",
+          "nodes/orc",
+          "edges/orc",
+          "nodes/arrow",
+          "edges/arrow"
+        ],
+        "max_lines": 24
+      }
+    },
+    {
+      "id": "fp_url_embed_with_layout_controls",
+      "prompt": "Provide one iframe src URL that includes dataset, play=0, a background color (bg), and one layout knob like linLog or scalingRatio.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "bg=",
+          "(linLog|scalingRatio)"
+        ],
+        "max_lines": 4
+      }
+    },
+    {
+      "id": "fp_collections_url_param_guidance",
+      "prompt": "In 2-4 lines, explain how the collections URL parameter should be formatted before attaching it to graph.html.",
+      "checks": {
+        "regex": [
+          "collections",
+          "(?i)url\\s*encoded|urlencoded",
+          "(?i)whitespace"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "fp_iframe_collections_tricky_settings",
+      "prompt": "Provide one iframe src URL for graph.html that includes dataset, play=0, showCollections=true, info=false, URL-encoded collections, and collectionsGlobalNodeColor.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "showCollections=true",
+          "info=false",
+          "collections=",
+          "(%5B|%7B)",
+          "collectionsGlobalNodeColor"
+        ],
+        "max_lines": 5
+      }
+    },
+    {
+      "id": "fp_sessions_experimental_behavior",
+      "prompt": "Summarize the experimental sessions workflow and show how session appears in the graph URL.",
+      "checks": {
+        "regex": [
+          "/docs/api/experimental/rest/sessions/",
+          "graph\\.html\\?dataset=",
+          "session="
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "fp_single_use_token_gateway_flow",
+      "prompt": "Give 3 concise bullets on the single-use token gateway flow, including generation and revocation endpoints.",
+      "checks": {
+        "regex": [
+          "/api/v2/generate/single-use-url/",
+          "/api/v2/logout-user/username/",
+          "(?i)admin|staff|superuser"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_admin_healthcheck_routes",
+      "prompt": "Give 4 concise bullets with core healthcheck routes and at least one service-specific health route, plus a deployment/admin scope note.",
+      "checks": {
+        "regex": [
+          "(healthcheck/|/ht/|healthz)",
+          "(streamgl-viz/health|pivot/health|streamgl-sessions/health|streamgl-gpu/primary/health)",
+          "(?i)admin|on-?prem|deployment"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "fp_rest_vs_python_gfql_boundary",
+      "prompt": "In 3 concise bullets, distinguish REST endpoint tasks from Python/GFQL SDK tasks and include one concrete do-not pattern.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(",
+          "(?i)rest\\s*endpoint|/api/v2/",
+          "(?i)avoid|do\\W*not",
+          "(?i)/api/v2/gfql/query|no\\s*generic\\s*rest\\s*gfql\\s*endpoint"
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "fp_no_fake_rest_endpoints",
+      "prompt": "Provide one short REST snippet and avoid undocumented query helpers or invented endpoints.",
+      "checks": {
+        "regex": [
+          "(api-token-auth/|/api/v2/auth/pkey/jwt/|/api/v2/files/|/api/v2/upload/files/|/api/v2/upload/datasets/)"
+        ],
+        "must_not_regex": [
+          "/api/v2/query",
+          "/api/v2/graphql",
+          "/api/v2/render",
+          "graph_query\\(",
+          "run_gfql\\("
+        ],
+        "max_lines": 16
+      }
+    },
+    {
+      "id": "fp_gfql_to_rest_viz_handoff_example",
+      "prompt": "Provide a minimal two-part answer: one line for Python GFQL extraction context, one line for REST-side graph URL/iframe usage.",
+      "checks": {
+        "regex": [
+          "(\\.gfql\\(|gfql_remote\\()",
+          "graph\\.html\\?dataset=",
+          "(?i)iframe|src=",
+          "(?i)rest"
+        ],
+        "must_not_regex": [
+          "/api/v2/gfql/query"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "fp_author_field_user_scoping_caveat",
+      "prompt": "In 3-5 bullets, explain user-scoped admin audits using files/datasets author fields and key caveats.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/\\?limit=100",
+          "/api/v2/datasets/\\?limit=100",
+          "author",
+          "(?i)username|identity|idp",
+          "(?i)caveat|mapping|not\\s+documented"
+        ],
+        "max_lines": 9
+      }
+    }
+  ]
+}

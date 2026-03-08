@@ -3,6 +3,18 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
+- REST phase2 full sweep (2026-03-07):
+  - Data: `data/2026-03-07-rest-phase2-full-sweep`
+  - Report: `reports/2026-03-07-rest-phase2-full-sweep.md`
+  - Skills ON: 90.9% pass (30/33), Skills OFF: 27.3% pass (9/33), **+63.6pp delta**
+- REST gapfix final sweep (2026-03-07):
+  - Data: `data/2026-03-07-rest-gapfix-final-sweep`
+  - Report: `reports/2026-03-07-rest-gapfix-final-sweep.md`
+  - Skills ON: 92.3% pass (24/26), Skills OFF: 30.8% pass (8/26), **+61.5pp delta**
+- REST skills optimization sweep (2026-03-07):
+  - Data: `data/2026-03-07-rest-skills-optimization-sweep`
+  - Report: `reports/2026-03-07-rest-skills-optimization-sweep.md`
+  - Skills ON: 95% pass (19/20), Skills OFF: 35% pass (7/20), **+60pp delta**
 - Baseline isolation sweep (2026-03-01):
   - Data: `data/2026-03-01-baseline-isolation-sweep`
   - Report: `reports/2026-03-01-baseline-isolation-sweep.md`

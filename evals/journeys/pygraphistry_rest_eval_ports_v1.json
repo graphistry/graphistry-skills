@@ -1,0 +1,274 @@
+{
+  "id": "pygraphistry_rest_eval_ports_v1",
+  "description": "Ports of existing PyGraphistry eval behavior into REST-focused prompts grounded in canonical Hub docs.",
+  "eval_intent": "alignment_legacy",
+  "tags": ["pygraphistry", "rest", "ports", "alignment"],
+  "cases": [
+    {
+      "id": "rest_auth_env_or_token_no_literals",
+      "prompt": "Provide a short curl-based Graphistry REST auth snippet that only uses environment variables (no literal credentials), obtains a JWT, and demonstrates one Bearer-authenticated follow-up call.",
+      "checks": {
+        "regex": [
+          "export\\s+GRAPHISTRY_",
+          "api-token-auth/",
+          "Authorization:\\s*Bearer",
+          "/api/v2/files/"
+        ],
+        "must_not_regex": [
+          "GRAPHISTRY_(USERNAME|PASSWORD)\\s*=\\s*['\\\"].+['\\\"]",
+          "password\\s*=\\s*['\\\"].+['\\\"]",
+          "username\\s*=\\s*['\\\"].+['\\\"]"
+        ],
+        "max_lines": 24
+      }
+    },
+    {
+      "id": "rest_org_and_personal_key_navigation",
+      "prompt": "In 3-5 concise bullets, explain how org users exchange a Personal Key for JWT and then call REST endpoints.",
+      "checks": {
+        "regex": [
+          "(?i)PersonalKey",
+          "/api/v2/auth/pkey/jwt/",
+          "(?i)Authorization:\\s*Bearer",
+          "(?i)org_name|organization"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_auth_troubleshooting_checklist",
+      "prompt": "Give a 4-bullet troubleshooting checklist for REST auth failures covering token creation, refresh/verify, and expiration behavior.",
+      "checks": {
+        "regex": [
+          "api-token-auth/",
+          "api-token-refresh/",
+          "api-token-verify/",
+          "(?i)expire|expiration|1\\s*hour|24\\s*hours|daily"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_privacy_and_share_url",
+      "prompt": "Show a concise safe-share guidance snippet for REST uploads: keep visibility non-public and return a graph URL pattern users can open.",
+      "checks": {
+        "regex": [
+          "(?i)private|organization",
+          "graph\\.html\\?dataset="
+        ],
+        "must_not_regex": [
+          "(?i)mode\\s*=\\s*['\\\"]public['\\\"]",
+          "(?i)privacy\\s*=\\s*public"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_url_params_layout_and_labels",
+      "prompt": "Provide one Graphistry URL example that uses dataset, play for 3 seconds, linLog, scalingRatio, pointsOfInterestMax=0, and pointSize.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play",
+          "linLog",
+          "scalingRatio",
+          "pointsOfInterestMax",
+          "pointSize"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "rest_url_params_layout_and_encoding_bridge",
+      "prompt": "Provide a concise /api/v2/upload/datasets/ payload fragment that sets color/size-style encodings, and mention one URL parameter tweak for first render.",
+      "checks": {
+        "regex": [
+          "/api/v2/upload/datasets/",
+          "(encodings|node_encodings|edge_encodings)",
+          "(?i)color|size|pointSize",
+          "(play|linLog|scalingRatio|pointsOfInterestMax)"
+        ],
+        "max_lines": 14
+      }
+    },
+    {
+      "id": "rest_iframe_collections_tricky_url_api",
+      "prompt": "Provide one iframe src URL that includes dataset, play=0, showCollections=true, info=false, a URL-encoded collections value, and one collections global color fallback.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "showCollections=true",
+          "info=false",
+          "collections=",
+          "(%5B|%7B)",
+          "(collectionsGlobalNodeColor|collectionsGlobalEdgeColor)"
+        ],
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "rest_docs_route_hub_api_pages",
+      "prompt": "List 3 canonical hub docs links, one per line: REST auth, REST upload, and URL control.",
+      "checks": {
+        "regex": [
+          "https://hub\\.graphistry\\.com/docs/api/1/rest/auth/?",
+          "https://hub\\.graphistry\\.com/docs/api/2/rest/upload/?",
+          "https://hub\\.graphistry\\.com/docs/api/1/rest/url/?"
+        ],
+        "min_lines": 3,
+        "max_lines": 6
+      }
+    },
+    {
+      "id": "rest_docs_fallback_policy_canonical",
+      "prompt": "In 3 concise bullets, describe a user-facing docs fallback policy when a hub REST docs page is missing.",
+      "checks": {
+        "regex": [
+          "(?i)hub\\.graphistry\\.com/docs/api/",
+          "(?i)closest|canonical|same\\s*api|same\\s*version",
+          "(?i)inference|documented"
+        ],
+        "must_not_regex": [
+          "/home/lmeyerov/Work/graphistry/apps/core/nexus"
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_admin_healthchecks_compact",
+      "prompt": "Give 4 concise bullets listing core Graphistry healthcheck routes and one service health route, with a deployment/admin scope note.",
+      "checks": {
+        "regex": [
+          "(healthcheck/|/ht/|healthz)",
+          "(streamgl-viz/health|pivot/health|streamgl-sessions/health|streamgl-gpu/primary/health)",
+          "(?i)admin|on-?prem|deployment"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_boundary_remote_gfql_python",
+      "prompt": "In 3 concise bullets, clarify the boundary between REST endpoint guidance and Python/GFQL SDK workflows.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(",
+          "(?i)rest\\s*endpoint|rest\\s*guidance|/api/v2/",
+          "(?i)/api/v2/gfql/query|no\\s*generic\\s*rest\\s*gfql\\s*endpoint|invented\\s*generic\\s*rest\\s*query\\s*endpoint"
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_no_token_in_query_params",
+      "prompt": "Give 3 REST sharing safety bullets including one explicit rule that JWTs must never appear in URL query parameters.",
+      "checks": {
+        "regex": [
+          "(?i)Authorization:\\s*Bearer|Bearer\\s+\\$?GRAPHISTRY_TOKEN",
+          "graph\\.html\\?dataset=",
+          "(?i)never|do not"
+        ],
+        "must_not_regex": [
+          "graph\\.html\\?[^\\n]*token="
+        ],
+        "max_lines": 7
+      }
+    },
+    {
+      "id": "rest_real_endpoints_only",
+      "prompt": "Provide one short REST workflow snippet using only documented auth/upload endpoints. Avoid invented endpoint names.",
+      "checks": {
+        "regex": [
+          "(api-token-auth/|/api/v2/auth/pkey/jwt/)",
+          "/api/v2/(files|upload/files|upload/datasets)"
+        ],
+        "must_not_regex": [
+          "/api/v2/query",
+          "/api/v2/graph/query",
+          "/api/v2/gfql/query",
+          "/api/v2/render"
+        ],
+        "max_lines": 20
+      }
+    },
+    {
+      "id": "rest_viz_gfql_handoff_boundary",
+      "prompt": "In 4 concise bullets, explain how to handle: \"run GFQL then share an iframe\" by separating Python/GFQL vs REST/URL responsibilities.",
+      "checks": {
+        "regex": [
+          "(?i)pygraphistry|python\\s*sdk|\\.gfql\\(|gfql_remote\\(",
+          "(?i)rest\\s*endpoint|/api/v2/",
+          "graph\\.html\\?dataset=",
+          "(?i)no\\s*generic\\s*rest\\s*gfql(\\s*query)?\\s*endpoint|do\\W*not\\s*invent\\s*/api/v2/gfql/query"
+        ],
+        "must_not_regex": [
+          "POST\\s+/api/v2/gfql/query",
+          "GET\\s+/api/v2/gfql/query"
+        ],
+        "max_lines": 8
+      }
+    },
+    {
+      "id": "rest_viz_url_debug_blank_graph",
+      "prompt": "Give a 5-step REST URL-debug checklist when an embedded graph renders blank or unreadable on first load.",
+      "checks": {
+        "regex": [
+          "graph\\.html\\?dataset=",
+          "play=0",
+          "(linLog|scalingRatio|pointSize|pointsOfInterestMax)",
+          "(showCollections|info|collections=|\\bcollections\\b)",
+          "(?i)url\\s*param|encode|collections"
+        ],
+        "max_lines": 16
+      }
+    },
+    {
+      "id": "rest_admin_find_old_files_runbook",
+      "prompt": "Provide a concise admin runbook to find files older than 90 days using documented REST endpoints only.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/\\?limit=",
+          "created_at",
+          "(?i)sort|filter",
+          "(?i)older\\s+than|90\\s*days"
+        ],
+        "max_lines": 10
+      }
+    },
+    {
+      "id": "rest_admin_files_for_specific_user",
+      "prompt": "In 4 concise bullets, explain how to locate files for a specific user without inventing undocumented user-list endpoints.",
+      "checks": {
+        "regex": [
+          "/api/v2/files/",
+          "(?i)author|creator|uploader",
+          "(?i)user\\s*id|username",
+          "(?i)filter|client-?side",
+          "(?i)do\\W*not\\s*invent|not\\s+documented|no\\s+documented\\s+user\\s+list"
+        ],
+        "must_not_regex": [
+          "(?i)\\b(GET|POST|PUT|DELETE)\\s+/api/v2/users/",
+          "(?i)\\b(GET|POST|PUT|DELETE)\\s+/api/v2/members/"
+        ],
+        "max_lines": 9
+      }
+    },
+    {
+      "id": "rest_admin_list_users_boundary",
+      "prompt": "A user asks for a REST endpoint to list users. Answer in <=4 bullets with documented-boundary guidance and next steps.",
+      "checks": {
+        "regex": [
+          "(?i)no\\s+documented.*rest\\s+endpoint|not\\s+documented",
+          "(?i)admin|idp|sso|directory",
+          "(?i)verify|docs|support|ops"
+        ],
+        "must_not_regex": [
+          "(?i)curl[^\\n]*/api/v2/users/",
+          "(?i)curl[^\\n]*/api/v2/members/",
+          "(?i)curl[^\\n]*/api/v2/orgs/.*/users"
+        ],
+        "max_lines": 8
+      }
+    }
+  ]
+}

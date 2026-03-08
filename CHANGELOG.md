@@ -9,12 +9,40 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
 ### Added
+- **Skills / graphistry-rest-api**: Added explicit admin healthcheck coverage (`/healthcheck/`, `/ht/`, `healthz`, service health routes), REST vs Python/GFQL boundary guidance, and advanced iframe URL API patterns (`showCollections`, collections global colors).
+- **Skills / REST references**: Added validated REST docs reference pack under `.agents/skills/graphistry-rest-api/references/` with:
+  - `hub-rest-docs-toc.md` (curated TOC),
+  - `hub-rest-docs-links.tsv` (machine-checkable URL inventory with status/timestamp),
+  - `README.md` (refresh/validation policy).
+- **Evals / REST journeys**: Added deterministic REST cases for advanced iframe+collections URL API, admin healthchecks, and REST-vs-GFQL/Python boundaries.
+- **Benchmarks**: Added new benchmark pack `2026-03-07-rest-gapfix-final-sweep` with public-safe metrics + report.
+- **Benchmarks**: Added new benchmark pack `2026-03-07-rest-phase2-full-sweep` with public-safe metrics + report.
 
 ### Fixed
+- **Evals / docs fallback policy**: Replaced local Nexus path dependency with user-facing canonical Hub docs fallback checks.
+- **Evals / boundary checks**: Fixed contradictory GFQL boundary assertions in deterministic checks and improved regex robustness for do-not phrasing.
+- **Skills / response control**: Tightened deterministic adapters for sessions short-form and file lifecycle endpoint-sequence outputs.
 
 ### Changed
+- **README / benchmarks docs**: Updated published REST benchmark claims and links to include the new gapfix final sweep.
+- **README / benchmarks docs**: Updated published REST benchmark claims and links to include the REST phase2 full sweep.
+- **Skills / REST guidance**: Kept named-endpoint guidance user-facing (`/functions/...` for definition lifecycle, `/run/...` for execution), removed internal backend distinctions, and added explicit deployment caveat wording for `/api/v2/share/link/`.
 
 ### Tests
+- **Evals / full REST rerun after reference updates (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (66 rows).
+  - Skills ON: 78.8% pass (26/33), 14.4s avg latency
+  - Skills OFF: 24.2% pass (8/33), 17.9s avg latency
+  - Delta: +54.6pp pass-rate improvement and lower latency with skills
+  - Harness OK: 65/66
+- **Evals / full REST phase2 sweep (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (66 rows).
+  - Skills ON: 90.9% pass (30/33), 13.0s avg latency
+  - Skills OFF: 27.3% pass (9/33), 17.0s avg latency
+  - Delta: +63.6pp pass-rate improvement and lower latency with skills
+- **Evals / full REST sweep (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (52 rows).
+  - Skills ON: 92.3% pass (24/26), 13.1s avg latency
+  - Skills OFF: 30.8% pass (8/26), 18.9s avg latency
+  - Delta: +61.5pp pass-rate improvement and lower latency with skills
+- **Evals / targeted regressions**: Follow-up targeted reruns validated fixes for remaining `skills=on` misses in sessions, REST/Python-GFQL boundary wording, and nodes/edges format endpoint patterns.
 
 ---
 

@@ -6,12 +6,27 @@ Graphistry is a graph intelligence ecosystem with fast-moving capabilities acros
 
 Strong frontier models often already know core Graphistry/PyGraphistry patterns due to ecosystem maturity and backward compatibility. The skills add high-value guidance on newer features, preferred workflow patterns, and safer/more reliable execution details.
 
+## Skills Coverage
+
+- `graphistry`: umbrella router across interfaces (SDK + REST; JS-ready routing path).
+- `graphistry-rest-api`: REST specialist for auth, upload lifecycle, URL controls, sessions, and sharing safety.
+- `pygraphistry`: Python SDK router.
+- `pygraphistry-core`: auth, shaping, and first plot workflows.
+- `pygraphistry-visualization`: bindings/encodings/layout/privacy/share patterns.
+- `pygraphistry-gfql`: GFQL extraction/pattern workflows.
+- `pygraphistry-ai`: embedding, UMAP/DBSCAN, anomaly workflows.
+- `pygraphistry-connectors`: connector/integration workflows.
+
 ## Install
+
+Recommended (mixed SDK + REST usage):
 
 ```bash
 npx skills add graphistry/graphistry-skills \
   --agent codex \
   --agent claude-code \
+  --skill graphistry \
+  --skill graphistry-rest-api \
   --skill pygraphistry \
   --skill pygraphistry-core \
   --skill pygraphistry-gfql \
@@ -29,6 +44,23 @@ This repository intentionally includes two skill tiers:
 - Internal maintainer skills live under `.agents/skills/internal/` (for example: `.agents/skills/internal/plan`, `.agents/skills/internal/eval-otel`, `.agents/skills/internal/benchmarks`) and are marked `metadata.internal: true`.
 
 Internal maintainer skills are kept in-repo for contributor workflows and are not part of the default end-user install set.
+
+REST-only minimal install:
+
+```bash
+npx skills add graphistry/graphistry-skills \
+  --agent codex \
+  --agent claude-code \
+  --skill graphistry \
+  --skill graphistry-rest-api \
+  --yes
+```
+
+## How To Use
+
+- For REST endpoint tasks, ask directly for endpoint-level output (for example: "show curl for PersonalKey -> JWT and upload dataset with private sharing URL").
+- For Python SDK tasks, ask for PyGraphistry workflows (for example: "table to graph + plot with bindings + privacy").
+- For mixed workflows, ask for both in one prompt; `graphistry` routes to the right specialist skill.
 
 ## Claude Code Example (Live URL)
 
@@ -60,6 +92,17 @@ Sample output (validated on `2026-02-21`, `model=opus`, runtime `~68.2s`):
 https://hub.graphistry.com/graph/graph.html?dataset=17743ba9ff3549729fdb4d9c1c071bbc&type=arrow&viztoken=e968954a-c0e5-4206-85a6-3d950817a6d4&usertag=ef9e6f8d-pygraphistry-0.50.6&splashAfter=1771659185&info=true
 ```
 
+## REST Example (Snippet Ask)
+
+Example prompt:
+
+```text
+Provide a concise Graphistry REST snippet that:
+1) gets JWT via /api-token-auth/ from env vars,
+2) uploads dataset via /api/v2/upload/datasets/ with private visibility,
+3) prints graph.html?dataset=... URL.
+```
+
 ## Evals
 
 These skills are regularly benchmarked and tuned against standard Graphistry user journeys (baseline vs skills, multiple runtimes/models).
@@ -68,17 +111,19 @@ For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
 Current checked-in benchmark packs show skills improving pass rates significantly:
 
-- Fresh eval sweep with isolated baseline (`codex`, `skills=both`, 56 cases × 2):
+- PyGraphistry suite (baseline isolation sweep, `codex`, `skills=both`, 56 cases × 2):
   - `skills=on`: **91% pass (51/56)**, avg `47.4s`
   - `skills=off`: **52% pass (29/56)**, avg `46.4s`
   - **Delta: +39pp pass rate improvement**
-- Prior sweep for reference (note: had baseline contamination bug):
-  - `skills=on`: `88/100` pass
-  - `skills=off`: `81/100` pass
+- REST suite (phase2 full sweep, `codex`, REST journeys, `skills=both`, 33 cases × 2):
+  - `skills=on`: **90.9% pass (30/33)**, avg `13.0s`
+  - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
+  - **Delta: +63.6pp pass rate improvement**
 
 See:
-- [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - Latest sweep with baseline fix
-- [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md) - Prior sweep
+- [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark
+- [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - REST suite benchmark
+- [benchmarks/README.md](benchmarks/README.md) - full benchmark pack history
 
 ## Docs
 
