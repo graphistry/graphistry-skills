@@ -14,6 +14,12 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - For constrained prompts (line counts, bullets, "snippet only"), do not add prefaces like "Using <skill>".
 - Keep outputs short and literal; avoid exploratory prose.
 
+## Fast Targeted Fetch Protocol
+- Start from `references/hub-rest-docs-toc.md` for the curated Hub REST navigation map.
+- Use `references/hub-rest-docs-links.tsv` as the machine-checkable inventory and prefer links with status `200`.
+- If a needed page is missing from references, check `https://hub.graphistry.com/docs/api/` and add an explicit inference note before using adjacent docs.
+- Avoid broad docs crawling when a referenced canonical page already answers the question.
+
 ## Core Endpoint Map
 - Auth:
   - `/api-token-auth/`
