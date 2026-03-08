@@ -72,7 +72,7 @@ Use this skill for Graphistry REST endpoint tasks, including JWT auth, uploads, 
 - For "find files older than 90 days" asks, output concise bullets only (no script), include `/api/v2/files/?limit=100`, `created_at`, and a client-side age filter.
 - For "files for a specific user" asks, include `/api/v2/files/?limit=100`, ownership field `author`, and a do-not-invent endpoint warning.
 - For "list users endpoint" asks, explicitly state no documented REST list-users endpoint and route to admin/IDP/support workflow.
-- For named-endpoint architecture asks, state ownership split clearly: Nexus persists named endpoints; forge-etl-python handles `/functions` + `/run` execution/proxy flow.
+- For named-endpoint architecture asks, keep explanation at public REST surface: use `/functions/...` endpoints for named-endpoint definition lifecycle and `/run/...` endpoints for execution.
 - For single-use gateway and experimental sessions asks, call out deployment/tenant gating when availability is uncertain.
 
 ## Deterministic Prompt Adapters
@@ -215,9 +215,9 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - Deployment/plan caveat: private/organization requests can be downgraded to `public` when sharing entitlements are unavailable.
 
 ### Adapter W: named-endpoint architecture boundary (3 bullets)
-- Create/read/update/delete source of truth is Nexus named-endpoint API (`/api/v1/named-endpoint/...`) behind Graphistry routing.
-- Execution and org-facing REST flows use forge-etl-python endpoints (`/api/v2/o/<org>/functions/{gfql|python}/...` and `/api/v2/o/<org>/run/{gfql|python}/...`).
-- Do not imply forge-etl-python is the persistence owner; it executes/proxies while lookup/storage lives in Nexus.
+- Manage named endpoint definitions via `/api/v2/o/<org>/functions/{gfql|python}/...`.
+- Execute named endpoints via `/api/v2/o/<org>/run/{gfql|python}/...`.
+- Keep guidance on documented external REST routes; avoid internal/backend route details.
 
 ## Minimal Auth Snippet (env-var-only)
 ```bash
@@ -269,7 +269,7 @@ curl -sS -X POST -H "Authorization: Bearer ${GRAPHISTRY_TOKEN}" -H 'Content-Type
 ## Policy Guardrails
 - Use documented endpoints only; avoid invented endpoints like `/api/v2/query`, `/api/v2/graph/query`, `/api/v2/render`, `/api/v2/graphql`.
 - Do not present SDK/GFQL behavior as a generic REST endpoint (for example avoid `/api/v2/gfql/query` claims).
-- Keep named-endpoint ownership precise: Nexus is persistence/CRUD owner; forge-etl-python is the org-facing execution/proxy path.
+- Keep named-endpoint guidance at the external REST layer: `/functions/...` for definition lifecycle and `/run/...` for execution.
 - Keep credentials in environment variables; never hardcode literals.
 
 ## Canonical Docs

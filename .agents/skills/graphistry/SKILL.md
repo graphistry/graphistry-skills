@@ -14,7 +14,7 @@ Use this skill as the shared entrypoint across Graphistry interfaces.
 
 ## Mixed Requests
 - If a request mixes Python SDK and REST endpoints, start with `pygraphistry` and pull in `graphistry-rest-api` for exact endpoint syntax.
-- For named-endpoint questions, clarify boundary: org-facing `/api/v2/o/<org>/functions|run/...` flows are execution/proxy paths, while named-endpoint persistence/CRUD is Nexus-owned.
+- For named-endpoint questions, keep guidance user-facing: `/api/v2/o/<org>/functions/...` for definition lifecycle and `/api/v2/o/<org>/run/...` for execution.
 - Keep the first routing response compact: selected interface + one minimal snippet + one canonical doc link.
 
 ## Safety Rules
