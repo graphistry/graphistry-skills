@@ -108,3 +108,4 @@ git push origin vX.Y.Z
 ## Related Skills
 - `eval-otel`: OTel trace validation and inspection
 - `plan`: Multi-session task planning (for complex benchmark campaigns)
+- `release`: Semver bump + changelog + tag + GitHub release workflow
