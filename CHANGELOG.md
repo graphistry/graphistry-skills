@@ -10,6 +10,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - **Skills / graphistry-rest-api**: Added explicit admin healthcheck coverage (`/healthcheck/`, `/ht/`, `healthz`, service health routes), REST vs Python/GFQL boundary guidance, and advanced iframe URL API patterns (`showCollections`, collections global colors).
+- **Skills / REST references**: Added validated REST docs reference pack under `.agents/skills/graphistry-rest-api/references/` with:
+  - `hub-rest-docs-toc.md` (curated TOC),
+  - `hub-rest-docs-links.tsv` (machine-checkable URL inventory with status/timestamp),
+  - `README.md` (refresh/validation policy).
 - **Evals / REST journeys**: Added deterministic REST cases for advanced iframe+collections URL API, admin healthchecks, and REST-vs-GFQL/Python boundaries.
 - **Benchmarks**: Added new benchmark pack `2026-03-07-rest-gapfix-final-sweep` with public-safe metrics + report.
 - **Benchmarks**: Added new benchmark pack `2026-03-07-rest-phase2-full-sweep` with public-safe metrics + report.
@@ -22,8 +26,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - **README / benchmarks docs**: Updated published REST benchmark claims and links to include the new gapfix final sweep.
 - **README / benchmarks docs**: Updated published REST benchmark claims and links to include the REST phase2 full sweep.
+- **Skills / REST guidance**: Kept named-endpoint guidance user-facing (`/functions/...` for definition lifecycle, `/run/...` for execution), removed internal backend distinctions, and added explicit deployment caveat wording for `/api/v2/share/link/`.
 
 ### Tests
+- **Evals / full REST rerun after reference updates (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (66 rows).
+  - Skills ON: 78.8% pass (26/33), 14.4s avg latency
+  - Skills OFF: 24.2% pass (8/33), 17.9s avg latency
+  - Delta: +54.6pp pass-rate improvement and lower latency with skills
+  - Harness OK: 65/66
 - **Evals / full REST phase2 sweep (codex)**: `pygraphistry_rest_eval_ports_v1` + `pygraphistry_rest_first_principles_v1` with `skills=both` (66 rows).
   - Skills ON: 90.9% pass (30/33), 13.0s avg latency
   - Skills OFF: 27.3% pass (9/33), 17.0s avg latency
