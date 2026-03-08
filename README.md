@@ -111,32 +111,19 @@ For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
 Current checked-in benchmark packs show skills improving pass rates significantly:
 
-- REST phase2 full sweep (`codex`, REST journeys, `skills=both`, 33 cases × 2):
-  - `skills=on`: **90.9% pass (30/33)**, avg `13.0s`
-  - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
-  - **Delta: +63.6pp pass rate improvement**
-- REST gapfix final sweep (`codex`, REST journeys, `skills=both`, 26 cases × 2):
-  - `skills=on`: **92.3% pass (24/26)**, avg `13.1s`
-  - `skills=off`: **30.8% pass (8/26)**, avg `18.9s`
-  - **Delta: +61.5pp pass rate improvement**
-- REST-focused eval sweep (`codex`, REST journeys, `skills=both`, 20 cases × 2):
-  - `skills=on`: **95% pass (19/20)**, avg `14.2s`
-  - `skills=off`: **35% pass (7/20)**, avg `20.4s`
-  - **Delta: +60pp pass rate improvement**
-- Fresh eval sweep with isolated baseline (`codex`, `skills=both`, 56 cases × 2):
+- PyGraphistry suite (baseline isolation sweep, `codex`, `skills=both`, 56 cases × 2):
   - `skills=on`: **91% pass (51/56)**, avg `47.4s`
   - `skills=off`: **52% pass (29/56)**, avg `46.4s`
   - **Delta: +39pp pass rate improvement**
-- Prior sweep for reference (note: had baseline contamination bug):
-  - `skills=on`: `88/100` pass
-  - `skills=off`: `81/100` pass
+- REST suite (phase2 full sweep, `codex`, REST journeys, `skills=both`, 33 cases × 2):
+  - `skills=on`: **90.9% pass (30/33)**, avg `13.0s`
+  - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
+  - **Delta: +63.6pp pass rate improvement**
 
 See:
-- [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - Latest REST phase2 full sweep
-- [benchmarks/reports/2026-03-07-rest-gapfix-final-sweep.md](benchmarks/reports/2026-03-07-rest-gapfix-final-sweep.md) - Latest REST gapfix sweep
-- [benchmarks/reports/2026-03-07-rest-skills-optimization-sweep.md](benchmarks/reports/2026-03-07-rest-skills-optimization-sweep.md) - Latest REST-focused sweep
-- [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - Latest sweep with baseline fix
-- [benchmarks/reports/2026-02-23-postcleanup-fullsweep.md](benchmarks/reports/2026-02-23-postcleanup-fullsweep.md) - Prior sweep
+- [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark
+- [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - REST suite benchmark
+- [benchmarks/README.md](benchmarks/README.md) - full benchmark pack history
 
 ## Docs
 
