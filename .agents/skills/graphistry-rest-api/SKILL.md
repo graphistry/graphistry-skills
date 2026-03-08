@@ -208,7 +208,8 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - Create dataset first via `/api/v2/upload/datasets/` with required `metadata`, `node_encodings`, and `edge_encodings`.
 - Set visibility with `POST /api/v2/share/link/` body: `{"obj_pk":"<dataset_id>","obj_type":"dataset","mode":"private","notify":false,"message":"","invited_users":[]}`.
 - If inviting users, include entries like `{"email":"user@example.com","action":"10"}` (`10` view, `20` edit).
-- Deployment/plan caveat: private/organization requests can be downgraded to `public` when sharing entitlements are unavailable.
+- Deployment/docs caveat: this route is deployment-exposed and may not have a dedicated canonical docs page; verify availability on the target tenant.
+- Plan caveat: private/organization requests can be downgraded to `public` when sharing entitlements are unavailable.
 
 ### Adapter W: named-endpoint architecture boundary
 - Manage named endpoint definitions via `/api/v2/o/<org>/functions/{gfql|python}/...`.
@@ -247,6 +248,7 @@ Use Adapter B for snippet form or Adapter I for compact bullet form.
 - Use documented endpoints only; avoid invented endpoints like `/api/v2/query`, `/api/v2/graph/query`, `/api/v2/render`, `/api/v2/graphql`.
 - Do not present SDK/GFQL behavior as a generic REST endpoint (for example avoid `/api/v2/gfql/query` claims).
 - Keep named-endpoint guidance at the external REST layer: `/functions/...` for definition lifecycle and `/run/...` for execution.
+- For deployment-exposed routes without dedicated docs pages (for example `/api/v2/share/link/`), explicitly label the uncertainty and advise tenant verification.
 - Keep credentials in environment variables; never hardcode literals.
 
 ## Canonical Docs
