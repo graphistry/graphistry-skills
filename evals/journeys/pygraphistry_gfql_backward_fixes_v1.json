@@ -1,0 +1,163 @@
+{
+  "id": "pygraphistry_gfql_backward_fixes_v1",
+  "description": "Guardrail cases verifying GFQL skill does not produce deprecated, hallucinated, or outdated patterns.",
+  "eval_intent": "guardrails",
+  "tags": ["pygraphistry", "gfql", "guardrails", "backward-fixes", "skills-expansion"],
+  "cases": [
+    {
+      "id": "no_deprecated_chain",
+      "prompt": "Write a PyGraphistry GFQL query that finds all Person nodes connected by KNOWS edges and filters to those with score > 50.",
+      "checks": {
+        "regex": [
+          "gfql\\("
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "chain_remote("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer uses gfql() and does not fall back to the deprecated chain() or chain_remote() methods.",
+        "rubric": [
+          "Uses gfql() for the query.",
+          "Does not use deprecated chain() or chain_remote() methods."
+        ]
+      }
+    },
+    {
+      "id": "correct_imports",
+      "prompt": "Give a complete PyGraphistry GFQL code snippet with all necessary imports to run a two-hop forward traversal filtering edges with weight > 10.",
+      "checks": {
+        "regex": [
+          "from graphistry import",
+          "gfql\\(",
+          "e_forward"
+        ],
+        "must_not_contain": [
+          "from graphistry.compute.ast import",
+          "from graphistry.compute.predicates import",
+          "from graphistry.gfql import"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer uses only public top-level imports from graphistry, not internal submodule paths.",
+        "rubric": [
+          "Uses public top-level imports only.",
+          "Does not import from internal submodules like graphistry.compute.ast, graphistry.compute.predicates, or graphistry.gfql."
+        ]
+      }
+    },
+    {
+      "id": "no_hallucinated_methods",
+      "prompt": "Show how to run a GFQL query against a remote Graphistry server dataset, returning only nodes with degree > 5.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\("
+        ],
+        "must_not_contain": [
+          "query_graph(",
+          "graph_query(",
+          "run_gfql(",
+          "connect_graphistry(",
+          "execute_query(",
+          "remote_query("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer uses the real gfql_remote() method and does not invent non-existent helper methods.",
+        "rubric": [
+          "Uses gfql_remote() for remote execution.",
+          "Does not use hallucinated methods like query_graph(), graph_query(), run_gfql(), connect_graphistry(), execute_query(), or remote_query()."
+        ]
+      }
+    },
+    {
+      "id": "cypher_not_blocked",
+      "prompt": "Can I use Cypher syntax with PyGraphistry GFQL? If yes, show me an example query.",
+      "checks": {
+        "regex": [
+          "gfql\\(",
+          "(MATCH|cypher)"
+        ],
+        "must_not_contain": [
+          "cypher is not supported",
+          "cypher not supported",
+          "cannot use cypher",
+          "doesn't support cypher",
+          "does not support cypher",
+          "no cypher support",
+          "only supports chain"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer affirms that Cypher syntax is supported in GFQL and provides a working example.",
+        "rubric": [
+          "Affirms Cypher support in GFQL.",
+          "Provides an example query using Cypher syntax with gfql()."
+        ]
+      }
+    },
+    {
+      "id": "edge_direction_variants",
+      "prompt": "How do I traverse edges in different directions with PyGraphistry GFQL? Show examples for forward, reverse, and undirected traversal.",
+      "checks": {
+        "regex": [
+          "e_forward",
+          "e_reverse",
+          "(e_undirected|e\\()"
+        ],
+        "must_not_contain": [
+          "e_backward(",
+          "only forward",
+          "only supports forward"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer demonstrates all three edge direction primitives: e_forward, e_reverse, and e_undirected (or e()) for undirected traversal.",
+        "rubric": [
+          "Shows e_forward for forward traversal.",
+          "Shows e_reverse for reverse traversal.",
+          "Shows e_undirected or e() for undirected traversal.",
+          "Does not use invented direction names like e_backward."
+        ]
+      }
+    },
+    {
+      "id": "remote_accepts_cypher",
+      "prompt": "Show me how to run a Cypher query on a remote Graphistry dataset using PyGraphistry. I want to find all paths between Person nodes with score > 10.",
+      "checks": {
+        "regex": [
+          "gfql_remote\\(",
+          "(MATCH|\"[^\"]*MATCH)"
+        ],
+        "must_not_contain": [
+          "only supports chain",
+          "cannot use cypher remotely",
+          "cypher is not supported remotely",
+          "remote does not accept strings",
+          "chain_remote("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.85,
+        "reference_answer": "A correct answer uses gfql_remote() with a Cypher query string to execute against a remote dataset.",
+        "rubric": [
+          "Uses gfql_remote() for remote execution.",
+          "Passes a Cypher string (containing MATCH) to gfql_remote().",
+          "Does not claim Cypher is unsupported remotely or fall back to chain_remote()."
+        ]
+      }
+    }
+  ]
+}

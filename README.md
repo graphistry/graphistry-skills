@@ -13,7 +13,7 @@ Strong frontier models often already know core Graphistry/PyGraphistry patterns 
 - `pygraphistry`: Python SDK router.
 - `pygraphistry-core`: auth, shaping, and first plot workflows.
 - `pygraphistry-visualization`: bindings/encodings/layout/privacy/share patterns.
-- `pygraphistry-gfql`: GFQL extraction/pattern workflows.
+- `pygraphistry-gfql`: GFQL extraction/pattern workflows — chain-list syntax, Cypher strings, Let/DAG bindings, GRAPH constructors, remote execution.
 - `pygraphistry-ai`: embedding, UMAP/DBSCAN, anomaly workflows.
 - `pygraphistry-connectors`: connector/integration workflows.
 

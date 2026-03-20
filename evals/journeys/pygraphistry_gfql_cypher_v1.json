@@ -1,0 +1,308 @@
+{
+  "id": "pygraphistry_gfql_cypher_v1",
+  "description": "GFQL Cypher-dialect eval: covers basic MATCH/RETURN, WHERE filters, auto-detect string queries, multi-hop patterns, ORDER/LIMIT with params, relationship type alternation, GRAPH constructor, multi-stage USE pipelines, and remote execution.",
+  "eval_intent": "realistic_capability",
+  "tags": ["pygraphistry", "gfql", "cypher", "skills-expansion"],
+  "cases": [
+    {
+      "id": "cypher_basic_match_return",
+      "prompt": "I have a PyGraphistry graph of employee communications. Write a Cypher query using PyGraphistry that returns all sender names and the recipients they emailed.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)MATCH\\s+\\(",
+          "(?i)RETURN\\s+",
+          "(?i)-\\["
+        ],
+        "must_not_contain": [
+          "cypher_to_gfql",
+          "chain("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher string containing MATCH on an edge pattern between sender and recipient nodes, using -[]- or -[]-> edge syntax, and a RETURN clause projecting sender name and recipient name.",
+        "rubric": [
+          "Must call .gfql() on a PyGraphistry graph object.",
+          "Must include a MATCH clause with a node-edge-node pattern.",
+          "Must include a RETURN clause selecting sender and recipient names.",
+          "Must use relationship bracket syntax -[]- or -[]->.",
+          "Must not use deprecated cypher_to_gfql or chain() APIs."
+        ],
+        "required_concepts": [
+          "gfql Cypher string query",
+          "MATCH with edge pattern",
+          "RETURN projection"
+        ]
+      }
+    },
+    {
+      "id": "cypher_where_filter",
+      "prompt": "Using PyGraphistry's Cypher support, query my social network graph to find all users older than 30 who have a 'verified' status. Return their name and age.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)MATCH\\s+\\(",
+          "(?i)WHERE\\s+",
+          "(?i)RETURN\\s+"
+        ],
+        "must_not_contain": [
+          "cypher_to_gfql",
+          "chain("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher string containing MATCH for user nodes, a WHERE clause filtering on age > 30 and verified status, and a RETURN clause projecting name and age.",
+        "rubric": [
+          "Must call .gfql() on a PyGraphistry graph object.",
+          "Must include a MATCH clause for user/person nodes.",
+          "Must include a WHERE clause filtering age > 30.",
+          "Must include a WHERE condition for verified status.",
+          "Must include a RETURN clause projecting name and age."
+        ],
+        "required_concepts": [
+          "gfql Cypher string query",
+          "WHERE property filter",
+          "RETURN projection"
+        ]
+      }
+    },
+    {
+      "id": "cypher_auto_detect",
+      "prompt": "I have a graph g in PyGraphistry. Run this query on it: find all Person nodes connected to Company nodes via WORKS_AT relationships and return the person name and company name.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(\\s*[\"']",
+          "(?i)MATCH",
+          "(?i):Person",
+          "(?i):WORKS_AT",
+          "(?i):Company"
+        ],
+        "must_not_contain": [
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer passes a Cypher string directly to g.gfql('...') with MATCH (p:Person)-[:WORKS_AT]->(c:Company) RETURN p.name, c.name, demonstrating that gfql auto-detects the Cypher dialect from the string.",
+        "rubric": [
+          "Must pass a Cypher query string directly to .gfql().",
+          "Must use typed node labels :Person and :Company.",
+          "Must use typed relationship label :WORKS_AT.",
+          "Must RETURN person name and company name.",
+          "Should demonstrate auto-detection by passing the string directly without explicit dialect flags."
+        ],
+        "required_concepts": [
+          "gfql auto-detect Cypher string",
+          "typed node and relationship labels",
+          "RETURN projection"
+        ]
+      }
+    },
+    {
+      "id": "cypher_multihop_pattern",
+      "prompt": "I have a fraud investigation graph in PyGraphistry. Find all paths from flagged accounts to merchant nodes within 1 to 3 hops. Return the start account, the end merchant, and the path length.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)MATCH",
+          "\\[\\*\\d+\\.\\.\\d+\\]|\\[\\*\\d+\\]",
+          "(?i)RETURN"
+        ],
+        "must_not_contain": [
+          "chain(",
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher MATCH pattern using variable-length relationship syntax like [*1..3] to express 1-to-3 hop paths between flagged account and merchant nodes, and RETURNs start account, end merchant, and path length.",
+        "rubric": [
+          "Must call .gfql() with a Cypher query string.",
+          "Must use variable-length path syntax [*1..3] or equivalent.",
+          "Must MATCH from flagged/account nodes to merchant nodes.",
+          "Must RETURN start account, end merchant, and path length.",
+          "Must not use deprecated chain() or cypher_to_gfql APIs."
+        ],
+        "required_concepts": [
+          "variable-length path pattern",
+          "multi-hop traversal",
+          "path length computation"
+        ]
+      }
+    },
+    {
+      "id": "cypher_order_limit_params",
+      "prompt": "Using PyGraphistry Cypher, find the top N highest-scoring nodes in my risk graph, where N is a parameter I can change at call time. Order results by score descending and return node id and score.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)ORDER\\s+BY",
+          "(?i)LIMIT",
+          "(?i)(DESC|DESCENDING)",
+          "(\\$\\w+|params\\s*=)"
+        ],
+        "must_not_contain": [
+          "chain(",
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher query using ORDER BY score DESC and LIMIT $n (or similar parameterization), and passes the parameter value via a params dict at call time so N is adjustable without rewriting the query.",
+        "rubric": [
+          "Must call .gfql() with a Cypher query string.",
+          "Must include ORDER BY with DESC or DESCENDING on score.",
+          "Must include LIMIT with a parameterized value.",
+          "Must demonstrate parameter passing (e.g., $n in query and params={'n': 10}).",
+          "Must RETURN node id and score."
+        ],
+        "required_concepts": [
+          "ORDER BY descending",
+          "parameterized LIMIT",
+          "runtime parameter passing"
+        ]
+      }
+    },
+    {
+      "id": "cypher_type_alternation",
+      "prompt": "In my PyGraphistry knowledge graph, find all Person nodes connected to other Person nodes through either KNOWS or COLLABORATES_WITH relationships. Return the pairs of names.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)MATCH",
+          "(?i):KNOWS\\s*\\|\\s*:?COLLABORATES_WITH|:COLLABORATES_WITH\\s*\\|\\s*:?KNOWS",
+          "(?i)RETURN"
+        ],
+        "must_not_contain": [
+          "chain(",
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher MATCH pattern using relationship type alternation syntax :KNOWS|:COLLABORATES_WITH (or :KNOWS|COLLABORATES_WITH) between two Person nodes, and RETURNs both names.",
+        "rubric": [
+          "Must call .gfql() with a Cypher query string.",
+          "Must use relationship type alternation with | operator.",
+          "Must include both :KNOWS and :COLLABORATES_WITH types.",
+          "Must MATCH between two :Person labeled nodes.",
+          "Must RETURN both person names."
+        ],
+        "required_concepts": [
+          "relationship type alternation",
+          "pipe operator for multiple edge types",
+          "RETURN name pairs"
+        ]
+      }
+    },
+    {
+      "id": "cypher_graph_constructor",
+      "prompt": "I have a large PyGraphistry supply chain graph. Extract a subgraph containing only the nodes and edges where the supplier risk_score exceeds 7. Use GFQL's GRAPH constructor so I get back a graph object I can visualize, not a table.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)GRAPH\\s*\\{",
+          "(?i)MATCH",
+          "(?i)risk_score"
+        ],
+        "must_not_contain": [
+          "chain(",
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a Cypher query that uses MATCH and WHERE to filter on risk_score > 7, then wraps the result in a GRAPH { ... } constructor to return a graph object suitable for visualization rather than a tabular result.",
+        "rubric": [
+          "Must call .gfql() with a Cypher query string.",
+          "Must use GRAPH { } constructor syntax to return a graph object.",
+          "Must include a MATCH clause for supplier nodes/edges.",
+          "Must filter on risk_score > 7 (or equivalent).",
+          "Must explain or demonstrate that the result is a graph object, not a table."
+        ],
+        "required_concepts": [
+          "GRAPH constructor for subgraph extraction",
+          "risk_score property filter",
+          "graph object output vs table"
+        ]
+      }
+    },
+    {
+      "id": "cypher_multi_stage_use",
+      "prompt": "Build a multi-stage GFQL Cypher pipeline on my PyGraphistry network graph: first extract the subgraph of high-activity nodes (event_count > 100), then within that subgraph compute degrees and return the top 10 nodes by degree. Use GRAPH bindings to chain the stages.",
+      "checks": {
+        "regex": [
+          "\\.gfql\\(",
+          "(?i)GRAPH\\s+\\w+\\s*=\\s*GRAPH\\s*\\{",
+          "(?i)USE\\s+\\w+",
+          "(?i)(CALL\\s+graphistry|degree|ORDER\\s+BY|LIMIT)"
+        ],
+        "must_not_contain": [
+          "chain(",
+          "cypher_to_gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer calls g.gfql() with a multi-stage Cypher pipeline: stage 1 uses GRAPH varName = GRAPH { MATCH ... WHERE event_count > 100 } to extract a subgraph, then stage 2 uses USE varName to operate within that subgraph, computing degrees (via CALL graphistry.degree or similar) and returning ORDER BY degree DESC LIMIT 10.",
+        "rubric": [
+          "Must call .gfql() with a Cypher query string.",
+          "Must use GRAPH variable = GRAPH { ... } binding for stage 1.",
+          "Must use USE variable to reference the bound subgraph in stage 2.",
+          "Must filter on event_count > 100 in the first stage.",
+          "Must compute degrees and return top 10 by degree.",
+          "Must not use deprecated chain() or cypher_to_gfql APIs."
+        ],
+        "required_concepts": [
+          "GRAPH binding for named subgraph",
+          "USE directive for multi-stage pipeline",
+          "degree computation and top-N ordering"
+        ]
+      }
+    },
+    {
+      "id": "cypher_remote_execution",
+      "prompt": "I have a dataset already uploaded to my Graphistry server (I have the dataset_id). Run a Cypher query remotely to find all nodes with risk_level = 'critical' and their immediate neighbors, without downloading the full graph locally.",
+      "checks": {
+        "regex": [
+          "(gfql_remote\\(|dataset_id)",
+          "(?i)MATCH",
+          "(?i)(risk_level|critical)",
+          "[\"'].*MATCH"
+        ],
+        "must_not_contain": [
+          "cypher_to_gfql",
+          "chain("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer uses gfql_remote() (or equivalent remote API) with a dataset_id to run a Cypher MATCH query server-side, finding nodes where risk_level = 'critical' and their immediate neighbors via a one-hop pattern, without downloading the full graph locally.",
+        "rubric": [
+          "Must use gfql_remote() or equivalent remote execution API.",
+          "Must reference a dataset_id for the server-side dataset.",
+          "Must include a Cypher MATCH query filtering risk_level = 'critical'.",
+          "Must find immediate neighbors (one-hop pattern).",
+          "Must emphasize that the query runs server-side without full local download."
+        ],
+        "required_concepts": [
+          "remote GFQL execution",
+          "dataset_id reference",
+          "server-side Cypher query",
+          "neighbor traversal"
+        ]
+      }
+    }
+  ]
+}
