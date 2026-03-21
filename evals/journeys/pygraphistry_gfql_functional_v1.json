@@ -1,0 +1,208 @@
+{
+  "id": "pygraphistry_gfql_functional_v1",
+  "description": "Functional GFQL eval cases: generated code must be executable and produce correct results. Each prompt asks for complete self-contained code with sample data. Graded at multiple levels: regex, AST parse, execution, result correctness.",
+  "eval_intent": "functional",
+  "tags": ["pygraphistry", "gfql", "functional", "execution", "skills-expansion"],
+  "cases": [
+    {
+      "id": "func_cypher_match_filter",
+      "prompt": "Write complete self-contained Python code (including sample data setup with pandas DataFrames) that: creates a small graph of 5 Person nodes and 6 KNOWS edges using PyGraphistry, then runs a Cypher MATCH query via g.gfql() to find all Person nodes with age > 30 and return their name. Print the result node count at the end with: print('RESULT_COUNT:', len(result._nodes)). Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "regex": [
+          "gfql\\(",
+          "(?i)MATCH",
+          "(?i)WHERE",
+          "(?i)age",
+          "RESULT_COUNT"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "RESULT_COUNT:",
+        "expect_result_nodes_gt": 0
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Code must be complete and self-contained with sample data.",
+          "Must use g.gfql() with a Cypher MATCH/WHERE/RETURN string.",
+          "Must filter persons by age > 30.",
+          "Must print RESULT_COUNT with the node count."
+        ]
+      }
+    },
+    {
+      "id": "func_cypher_order_limit",
+      "prompt": "Write complete self-contained Python code that: creates a graph of 8 nodes with a 'score' property (varying values) and some edges using PyGraphistry, then runs a Cypher query via g.gfql() to return the top 3 nodes by score descending. Print 'RESULT_COUNT:' followed by the number of result rows, and 'TOP_SCORE:' followed by the first row's score. Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "regex": [
+          "gfql\\(",
+          "(?i)ORDER\\s+BY",
+          "(?i)LIMIT",
+          "(?i)DESC",
+          "RESULT_COUNT"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "RESULT_COUNT:"
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Must create a graph with nodes having varying score values.",
+          "Must use Cypher ORDER BY ... DESC LIMIT 3.",
+          "Must print RESULT_COUNT and TOP_SCORE."
+        ]
+      }
+    },
+    {
+      "id": "func_chain_hop_filter",
+      "prompt": "Write complete self-contained Python code that: creates a graph with 6 nodes (3 of type 'server', 3 of type 'database') and 5 edges using PyGraphistry, then uses g.gfql() with chain-list syntax [n(), e_forward(), n()] to find all server nodes connected to database nodes. Print 'RESULT_NODES:' followed by len(result._nodes) and 'RESULT_EDGES:' followed by len(result._edges). Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "regex": [
+          "gfql\\(",
+          "n\\(",
+          "e_forward",
+          "RESULT_NODES",
+          "RESULT_EDGES"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "RESULT_NODES:"
+      }
+    },
+    {
+      "id": "func_chain_hop_bounds",
+      "prompt": "Write complete self-contained Python code that: creates a linear chain graph A->B->C->D->E using PyGraphistry, then uses g.gfql() with chain-list syntax to traverse exactly 2 hops forward from all nodes (min_hops=2, max_hops=2). Print 'RESULT_NODES:' followed by len(result._nodes) and 'RESULT_EDGES:' followed by len(result._edges). Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "regex": [
+          "gfql\\(",
+          "min_hops",
+          "max_hops",
+          "RESULT_NODES"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "RESULT_NODES:"
+      }
+    },
+    {
+      "id": "func_let_ref_dag",
+      "prompt": "Write complete self-contained Python code that: creates a graph with 4 'account' nodes (2 flagged as high_risk=True) and 5 'transfer' edges using PyGraphistry. Then uses g.gfql() with let/ref DAG syntax: define a 'seeds' binding for high_risk accounts, and a 'neighbors' binding that refs 'seeds' and traverses 1 hop forward. Print 'SEED_COUNT:' followed by the count and 'NEIGHBOR_NODES:' followed by len(result._nodes). Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "regex": [
+          "gfql\\(",
+          "let\\(",
+          "ref\\(",
+          "SEED_COUNT",
+          "NEIGHBOR_NODES"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "NEIGHBOR_NODES:"
+      }
+    },
+    {
+      "id": "func_graph_constructor",
+      "prompt": "Write complete self-contained Python code that: creates a graph with 6 nodes (3 have risk_score > 7, 3 have risk_score <= 7) and 8 edges using PyGraphistry. Then uses g.gfql() with a GRAPH {} constructor Cypher query to extract only the subgraph where nodes have risk_score > 7. Print 'SUBGRAPH_NODES:' followed by len(result._nodes) and 'SUBGRAPH_EDGES:' followed by len(result._edges). Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "regex": [
+          "gfql\\(",
+          "(?i)GRAPH\\s*\\{",
+          "(?i)risk_score",
+          "SUBGRAPH_NODES"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "SUBGRAPH_NODES:"
+      }
+    },
+    {
+      "id": "func_edge_directions",
+      "prompt": "Write complete self-contained Python code that: creates a directed graph with 4 nodes and 4 edges (A->B, B->C, C->D, D->A) using PyGraphistry. Then runs THREE separate g.gfql() queries starting from node A: (1) e_forward 1 hop, (2) e_reverse 1 hop, (3) e_undirected 1 hop. Print 'FORWARD_NODES:', 'REVERSE_NODES:', 'UNDIRECTED_NODES:' each followed by the respective result node count. Do not call plot() or register().",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "regex": [
+          "gfql\\(",
+          "e_forward",
+          "e_reverse",
+          "(e_undirected|e\\()",
+          "FORWARD_NODES",
+          "REVERSE_NODES",
+          "UNDIRECTED_NODES"
+        ],
+        "must_not_contain": [
+          ".chain(",
+          "register(",
+          "plot("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "FORWARD_NODES:"
+      }
+    }
+  ]
+}

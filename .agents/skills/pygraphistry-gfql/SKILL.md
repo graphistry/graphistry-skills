@@ -60,6 +60,23 @@ g2 = g.gfql(
 g2 = g.gfql("MATCH (a:Person)-[:KNOWS|COLLABORATES_WITH]->(b:Person) RETURN a.name, b.name")
 ```
 
+### Cypher node labels and DataFrame columns
+GFQL Cypher maps `:Label` to boolean columns, not string columns:
+- `MATCH (p:Person)` looks for boolean column `label__Person` being `True`
+- To use labels, **pre-create boolean label columns**: `nodes['label__Person'] = nodes['type'] == 'Person'`
+- OR match by property instead: `MATCH (p) WHERE p.type = 'Person'` (works with string columns)
+- OR use inline properties: `MATCH (p {type: 'Person'})`
+
+```python
+# Option A: property filter (works with any column)
+g2 = g.gfql("MATCH (p) WHERE p.type = 'Person' AND p.age > 30 RETURN p.name")
+
+# Option B: pre-create label columns for Cypher :Label syntax
+nodes['label__Person'] = nodes['type'] == 'Person'
+g = graphistry.edges(edges, 'src', 'dst').nodes(nodes, 'id')
+g2 = g.gfql("MATCH (p:Person) WHERE p.age > 30 RETURN p.name")
+```
+
 ### Supported Cypher clauses
 - **Full**: MATCH, WHERE, RETURN, WITH, ORDER BY, SKIP, LIMIT, DISTINCT, CALL graphistry.*, GRAPH {}, USE
 - **Partial**: OPTIONAL MATCH (bounded subset), UNWIND (top-level), UNION/UNION ALL (direct g.gfql() only)
