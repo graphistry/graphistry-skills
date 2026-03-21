@@ -124,7 +124,7 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=on`: **79% pass (26/33)**, avg score 0.93
   - `skills=off`: **6% pass (2/33)**
   - **Delta: +73pp pass rate improvement**
-  - Functional execution: 5/7 cases produce correct, executable GFQL code
+  - Separate functional execution check (code actually runs with pygraphistry): 5/7 produce correct results
 
 See:
 - [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark

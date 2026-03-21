@@ -117,7 +117,7 @@
       "prompt": "Write a minimal local GFQL traversal snippet that applies explicit hop bounds and returns a focused subgraph.",
       "checks": {
         "regex": [
-          "(gfql\\(|\\bchain\\(|\\bhop\\()",
+          "gfql\\(",
           "(min_hops\\s*=|max_hops\\s*=|hops\\s*=)"
         ]
       }

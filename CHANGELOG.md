@@ -26,13 +26,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Skills / graphistry (umbrella)**: Added Cypher/Let/DAG mention to Python SDK routing line.
 
 ### Tests
-- **Evals / GFQL deterministic (claude, skills=both, 26 cases)**:
-  - `skills=on`: **92% pass (24/26)**, avg score 0.976
-  - `skills=off`: **4% pass (1/26)**
-  - **Delta: +88pp pass rate improvement**
-- **Evals / GFQL functional execution (claude, skills=on, 7 cases)**:
-  - Chain-list + GRAPH constructor: 4/4 pass (code executes and produces correct results)
-  - Cypher label mapping bug caught by functional testing (fixed in skill)
+- **Evals / GFQL full suite (claude, skills=both, 33 cases × 2)**:
+  - `skills=on`: **79% pass (26/33)**, avg score 0.93
+  - `skills=off`: **6% pass (2/33)**
+  - **Delta: +73pp pass rate improvement**
+  - No regressions on existing suites (skill_pressure + guardrails: 16/19)
+- **Evals / GFQL functional execution (separate checker, skills=on, 7 cases)**:
+  - 5/7 cases produce correct executable GFQL code (chain-list, Cypher, GRAPH all pass)
+  - Cypher label-to-column mapping bug caught by functional testing (fixed in skill)
   - Functional testing validates code actually runs, not just pattern-matches
 
 ---

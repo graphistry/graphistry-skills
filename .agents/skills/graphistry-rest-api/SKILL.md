@@ -160,7 +160,7 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 ### Adapter M: REST vs Python/GFQL boundary
 - REST skill is for auth/upload/url/session/health endpoints and `graph.html` URL controls.
 - Named-endpoint REST flows are valid via `/api/v2/o/<org>/functions/{gfql|python}/...` and `/api/v2/o/<org>/run/{gfql|python}/...`.
-- For ad-hoc SDK GFQL tasks (`.gfql()`, query chaining, Python dataframe logic), route to `pygraphistry` / `pygraphistry-gfql`; do not invent generic endpoints like `/api/v2/gfql/query`.
+- For ad-hoc SDK GFQL tasks (`.gfql()` with chain-lists, Cypher strings, or Let/DAG, plus Python dataframe logic), route to `pygraphistry` / `pygraphistry-gfql`; do not invent generic endpoints like `/api/v2/gfql/query`.
 
 ### Adapter N: iframe URL API with collections + tricky settings
 - `https://hub.graphistry.com/graph/graph.html?dataset=<dataset_id>&play=0&bg=%23000000&linLog=true&showCollections=true&info=false&pointsOfInterestMax=0&collections=%5B%7B%22name%22%3A%22risk%22%7D%5D&collectionsGlobalNodeColor=00FF00`
