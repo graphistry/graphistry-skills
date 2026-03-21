@@ -1,0 +1,606 @@
+{
+  "generated_at": "2026-03-21T21:46:58.049149+00:00",
+  "inputs": [],
+  "inputs_redacted": true,
+  "input_count": 2,
+  "overall": {
+    "total": 66,
+    "passed": 28,
+    "pass_rate": 0.42424242424242425
+  },
+  "by_harness_and_mode": [
+    {
+      "total": 33,
+      "passed": 2,
+      "pass_rate": 0.06060606060606061,
+      "harness_ok": 24,
+      "harness_ok_rate": 0.7272727272727273,
+      "avg_latency_ms": 62983.09090909091,
+      "avg_score": 0.6244698062879881,
+      "harness": "claude",
+      "skills_mode": "off"
+    },
+    {
+      "total": 33,
+      "passed": 26,
+      "pass_rate": 0.7878787878787878,
+      "harness_ok": 32,
+      "harness_ok_rate": 0.9696969696969697,
+      "avg_latency_ms": 22257.909090909092,
+      "avg_score": 0.9310442083169356,
+      "harness": "claude",
+      "skills_mode": "on"
+    }
+  ],
+  "by_harness_model_and_mode": [
+    {
+      "total": 33,
+      "passed": 2,
+      "pass_rate": 0.06060606060606061,
+      "harness_ok": 24,
+      "harness_ok_rate": 0.7272727272727273,
+      "avg_latency_ms": 62983.09090909091,
+      "avg_score": 0.6244698062879881,
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off"
+    },
+    {
+      "total": 33,
+      "passed": 26,
+      "pass_rate": 0.7878787878787878,
+      "harness_ok": 32,
+      "harness_ok_rate": 0.9696969696969697,
+      "avg_latency_ms": 22257.909090909092,
+      "avg_score": 0.9310442083169356,
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on"
+    }
+  ],
+  "by_eval_intent": [
+    {
+      "total": 14,
+      "passed": 3,
+      "pass_rate": 0.21428571428571427,
+      "harness_ok": 9,
+      "harness_ok_rate": 0.6428571428571429,
+      "avg_latency_ms": 73419.5,
+      "avg_score": 0.6568181818181819,
+      "eval_intent": "functional"
+    },
+    {
+      "total": 12,
+      "passed": 7,
+      "pass_rate": 0.5833333333333334,
+      "harness_ok": 12,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19190.416666666668,
+      "avg_score": 0.8974867724867724,
+      "eval_intent": "guardrails"
+    },
+    {
+      "total": 40,
+      "passed": 18,
+      "pass_rate": 0.45,
+      "harness_ok": 35,
+      "harness_ok_rate": 0.875,
+      "avg_latency_ms": 38869.875,
+      "avg_score": 0.7841666666666667,
+      "eval_intent": "realistic_capability"
+    }
+  ],
+  "by_eval_intent_harness_and_mode": [
+    {
+      "total": 7,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "harness_ok": 3,
+      "harness_ok_rate": 0.42857142857142855,
+      "avg_latency_ms": 108889.0,
+      "avg_score": 0.5012987012987014,
+      "eval_intent": "functional",
+      "harness": "claude",
+      "skills_mode": "off"
+    },
+    {
+      "total": 7,
+      "passed": 3,
+      "pass_rate": 0.42857142857142855,
+      "harness_ok": 6,
+      "harness_ok_rate": 0.8571428571428571,
+      "avg_latency_ms": 37950.0,
+      "avg_score": 0.8123376623376624,
+      "eval_intent": "functional",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 6,
+      "passed": 1,
+      "pass_rate": 0.16666666666666666,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 19955.166666666668,
+      "avg_score": 0.794973544973545,
+      "eval_intent": "guardrails",
+      "harness": "claude",
+      "skills_mode": "off"
+    },
+    {
+      "total": 6,
+      "passed": 6,
+      "pass_rate": 1.0,
+      "harness_ok": 6,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 18425.666666666668,
+      "avg_score": 1.0,
+      "eval_intent": "guardrails",
+      "harness": "claude",
+      "skills_mode": "on"
+    },
+    {
+      "total": 20,
+      "passed": 1,
+      "pass_rate": 0.05,
+      "harness_ok": 15,
+      "harness_ok_rate": 0.75,
+      "avg_latency_ms": 59824.4,
+      "avg_score": 0.6164285714285714,
+      "eval_intent": "realistic_capability",
+      "harness": "claude",
+      "skills_mode": "off"
+    },
+    {
+      "total": 20,
+      "passed": 17,
+      "pass_rate": 0.85,
+      "harness_ok": 20,
+      "harness_ok_rate": 1.0,
+      "avg_latency_ms": 17915.35,
+      "avg_score": 0.9519047619047619,
+      "eval_intent": "realistic_capability",
+      "harness": "claude",
+      "skills_mode": "on"
+    }
+  ],
+  "by_grading_mode": [
+    {
+      "total": 66,
+      "passed": 28,
+      "pass_rate": 0.42424242424242425,
+      "harness_ok": 56,
+      "harness_ok_rate": 0.8484848484848485,
+      "avg_latency_ms": 42620.5,
+      "avg_score": 0.7777570073024619,
+      "grading_mode": "deterministic"
+    }
+  ],
+  "by_grading_source": [
+    {
+      "total": 66,
+      "passed": 28,
+      "pass_rate": 0.42424242424242425,
+      "harness_ok": 56,
+      "harness_ok_rate": 0.8484848484848485,
+      "avg_latency_ms": 42620.5,
+      "avg_score": 0.7777570073024619,
+      "grading_source": "deterministic"
+    }
+  ],
+  "kpi": {
+    "intents": [
+      "execution_grade",
+      "realistic_capability"
+    ],
+    "total": 40,
+    "passed": 18,
+    "pass_rate": 0.45,
+    "by_harness_and_mode": [
+      {
+        "total": 20,
+        "passed": 1,
+        "pass_rate": 0.05,
+        "harness_ok": 15,
+        "harness_ok_rate": 0.75,
+        "avg_latency_ms": 59824.4,
+        "avg_score": 0.6164285714285714,
+        "harness": "claude",
+        "skills_mode": "off"
+      },
+      {
+        "total": 20,
+        "passed": 17,
+        "pass_rate": 0.85,
+        "harness_ok": 20,
+        "harness_ok_rate": 1.0,
+        "avg_latency_ms": 17915.35,
+        "avg_score": 0.9519047619047619,
+        "harness": "claude",
+        "skills_mode": "on"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_chain_hop_bounds",
+      "score": 0.5,
+      "latency_ms": 122426.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_chain_hop_filter",
+      "score": 0.8181818181818182,
+      "latency_ms": 74133.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_cypher_match_filter",
+      "score": 0.8181818181818182,
+      "latency_ms": 87377.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_cypher_order_limit",
+      "score": 0.2727272727272727,
+      "latency_ms": 120434.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_edge_directions",
+      "score": 0.5,
+      "latency_ms": 114903.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_graph_constructor",
+      "score": 0.3,
+      "latency_ms": 120591.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_let_ref_dag",
+      "score": 0.3,
+      "latency_ms": 122359.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "guardrails",
+      "journey_id": "pygraphistry_gfql_backward_fixes_v1",
+      "case_id": "correct_imports",
+      "score": 0.8333333333333334,
+      "latency_ms": 9429.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "guardrails",
+      "journey_id": "pygraphistry_gfql_backward_fixes_v1",
+      "case_id": "cypher_not_blocked",
+      "score": 0.8888888888888888,
+      "latency_ms": 53093.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "guardrails",
+      "journey_id": "pygraphistry_gfql_backward_fixes_v1",
+      "case_id": "no_deprecated_chain",
+      "score": 0.3333333333333333,
+      "latency_ms": 8417.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "guardrails",
+      "journey_id": "pygraphistry_gfql_backward_fixes_v1",
+      "case_id": "no_hallucinated_methods",
+      "score": 0.8571428571428571,
+      "latency_ms": 17584.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "guardrails",
+      "journey_id": "pygraphistry_gfql_backward_fixes_v1",
+      "case_id": "remote_accepts_cypher",
+      "score": 0.8571428571428571,
+      "latency_ms": 16337.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_auto_detect",
+      "score": 0.3333333333333333,
+      "latency_ms": 14274.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_basic_match_return",
+      "score": 0.8333333333333334,
+      "latency_ms": 11142.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_graph_constructor",
+      "score": 0.5,
+      "latency_ms": 93311.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_multi_stage_use",
+      "score": 0.3333333333333333,
+      "latency_ms": 120562.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_multihop_pattern",
+      "score": 0.5,
+      "latency_ms": 34174.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_order_limit_params",
+      "score": 0.8571428571428571,
+      "latency_ms": 119177.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_remote_execution",
+      "score": 0.3333333333333333,
+      "latency_ms": 120507.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_type_alternation",
+      "score": 0.5,
+      "latency_ms": 33688.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_cypher_v1",
+      "case_id": "cypher_where_filter",
+      "score": 0.8333333333333334,
+      "latency_ms": 59136.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_basic_bindings",
+      "score": 0.3333333333333333,
+      "latency_ms": 120608.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_nested",
+      "score": 0.6666666666666666,
+      "latency_ms": 29483.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_ref_chain",
+      "score": 0.3333333333333333,
+      "latency_ms": 25229.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_with_astcall",
+      "score": 0.5714285714285714,
+      "latency_ms": 25035.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "astcall_degree_in_chain",
+      "score": 0.8,
+      "latency_ms": 21004.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "astcall_layout_in_pipeline",
+      "score": 0.8,
+      "latency_ms": 13765.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "mixed_chain_and_cypher",
+      "score": 0.6666666666666666,
+      "latency_ms": 120601.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "row_group_by_aggregation",
+      "score": 0.6666666666666666,
+      "latency_ms": 120508.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "row_order_limit",
+      "score": 0.6666666666666666,
+      "latency_ms": 16137.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "off",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "row_unwind",
+      "score": 0.8,
+      "latency_ms": 9827.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_cypher_match_filter",
+      "score": 0.8181818181818182,
+      "latency_ms": 15958.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_cypher_order_limit",
+      "score": 0.8181818181818182,
+      "latency_ms": 14465.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_edge_directions",
+      "score": 0.75,
+      "latency_ms": 71767.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "functional",
+      "journey_id": "pygraphistry_gfql_functional_v1",
+      "case_id": "func_let_ref_dag",
+      "score": 0.3,
+      "latency_ms": 120429.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_nested",
+      "score": 0.6666666666666666,
+      "latency_ms": 20269.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_let_dag_v1",
+      "case_id": "let_with_astcall",
+      "score": 0.5714285714285714,
+      "latency_ms": 17047.0
+    },
+    {
+      "harness": "claude",
+      "model": "default",
+      "skills_mode": "on",
+      "eval_intent": "realistic_capability",
+      "journey_id": "pygraphistry_gfql_row_pipeline_v1",
+      "case_id": "astcall_layout_in_pipeline",
+      "score": 0.8,
+      "latency_ms": 10091.0
+    }
+  ]
+}

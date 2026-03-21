@@ -120,9 +120,16 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
   - **Delta: +63.6pp pass rate improvement**
 
+- GFQL expansion suite (`claude`, GFQL Cypher/Let/DAG/functional journeys, `skills=both`, 33 cases × 2):
+  - `skills=on`: **79% pass (26/33)**, avg score 0.93
+  - `skills=off`: **6% pass (2/33)**
+  - **Delta: +73pp pass rate improvement**
+  - Functional execution: 5/7 cases produce correct, executable GFQL code
+
 See:
 - [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark
 - [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - REST suite benchmark
+- [benchmarks/reports/2026-03-21-gfql-expansion.md](benchmarks/reports/2026-03-21-gfql-expansion.md) - GFQL expansion benchmark
 - [benchmarks/README.md](benchmarks/README.md) - full benchmark pack history
 
 ## Docs

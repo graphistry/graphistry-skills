@@ -3,6 +3,11 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
+- GFQL expansion eval (2026-03-21, Claude):
+  - Data: `data/2026-03-21-gfql-expansion`
+  - Report: `reports/2026-03-21-gfql-expansion.md`
+  - Skills ON: 79% pass (26/33), Skills OFF: 6% pass (2/33), **+73pp delta**
+  - Includes functional execution testing (5/7 cases produce correct executable code)
 - REST phase2 full sweep (2026-03-07):
   - Data: `data/2026-03-07-rest-phase2-full-sweep`
   - Report: `reports/2026-03-07-rest-phase2-full-sweep.md`
