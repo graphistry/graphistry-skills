@@ -62,6 +62,41 @@ Use this while editing skill text.
   --failfast
 ```
 
+## GFQL Expansion Evals
+
+Run the GFQL-specific eval suites (deterministic):
+
+```bash
+./bin/agent.sh \
+  --claude \
+  --journeys pygraphistry_gfql_cypher_v1,pygraphistry_gfql_let_dag_v1,pygraphistry_gfql_backward_fixes_v1,pygraphistry_gfql_row_pipeline_v1 \
+  --skills-mode both \
+  --skills-delivery native \
+  --max-workers 2 \
+  --out "$OUT"
+```
+
+Run functional execution evals (code is actually executed with pygraphistry):
+
+```bash
+# Step 1: Generate responses
+./bin/agent.sh \
+  --claude \
+  --journeys pygraphistry_gfql_functional_v1 \
+  --skills-mode on \
+  --skills-delivery native \
+  --max-workers 2 \
+  --out "$OUT"
+
+# Step 2: Execute generated code and validate results
+cd ~/Work/pygraphistry && PYTHONPATH="$PWD" python3 \
+  /path/to/graphistry-skills/scripts/evals/gfql_functional_check.py \
+  --rows "$OUT/rows.jsonl" \
+  --journey-dir /path/to/graphistry-skills/evals/journeys
+```
+
+The functional checker extracts Python code blocks from responses, runs them with pygraphistry, and validates: no exceptions, expected output strings, correct result shapes.
+
 ## Grading Modes (Deterministic / Oracle / Hybrid)
 
 Default eval scoring is deterministic checks from each journey case.

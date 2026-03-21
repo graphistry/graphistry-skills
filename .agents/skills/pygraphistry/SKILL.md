@@ -1,6 +1,6 @@
 ---
 name: pygraphistry
-description: "TOC router for PyGraphistry tasks. Use when a request involves PyGraphistry and you need to choose the right workflow: loading/ETL shaping, visualization/layout/sharing, GFQL or hop/chain traversal/search, AI/UMAP/embed/semantic-search workflows, or connector-specific ingestion."
+description: "TOC router for PyGraphistry tasks. Use when a request involves PyGraphistry and you need to choose the right workflow: loading/ETL shaping, visualization/layout/sharing, GFQL queries (Cypher, chain-lists, Let/DAG, GRAPH constructors), AI/UMAP/embed/semantic-search workflows, or connector-specific ingestion."
 ---
 
 # PyGraphistry Router
@@ -12,7 +12,7 @@ Treat this as the Python SDK entrypoint; for a cross-interface entrypoint use `g
 - Setup/auth/first plot from tables: use `pygraphistry-core`.
 - Direct Graphistry REST endpoint requests (`curl`, `/api/v2/...`, JWT/Bearer, upload/session/url params): immediately use `graphistry-rest-api` and skip ReadTheDocs discovery.
 - Styling/layout/static output/privacy and sharing: use `pygraphistry-visualization`.
-- Pattern matching, hops/chains, predicates, remote graph queries: use `pygraphistry-gfql`.
+- Pattern matching, GFQL/Cypher queries, Let/DAG bindings, GRAPH constructors, predicates, remote graph queries: use `pygraphistry-gfql`.
 - UMAP/DBSCAN/embedding/anomaly and graph-AI notebooks: use `pygraphistry-ai`.
 - Database/platform integrations (Neo4j, Splunk, Kusto, Databricks, SQL, etc.): use `pygraphistry-connectors`.
 
