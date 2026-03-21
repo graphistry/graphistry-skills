@@ -127,7 +127,7 @@ g2.plot()
 
 ## Focused subgraph views (collection-like workflow)
 ```python
-# Use GFQL slices to publish multiple focused views from one base graph
+# Use GFQL slices to publish multiple focused views from one base graph (use .gfql(), not deprecated .chain())
 high_risk = g.gfql([...]).name('high-risk-slice')
 partner_flow = g.gfql([...]).name('partner-flow-slice')
 urls = [high_risk.plot(render=False), partner_flow.plot(render=False)]

@@ -186,7 +186,7 @@ echo "${GRAPHISTRY_HOST%/}/graph/graph.html?dataset=${DATASET_ID}"
 - Pair with upload lifecycle references: `/api/v2/upload/files/` then `/api/v2/upload/datasets/`.
 
 ### Adapter R: GFQL -> REST iframe handoff
-- Python/GFQL layer: run extraction in SDK (`.gfql(...)` / `gfql_remote(...)`).
+- Python/GFQL layer: run extraction in SDK (`.gfql(...)` / `gfql_remote(...)`) — supports chain-list, Cypher strings, and Let/DAG bindings.
 - REST layer: use auth/upload/dataset/session endpoints (`/api-token-auth/`, `/api/v2/upload/datasets/`).
 - Boundary: no generic REST GFQL query endpoint; do not invent `/api/v2/gfql/query`.
 - Share/render: use `graph.html?dataset=<dataset_id>` (optionally `&session=<session_id>`), keep JWT out of URL params.
