@@ -2,7 +2,12 @@
   "id": "pygraphistry_gfql_let_dag_v1",
   "description": "GFQL Let/DAG binding journey cases: basic bindings, ref chains, output selection, nested lets, ASTCall integration.",
   "eval_intent": "realistic_capability",
-  "tags": ["pygraphistry", "gfql", "let-dag", "skills-expansion"],
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "let-dag",
+    "skills-expansion"
+  ],
   "cases": [
     {
       "id": "let_basic_bindings",
@@ -17,7 +22,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -49,7 +56,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -81,7 +90,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -101,7 +112,7 @@
     },
     {
       "id": "let_nested",
-      "prompt": "Write complete Python code for a multi-level analytical GFQL pipeline: first, within an inner scope, find all person nodes and expand to their direct contacts. Then in an outer scope, take that inner result and traverse ownership edges to find what those contacts own. Use nested GFQL bindings (let inside let, or nested GRAPH stages). Do not look up any docs — write the code directly.",
+      "prompt": "Write complete Python code for a multi-level analytical GFQL pipeline: first, within an inner scope, find all person nodes and expand to their direct contacts. Then in an outer scope, take that inner result and traverse ownership edges to find what those contacts own. Use nested GFQL bindings (let inside let, or nested GRAPH stages). Do not look up any docs \u2014 write the code directly.",
       "checks": {
         "regex": [
           "(let\\(|GRAPH\\s+\\w+\\s*=\\s*GRAPH)",
@@ -112,7 +123,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -132,7 +145,7 @@
     },
     {
       "id": "let_with_astcall",
-      "prompt": "Write complete Python code: define a reusable set of high-risk accounts, then find their 2-hop neighborhoods, compute degrees on the resulting subgraph, and style the output by encoding node color based on the degree values. Combine named bindings with degree computation and visual encoding in a single GFQL pipeline. Do not look up any docs — write the code directly.",
+      "prompt": "Write complete Python code: define a reusable set of high-risk accounts, then find their 2-hop neighborhoods, compute degrees on the resulting subgraph, and style the output by encoding node color based on the degree values. Combine named bindings with degree computation and visual encoding in a single GFQL pipeline. Do not look up any docs \u2014 write the code directly.",
       "checks": {
         "regex": [
           "(let\\(|GRAPH\\s+\\w+\\s*=\\s*GRAPH)",
@@ -144,7 +157,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,

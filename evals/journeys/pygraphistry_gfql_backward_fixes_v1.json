@@ -2,7 +2,13 @@
   "id": "pygraphistry_gfql_backward_fixes_v1",
   "description": "Guardrail cases verifying GFQL skill does not produce deprecated, hallucinated, or outdated patterns.",
   "eval_intent": "guardrails",
-  "tags": ["pygraphistry", "gfql", "guardrails", "backward-fixes", "skills-expansion"],
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "guardrails",
+    "backward-fixes",
+    "skills-expansion"
+  ],
   "cases": [
     {
       "id": "no_deprecated_chain",
@@ -14,7 +20,9 @@
         "must_not_contain": [
           ".chain(",
           "chain_remote("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -39,7 +47,9 @@
           "from graphistry.compute.ast import",
           "from graphistry.compute.predicates import",
           "from graphistry.gfql import"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -65,7 +75,9 @@
           "connect_graphistry(",
           "execute_query(",
           "remote_query("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -118,7 +130,9 @@
           "e_backward(",
           "only forward",
           "only supports forward"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -146,7 +160,9 @@
           "cypher is not supported remotely",
           "remote does not accept strings",
           "chain_remote("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,

@@ -2,7 +2,13 @@
   "id": "pygraphistry_gfql_row_pipeline_v1",
   "description": "Row pipeline, ASTCall, and mixed-paradigm journey cases for GFQL expansion.",
   "eval_intent": "realistic_capability",
-  "tags": ["pygraphistry", "gfql", "row-pipeline", "astcall", "skills-expansion"],
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "row-pipeline",
+    "astcall",
+    "skills-expansion"
+  ],
   "cases": [
     {
       "id": "row_group_by_aggregation",
@@ -17,7 +23,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -33,12 +41,14 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
       "id": "row_unwind",
-      "prompt": "Write complete Python code using PyGraphistry GFQL: I have a graph of Article nodes where each article has a tags property containing a list of strings. Write a GFQL query that uses UNWIND to expand each article's tags into individual rows (one row per article-tag pair), then count how many articles use each tag, returning the tag and its count sorted by count descending. Do not look up any docs — write the code directly.",
+      "prompt": "Write complete Python code using PyGraphistry GFQL: I have a graph of Article nodes where each article has a tags property containing a list of strings. Write a GFQL query that uses UNWIND to expand each article's tags into individual rows (one row per article-tag pair), then count how many articles use each tag, returning the tag and its count sorted by count descending. Do not look up any docs \u2014 write the code directly.",
       "checks": {
         "regex": [
           "(?i)(unwind|UNWIND)",
@@ -48,7 +58,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -63,7 +75,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -77,7 +91,7 @@
     },
     {
       "id": "astcall_layout_in_pipeline",
-      "prompt": "Write complete Python code: first filter a PyGraphistry knowledge graph to a subgraph of Concept nodes connected by RELATED_TO edges using GFQL, then apply an igraph layout (like layout_igraph or CALL graphistry.layout) to make the visualization readable, and plot the result. Do not look up any docs — write the code directly.",
+      "prompt": "Write complete Python code: first filter a PyGraphistry knowledge graph to a subgraph of Concept nodes connected by RELATED_TO edges using GFQL, then apply an igraph layout (like layout_igraph or CALL graphistry.layout) to make the visualization readable, and plot the result. Do not look up any docs \u2014 write the code directly.",
       "checks": {
         "regex": [
           "(?i)(call\\(|layout_igraph|layout_|CALL\\s+graphistry\\.layout|ASTCall|igraph)",
@@ -87,7 +101,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
