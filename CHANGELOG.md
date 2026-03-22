@@ -8,6 +8,32 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Skills / pygraphistry-gfql**: Major expansion — added Cypher string support (MATCH/WHERE/RETURN/ORDER BY/LIMIT, parameterized queries, type alternation, variable-length paths), GRAPH {} constructor with multi-stage USE pipelines, Let/DAG bindings (let/ref/output/nested), edge direction variants (e_forward/e_reverse/e_undirected/e), and remote mode for Cypher + Let queries.
+- **Evals / GFQL journeys**: Added 5 new eval suites with 33 total cases:
+  - `pygraphistry_gfql_cypher_v1` (9 cases): Cypher basics, advanced patterns, GRAPH constructor, remote execution.
+  - `pygraphistry_gfql_let_dag_v1` (5 cases): Let/DAG bindings, ref chains, output selection, nested lets, ASTCall integration.
+  - `pygraphistry_gfql_backward_fixes_v1` (6 cases): guardrails for deprecated chain(), correct imports, no hallucinated methods, Cypher acknowledgment, edge directions, remote Cypher.
+  - `pygraphistry_gfql_row_pipeline_v1` (6 cases): GROUP BY/aggregation, ORDER BY/LIMIT, UNWIND, ASTCall degree/layout, mixed chain+Cypher paradigm.
+  - `pygraphistry_gfql_functional_v1` (7 cases): Functional execution evals — generated code must be self-contained, executable, and produce correct results. Multi-level grading: regex, AST parse, execution, result correctness.
+- **Evals / Functional checker**: Added `scripts/evals/gfql_functional_check.py` — post-eval script that extracts code from eval responses, executes with pygraphistry, and validates output correctness.
+- **Skills / cross-repo consistency**: Updated pygraphistry router, graphistry umbrella router, and pygraphistry-core to reflect Cypher/Let/DAG routing and chain()/hop() deprecation.
+
+### Changed
+- **Skills / pygraphistry-gfql**: Marked `chain()` and `hop()` as deprecated — skill now directs agents to use `gfql()` exclusively. Updated description to reflect Cypher + Let/DAG coverage. Added Cypher label-to-column mapping guidance. Added new canonical doc URLs for Cypher syntax guide and Cypher-GFQL mapping.
+- **Skills / pygraphistry (router)**: Updated routing to mention Cypher/Let/DAG/GRAPH explicitly; removed deprecated hop/chain terminology.
+- **Skills / pygraphistry-core**: Replaced chain()/hop() shorthand guidance with deprecation notice.
+- **Skills / graphistry (umbrella)**: Added Cypher/Let/DAG mention to Python SDK routing line.
+
+### Tests
+- **Evals / GFQL full suite (claude, skills=on, 33 cases)**:
+  - `skills=on`: **82% pass (27/33)**, avg score 0.95
+  - No regressions on existing suites (skill_pressure + guardrails + e2e: 15/23 with GFQL cases all passing)
+- **Evals / GFQL functional execution (separate checker, skills=on, 7 cases)**:
+  - 4/7 cases produce correct executable GFQL code (chain-list, GRAPH constructor pass)
+  - Cypher label-to-column mapping bug caught by functional testing (fixed in skill)
+  - Functional testing validates code actually runs, not just pattern-matches
+
 ---
 
 ## [0.3.0 - 2026-03-08]

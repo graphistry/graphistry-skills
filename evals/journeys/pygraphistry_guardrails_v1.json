@@ -115,7 +115,7 @@
       "prompt": "Provide one short GFQL snippet on a bound remote dataset that explicitly traverses an edge pattern using real methods (prefer n/e/e_forward). Avoid invented helper names.",
       "checks": {
         "regex": [
-          "(gfql_remote\\(|\\.gfql\\(|\\bchain\\()",
+          "(gfql_remote\\(|\\.gfql\\()",
           "n\\(",
           "(e_forward\\(|e\\()",
           "(bind\\(|dataset_id|remote)"
@@ -135,7 +135,7 @@
         "reference_answer": "A strong answer demonstrates a remote GFQL call with explicit node/edge pattern primitives and no invented APIs.",
         "rubric": [
           "Must include gfql_remote with explicit node/edge traversal primitives.",
-          "Must avoid hop/chain shorthand and invented helper names.",
+          "Should prefer gfql()/gfql_remote() over deprecated hop/chain shorthand.",
           "Should be concise and syntactically plausible."
         ],
         "required_concepts": [

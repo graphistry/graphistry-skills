@@ -1,0 +1,182 @@
+{
+  "id": "pygraphistry_gfql_let_dag_v1",
+  "description": "GFQL Let/DAG binding journey cases: basic bindings, ref chains, output selection, nested lets, ASTCall integration.",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "let-dag",
+    "skills-expansion"
+  ],
+  "cases": [
+    {
+      "id": "let_basic_bindings",
+      "prompt": "I have a graph of financial transactions. I want to define a reusable set of high-risk accounts (risk_score above 0.8) and separately identify accounts created this quarter, then run both as a single GFQL query. Show me how to name these intermediate results so I can reference them later.",
+      "checks": {
+        "regex": [
+          "let\\(",
+          "(ASTLet|let\\(\\s*\\{)",
+          "(ref\\(|ASTRef)",
+          "gfql\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer demonstrates let() with a dict-of-bindings that defines independent named intermediate results on the root graph, then executes the whole DAG via gfql().",
+        "rubric": [
+          "Must use let() with a dict-of-bindings to name intermediate results.",
+          "Must define independent bindings on the root graph for high-risk and recent accounts.",
+          "Must execute the pipeline via gfql() or an equivalent GFQL entry point.",
+          "Must show how ref() or ASTRef is used to reference named bindings."
+        ],
+        "required_concepts": [
+          "dict-of-bindings in let",
+          "independent bindings on root graph",
+          "gfql execution"
+        ]
+      }
+    },
+    {
+      "id": "let_ref_chain",
+      "prompt": "Starting from the named set of flagged accounts I already defined, I need to find their 2-hop transaction neighborhoods and then filter that neighborhood to only include edges where the amount exceeds 10000. Show me how to build on a previously named result with additional traversal and filtering steps.",
+      "checks": {
+        "regex": [
+          "ref\\(",
+          "let\\(",
+          "(e_forward|e_reverse|e_undirected|e\\()",
+          "(max_hops|min_hops|hops)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer shows ref() referencing a previously named binding, then chains traversal steps (e_forward/e/etc.) with hop parameters, and applies edge filtering on the result.",
+        "rubric": [
+          "Must use ref() to reference a previously named binding.",
+          "Must chain traversal steps (e_forward, e_reverse, or e) after the ref.",
+          "Must include hop parameters (max_hops, min_hops, or hops) for multi-hop traversal.",
+          "Must demonstrate correct scope rules where later bindings build on earlier ones."
+        ],
+        "required_concepts": [
+          "ref referencing named binding",
+          "chained traversal after ref",
+          "scope rules"
+        ]
+      }
+    },
+    {
+      "id": "let_output_selection",
+      "prompt": "I have a multi-step GFQL pipeline with several named intermediate results -- seed accounts, their neighborhoods, and a filtered subset. When I run the whole DAG, I only want to get back the filtered subset, not everything. How do I select which named result is returned?",
+      "checks": {
+        "regex": [
+          "output\\s*=",
+          "let\\(",
+          "gfql\\(",
+          "ref\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer demonstrates the output= parameter to select which named binding is returned from a multi-binding let/gfql pipeline.",
+        "rubric": [
+          "Must use the output= parameter to select a specific named result.",
+          "Must demonstrate a multi-binding let with at least two named intermediate results.",
+          "Must execute via gfql() and show how the selected output is returned.",
+          "Must clarify that unselected bindings are computed but not returned."
+        ],
+        "required_concepts": [
+          "output= parameter",
+          "multi-binding let"
+        ]
+      }
+    },
+    {
+      "id": "let_nested",
+      "prompt": "Write complete Python code for a multi-level analytical GFQL pipeline: first, within an inner scope, find all person nodes and expand to their direct contacts. Then in an outer scope, take that inner result and traverse ownership edges to find what those contacts own. Use nested GFQL bindings (let inside let, or nested GRAPH stages). Do not look up any docs \u2014 write the code directly.",
+      "checks": {
+        "regex": [
+          "(let\\(|GRAPH\\s+\\w+\\s*=\\s*GRAPH)",
+          "(ref\\(|USE\\s+\\w+)",
+          "(e_forward|e_reverse|e_undirected|e\\(|->|<-|-\\[)",
+          "(n\\(|:Person|person)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer demonstrates a nested let() inside another let(), where an inner scope defines person-to-contact expansion and an outer scope references the inner result to traverse ownership edges.",
+        "rubric": [
+          "Must use nested let() calls (a let inside another let).",
+          "Must use ref() to bridge between inner and outer scopes.",
+          "Must include node matching with n() and edge traversal with e_forward/e_reverse/e.",
+          "Must clearly show how the inner scope result feeds into the outer scope."
+        ],
+        "required_concepts": [
+          "nested let inside let",
+          "ref bridging scopes"
+        ]
+      }
+    },
+    {
+      "id": "let_with_astcall",
+      "prompt": "Write complete Python code: define a reusable set of high-risk accounts, then find their 2-hop neighborhoods, compute degrees on the resulting subgraph, and style the output by encoding node color based on the degree values. Combine named bindings with degree computation and visual encoding in a single GFQL pipeline. Do not look up any docs \u2014 write the code directly.",
+      "checks": {
+        "regex": [
+          "(let\\(|GRAPH\\s+\\w+\\s*=\\s*GRAPH)",
+          "(call\\(|ASTCall|get_degrees|CALL\\s+graphistry\\.degree|degree)",
+          "(encode_point_color|encode_edge_color|encode_point_size)",
+          "(ref\\(|USE\\s+\\w+)",
+          "gfql\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A strong answer shows let() with named bindings integrated with ASTCall or call() for degree computation, followed by visual encoding (encode_point_color or similar) on the results, all executed via gfql().",
+        "rubric": [
+          "Must use let() with named bindings in a GFQL pipeline.",
+          "Must integrate ASTCall or call() for degree computation (get_degrees, get_indegrees, or get_outdegrees).",
+          "Must include visual encoding (encode_point_color, encode_edge_color, or encode_point_size) based on computed values.",
+          "Must use ref() to chain bindings and gfql() to execute the full pipeline."
+        ],
+        "required_concepts": [
+          "let with ASTCall integration",
+          "degree computation inside DAG",
+          "visual encoding"
+        ]
+      }
+    }
+  ]
+}

@@ -155,7 +155,7 @@
     },
     {
       "id": "persona_connector_analyst_workflow",
-      "prompt": "Provide a concise connector-oriented workflow for Neo4j or Splunk with a dataframe-first fallback: mention connector choice, include explicit edges(...).nodes(...) shaping, run one GFQL filter using explicit .gfql([...]) (not chain()/hop()), set privacy mode (private or organization), and produce plot(render=False). If auth is shown, use environment variables only (no username/password string literals). Return one compact code block with minimal prose.",
+      "prompt": "Provide a concise connector-oriented workflow for Neo4j or Splunk with a dataframe-first fallback: mention connector choice, include explicit edges(...).nodes(...) shaping, run one GFQL filter using .gfql([...]) or .gfql(\"MATCH ...\"), set privacy mode (private or organization), and produce plot(render=False). If auth is shown, use environment variables only (no username/password string literals). Return one compact code block with minimal prose.",
       "checks": {
         "regex": [
           "(?i)(neo4j|splunk)",

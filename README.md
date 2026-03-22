@@ -13,7 +13,7 @@ Strong frontier models often already know core Graphistry/PyGraphistry patterns 
 - `pygraphistry`: Python SDK router.
 - `pygraphistry-core`: auth, shaping, and first plot workflows.
 - `pygraphistry-visualization`: bindings/encodings/layout/privacy/share patterns.
-- `pygraphistry-gfql`: GFQL extraction/pattern workflows.
+- `pygraphistry-gfql`: GFQL extraction/pattern workflows — chain-list syntax, Cypher strings, Let/DAG bindings, GRAPH constructors, remote execution.
 - `pygraphistry-ai`: embedding, UMAP/DBSCAN, anomaly workflows.
 - `pygraphistry-connectors`: connector/integration workflows.
 
@@ -120,9 +120,14 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
   - **Delta: +63.6pp pass rate improvement**
 
+- GFQL expansion suite (`claude`, GFQL Cypher/Let/DAG/functional journeys, `skills=on`, 33 cases):
+  - `skills=on`: **82% pass (27/33)**, avg score 0.95
+  - Separate functional execution check (code actually runs with pygraphistry): 4/7 produce correct results
+
 See:
 - [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark
 - [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - REST suite benchmark
+- [benchmarks/reports/2026-03-21-gfql-expansion.md](benchmarks/reports/2026-03-21-gfql-expansion.md) - GFQL expansion benchmark
 - [benchmarks/README.md](benchmarks/README.md) - full benchmark pack history
 
 ## Docs

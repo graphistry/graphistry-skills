@@ -8,7 +8,7 @@ description: "Umbrella router for Graphistry workflows across SDK and API surfac
 Use this skill as the shared entrypoint across Graphistry interfaces.
 
 ## Route By Interface
-- Python SDK tasks (`import graphistry`, DataFrame shaping, `.plot()`, `.gfql()`, PyGraphistry notebooks): use `pygraphistry`.
+- Python SDK tasks (`import graphistry`, DataFrame shaping, `.plot()`, `.gfql()` including Cypher/Let/DAG, PyGraphistry notebooks): use `pygraphistry`.
 - REST API tasks (`curl`, `/api/v2/...`, JWT/Bearer auth, upload endpoints, `graph.html` URL params): use `graphistry-rest-api`.
 - JavaScript/TypeScript SDK tasks (`@graphistry/*`, browser/frontend integrations): use `graphistry-js` when available.
 
