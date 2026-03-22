@@ -12,7 +12,9 @@
           "gfql\\(",
           "edge_query\\s*(=\\s*f?['\\\"]|\\()",
           "(?i)type"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -23,7 +25,9 @@
           "where\\s*=\\s*\\[",
           "compare\\(",
           "col\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -36,7 +40,9 @@
           "max_hops\\s*=\\s*\\d+",
           "output_min_hops\\s*=\\s*\\d+",
           "output_max_hops\\s*=\\s*\\d+"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -46,7 +52,9 @@
         "regex": [
           "gfql_remote\\(",
           "node_col_subset\\s*=\\s*\\["
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {

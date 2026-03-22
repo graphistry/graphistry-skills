@@ -25,6 +25,8 @@
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
         ],
+        "python_block": true,
+        "python_ast_parse": true,
         "max_lines": 90
       },
       "oracle": {
@@ -59,6 +61,8 @@
           "url_params",
           "\\.plot\\("
         ],
+        "python_block": true,
+        "python_ast_parse": true,
         "max_lines": 70
       },
       "oracle": {
@@ -91,6 +95,8 @@
           "privacy\\(mode\\s*=\\s*['\\\"](private|organization)['\\\"]\\)",
           "plot\\(render\\s*=\\s*False\\)"
         ],
+        "python_block": true,
+        "python_ast_parse": true,
         "max_lines": 75
       },
       "oracle": {
@@ -131,6 +137,8 @@
           "personal_key_id\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
           "personal_key_secret\\s*=\\s*['\\\"][^'\\\"]+['\\\"]"
         ],
+        "python_block": true,
+        "python_ast_parse": true,
         "max_lines": 80
       },
       "oracle": {
