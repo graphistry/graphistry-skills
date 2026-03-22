@@ -25,8 +25,8 @@ import graphistry
 
 graphistry.register(
     api=3,
-    username=os.environ['GRAPHISTRY_USERNAME'],
-    password=os.environ['GRAPHISTRY_PASSWORD']
+    username=os.environ.get('GRAPHISTRY_USERNAME'),
+    password=os.environ.get('GRAPHISTRY_PASSWORD')
 )
 ```
 

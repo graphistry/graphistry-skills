@@ -61,17 +61,13 @@ g2 = g.gfql("MATCH (a:Person)-[:KNOWS|COLLABORATES_WITH]->(b:Person) RETURN a.na
 ```
 
 ### Cypher node labels and DataFrame columns
-GFQL Cypher maps `:Label` to boolean columns, not string columns:
-- `MATCH (p:Person)` looks for boolean column `label__Person` being `True`
-- To use labels, **pre-create boolean label columns**: `nodes['label__Person'] = nodes['type'] == 'Person'`
-- OR match by property instead: `MATCH (p) WHERE p.type = 'Person'` (works with string columns)
-- OR use inline properties: `MATCH (p {type: 'Person'})`
+GFQL Cypher maps `:Label` to boolean columns `label__<Label>`, not string columns. **Prefer property filters** (simpler, works with any column):
 
 ```python
-# Option A: property filter (works with any column)
+# Recommended: property filter (works with any string/numeric column)
 g2 = g.gfql("MATCH (p) WHERE p.type = 'Person' AND p.age > 30 RETURN p.name")
 
-# Option B: pre-create label columns for Cypher :Label syntax
+# Alternative: pre-create boolean label columns for Cypher :Label syntax
 nodes['label__Person'] = nodes['type'] == 'Person'
 g = graphistry.edges(edges, 'src', 'dst').nodes(nodes, 'id')
 g2 = g.gfql("MATCH (p:Person) WHERE p.age > 30 RETURN p.name")
@@ -115,12 +111,10 @@ result = g.gfql(let({...}), output='neighborhoods')
 ```
 
 ```python
-# Nested let: inner scope builds contact graph, outer traverses ownership
+# Multi-stage DAG: sequential refs build on each other
 result = g.gfql(let({
-    'contacts': let({
-        'people': n({'type': 'person'}),
-        'direct_contacts': ref('people', [e_forward({'rel': 'contacts'}), n()])
-    }),
+    'people': n({'type': 'person'}),
+    'contacts': ref('people', [e_forward({'rel': 'contacts'}), n()]),
     'owned': ref('contacts', [e_forward({'rel': 'owns'}), n()])
 }), output='owned')
 ```
@@ -138,8 +132,7 @@ result = result.get_degrees().encode_point_color('degree', as_continuous=True)
 
 - **Independent bindings** operate on the root graph
 - **ref()** bindings operate on the referenced binding's output
-- **Nested let**: `let()` can contain other `let()` for sub-DAG composition
-- **NEVER use `.chain()`** — it is deprecated. Always use `.gfql()` instead
+- **Multi-stage DAGs**: chain refs sequentially — each binding can reference earlier bindings
 
 ## Targeted patterns (high signal)
 ```python
