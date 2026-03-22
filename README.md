@@ -120,8 +120,10 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
   - **Delta: +63.6pp pass rate improvement**
 
-- GFQL expansion suite (`claude`, GFQL Cypher/Let/DAG/functional journeys, `skills=on`, 33 cases):
+- GFQL expansion suite (`claude`, GFQL Cypher/Let/DAG/functional journeys, `skills=both`, 33 cases × 2):
   - `skills=on`: **82% pass (27/33)**, avg score 0.95
+  - `skills=off`: **6% pass (2/33)**
+  - **Delta: +76pp pass rate improvement**
   - Separate functional execution check (code actually runs with pygraphistry): 4/7 produce correct results
 
 See:
