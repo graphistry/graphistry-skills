@@ -16,7 +16,7 @@
           "edges\\(",
           "\\.nodes\\(",
           "(groupby\\(|value_counts\\(|degree|in_degree|out_degree)",
-          "(gfql\\(|\\bhop\\(|\\bchain\\()",
+          "gfql\\(",
           "encode_",
           "privacy\\(mode\\s*=\\s*['\\\"]private['\\\"][^)]*\\)",
           "plot\\(render\\s*=\\s*False[^)]*\\)"

@@ -22,7 +22,8 @@ description: "Select and use PyGraphistry connector and plugin workflows for gra
 - In concise snippets, prefer explicit privacy literals (`'private'` or `'organization'`) over placeholder variables.
 
 ## Connector triage rubric
-- Use native graph-db connectors (`cypher`, Neptune/TigerGraph flows) when traversal is best expressed upstream.
+- Use native graph-db connectors (`cypher()`, Neptune/TigerGraph flows) when traversal is best expressed upstream.
+- For local Cypher-style queries on in-memory PyGraphistry graphs (no external DB), use `g.gfql("MATCH ...")`. Note: `graphistry.cypher()` is a distinct Neo4j/Memgraph/Neptune connector, not the same as local GFQL Cypher.
 - Use SQL/log source extraction when your source is tabular or SIEM-centric, then bind in PyGraphistry.
 - If unsure, start with source-native query -> dataframe -> `edges()/nodes()`, then optimize connector depth.
 
@@ -34,9 +35,14 @@ description: "Select and use PyGraphistry connector and plugin workflows for gra
 
 ## Minimal examples
 ```python
-# Neo4j-style cypher path (example)
+# Neo4j/Memgraph/Neptune connector (runs query on external DB server)
 g = graphistry.cypher('MATCH (a)-[r]->(b) RETURN a,b,r')
 g.plot()
+```
+
+```python
+# Local Cypher via GFQL (no external DB needed — preferred for local graphs)
+g2 = g.gfql("MATCH (a)-[r]->(b) WHERE a.score > 10 RETURN a.id, b.id")
 ```
 
 ```python
