@@ -65,11 +65,17 @@ git tag -a vX.Y.Z -m "Release vX.Y.Z"
 git push origin vX.Y.Z
 ```
 
-### 7) Publish GitHub release
+### 7) Clean up release branch
+```bash
+git branch -d release/vX.Y.Z
+git push origin --delete release/vX.Y.Z
+```
+
+### 8) Publish GitHub release
 ```bash
 gh release create vX.Y.Z \
   --title "vX.Y.Z" \
-  --notes-file /tmp/release_vX.Y.Z.md
+  --generate-notes
 ```
 
 ## Guardrails
