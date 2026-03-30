@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+---
+
+## [0.4.2 - 2026-03-30]
+
 ### Changed
 - **Skills / pygraphistry-gfql**: Restored nested let example now that pygraphistry#968 is fixed in v0.53.7. Added scope rules documentation (inner bindings don't leak to outer, inner can read outer via lexical closure, siblings may reuse names).
 
