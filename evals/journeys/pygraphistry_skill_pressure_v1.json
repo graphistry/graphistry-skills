@@ -19,7 +19,9 @@
         "must_not_contain": [
           "EXAMPLE_USERNAME_LITERAL",
           "EXAMPLE_PASSWORD_LITERAL"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -65,7 +67,9 @@
           "encode_point_size\\(",
           "url_params",
           "\\.plot\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -117,9 +121,11 @@
       "prompt": "Write a minimal local GFQL traversal snippet that applies explicit hop bounds and returns a focused subgraph.",
       "checks": {
         "regex": [
-          "(gfql\\(|\\bchain\\(|\\bhop\\()",
+          "gfql\\(",
           "(min_hops\\s*=|max_hops\\s*=|hops\\s*=)"
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -129,7 +135,9 @@
         "regex": [
           "gfql_remote\\(",
           "python_remote_(table|g|json)\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -138,7 +146,9 @@
       "checks": {
         "regex": [
           "\\b(hop|chain)\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       },
       "oracle": {
         "enabled": true,
@@ -162,7 +172,9 @@
         "regex": [
           "umap\\(",
           "dbscan\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {
@@ -172,7 +184,9 @@
         "regex": [
           "search\\(",
           "(umap|featurize|embed)\\("
-        ]
+        ],
+        "python_block": true,
+        "python_ast_parse": true
       }
     },
     {

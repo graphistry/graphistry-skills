@@ -1,0 +1,144 @@
+{
+  "id": "pygraphistry_gfql_row_pipeline_v1",
+  "description": "Row pipeline, ASTCall, and mixed-paradigm journey cases for GFQL expansion.",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "row-pipeline",
+    "astcall",
+    "skills-expansion"
+  ],
+  "cases": [
+    {
+      "id": "row_group_by_aggregation",
+      "prompt": "I have a graph of employees and departments connected by WORKS_IN edges. Using PyGraphistry GFQL, write a query that counts the number of employees per department and computes the average salary by department. Return the department name, employee count, and average salary.",
+      "checks": {
+        "regex": [
+          "(?i)(group_by|groupby|GROUP\\s+BY|count\\()",
+          "(?i)(count|COUNT)",
+          "(?i)(avg|mean|average|AVG)",
+          "(?i)gfql\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      }
+    },
+    {
+      "id": "row_order_limit",
+      "prompt": "Using PyGraphistry GFQL, query a social network graph to find the top 10 users by follower count. The graph has User nodes with a followers property and FOLLOWS edges. Return the user name and follower count, sorted descending by followers.",
+      "checks": {
+        "regex": [
+          "(?i)(order_by|ORDER\\s+BY)",
+          "(?i)(limit|LIMIT)",
+          "(?i)(desc|DESC)",
+          "(?i)gfql\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      }
+    },
+    {
+      "id": "row_unwind",
+      "prompt": "Write complete Python code using PyGraphistry GFQL: I have a graph of Article nodes where each article has a tags property containing a list of strings. Write a GFQL query that uses UNWIND to expand each article's tags into individual rows (one row per article-tag pair), then count how many articles use each tag, returning the tag and its count sorted by count descending. Do not look up any docs \u2014 write the code directly.",
+      "checks": {
+        "regex": [
+          "(?i)(unwind|UNWIND)",
+          "(?i)(count|COUNT)",
+          "(?i)gfql\\("
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      }
+    },
+    {
+      "id": "astcall_degree_in_chain",
+      "prompt": "I have a network of servers connected by traffic flow edges in PyGraphistry. Write a GFQL pipeline that computes the degree of each server node, then filters to only show nodes with degree greater than 5. I want to identify the most connected servers. Show me the complete code including imports.",
+      "checks": {
+        "regex": [
+          "(?i)(call\\(|get_degrees|CALL\\s+graphistry\\.degree|ASTCall|degree)",
+          "(?i)gfql\\(",
+          "(?i)(degree|Degree)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.75,
+        "rubric": [
+          "Degree computation inside GFQL pipeline.",
+          "Filtering by threshold.",
+          "Complete code."
+        ]
+      }
+    },
+    {
+      "id": "astcall_layout_in_pipeline",
+      "prompt": "Write complete Python code: first filter a PyGraphistry knowledge graph to a subgraph of Concept nodes connected by RELATED_TO edges using GFQL, then apply an igraph layout (like layout_igraph or CALL graphistry.layout) to make the visualization readable, and plot the result. Do not look up any docs \u2014 write the code directly.",
+      "checks": {
+        "regex": [
+          "(?i)(call\\(|layout_igraph|layout_|CALL\\s+graphistry\\.layout|ASTCall|igraph)",
+          "(?i)gfql\\(",
+          "(?i)(igraph|layout)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.75,
+        "rubric": [
+          "Subgraph extraction plus layout in pipeline.",
+          "Plot code included."
+        ]
+      }
+    },
+    {
+      "id": "mixed_chain_and_cypher",
+      "prompt": "I'm new to PyGraphistry GFQL and I've seen examples using both Python chain syntax (with n(), e_forward(), etc.) and Cypher string syntax (MATCH/WHERE/RETURN). Can you explain: (1) Are both valid ways to use gfql()? (2) How does gfql() know which one I'm using? (3) When should I prefer one over the other? Give concrete guidance with short examples of each.",
+      "checks": {
+        "regex": [
+          "(?i)gfql\\(",
+          "(?i)(chain|list|\\[\\s*n\\()",
+          "(?i)(MATCH|cypher|Cypher)",
+          "(?i)(auto[- ]?detect|detect|string|list)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Both syntaxes valid.",
+          "Auto-detection explained.",
+          "Guidance on when to use each.",
+          "Examples of both."
+        ]
+      }
+    }
+  ]
+}

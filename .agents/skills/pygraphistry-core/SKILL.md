@@ -25,8 +25,8 @@ import graphistry
 
 graphistry.register(
     api=3,
-    username=os.environ['GRAPHISTRY_USERNAME'],
-    password=os.environ['GRAPHISTRY_PASSWORD']
+    username=os.environ.get('GRAPHISTRY_USERNAME'),
+    password=os.environ.get('GRAPHISTRY_PASSWORD')
 )
 ```
 
@@ -73,7 +73,7 @@ g = graphistry.edges(edges_df, 'src', 'dst').materialize_nodes()
 - Confirm source/destination columns are non-null and correctly typed.
 - Materialize nodes if needed (`g.materialize_nodes()`) before node-centric operations.
 - Start with smaller slices for first render on large data.
-- For neighborhood expansion and pattern mining, use `.gfql([...])` when the user requests GFQL; mention `hop()/chain()` only as optional shorthand.
+- For neighborhood expansion and pattern mining, always use `.gfql([...])` or `.gfql("MATCH ...")`. The methods `hop()` and `chain()` are deprecated.
 - Keep credentials in environment variables only; do not hardcode usernames/passwords/tokens.
 
 ## Canonical docs
