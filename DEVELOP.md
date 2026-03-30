@@ -20,6 +20,7 @@ Optional (for OTel trace capture + inspection):
 - Runner: `bin/agent.sh`
 - Core eval engine: `scripts/agent_eval_loop.py`
 - Checked-in benchmark artifacts (public-safe): `benchmarks/data/*/combined_metrics.json` and `benchmarks/reports/*`
+- Release workflow (maintainers): `RELEASE.md`
 
 ## Skill Scope Conventions
 
@@ -369,3 +370,10 @@ python3 scripts/benchmarks/readme_snippet.py \
 5. Update `README.md` Evals section with the generated snippet.
 6. Update `benchmarks/README.md` with the new pack reference.
 7. Check in sanitized report, `combined_metrics.json`, and README updates.
+
+## Releasing Versions
+
+For semver bump + publish steps (release branch, changelog cut, PR merge, tag, GitHub release), use:
+
+- `RELEASE.md` (maintainer release guide)
+- `.agents/skills/internal/release/SKILL.md` (internal release skill)

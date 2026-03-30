@@ -154,4 +154,5 @@ See:
 - [Report generator](scripts/benchmarks/make_report.py)
 - [Scenario coverage audit tool](scripts/benchmarks/scenario_coverage_audit.py)
 - [Benchmark artifact structure](benchmarks/README.md)
+- [Release guide (maintainers)](RELEASE.md)
 - [Latest eval sweep plan](plans/fresh-eval-sweep-2026-02-28/plan.md)
