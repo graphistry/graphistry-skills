@@ -101,7 +101,8 @@ def check_post(version: str) -> list[str]:
     # [Development] is empty (content was moved to version section)
     dev_match = re.search(r"## \[Development\].*?\n(.*?)(?=\n## \[|\Z)", changelog, re.DOTALL)
     if dev_match:
-        content = re.sub(r"<!--.*?-->", "", dev_match.group(1)).strip()
+        content = re.sub(r"<!--.*?-->", "", dev_match.group(1))
+        content = re.sub(r"^-{3,}\s*$", "", content, flags=re.MULTILINE).strip()
         if content:
             errors.append("[Development] section not empty after release — entries should have moved to version section")
 
