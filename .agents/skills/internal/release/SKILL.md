@@ -26,10 +26,9 @@ Use this for release operations on this repository. This is not a user-facing Gr
 
 ### 1) Preflight
 ```bash
-git fetch origin
 git checkout main
 git pull --ff-only
-python3 scripts/ci/validate_skills.py
+python3 scripts/ci/validate_release.py --pre
 ```
 
 ### 2) Cut release branch
@@ -78,14 +77,21 @@ gh release create vX.Y.Z \
   --generate-notes
 ```
 
+### 9) Post-release verification
+```bash
+python3 scripts/ci/validate_release.py --post vX.Y.Z
+```
+
 ## Guardrails
 
 - Do not release from an unmerged feature branch.
 - Do not tag before the release PR is merged to `main`.
 - Do not put secrets or raw eval artifacts in release notes.
+- Run `validate_release.py --pr` during PR review to catch common mistakes.
 
 ## Related Files
 
 - `RELEASE.md`
 - `CHANGELOG.md`
+- `scripts/ci/validate_release.py`
 - `.agents/skills/internal/benchmarks/SKILL.md`

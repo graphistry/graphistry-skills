@@ -20,13 +20,12 @@ Use semver `vX.Y.Z`.
 
 ## Preflight Checklist
 
-- Local checkout is clean: `git status --short`
-- Local `main` is up to date: `git fetch origin && git checkout main && git pull --ff-only`
-- `CHANGELOG.md` has complete entries under `[Development]`
-- Skills validation passes:
+Run the automated preflight check:
 ```bash
-python3 scripts/ci/validate_skills.py
+python3 scripts/ci/validate_release.py --pre
 ```
+
+This verifies: clean working tree, up-to-date with origin, changelog has content, skills validate, no direct-to-main pushes since last tag.
 
 ## Standard Release Workflow
 
@@ -79,14 +78,19 @@ gh release create vX.Y.Z \
 ## Post-Release Verification
 
 ```bash
-git tag --list --sort=v:refname | tail -n 5
-gh release view vX.Y.Z --json url,publishedAt,tagName,targetCommitish
+python3 scripts/ci/validate_release.py --post vX.Y.Z
 ```
 
-Verify:
-- tag exists on remote,
-- release is published (not draft),
-- target commit is `main`.
+This verifies: tag exists locally and on remote, changelog version section exists, [Development] is empty, release branch cleaned up.
+
+## PR Review Check
+
+During PR review, run:
+```bash
+python3 scripts/ci/validate_release.py --pr
+```
+
+This verifies: branch up-to-date with main, skills validate, eval JSONs valid, no common mistakes (os.environ[], chain()).
 
 ## Related Maintainer Docs
 
