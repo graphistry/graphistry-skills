@@ -15,7 +15,7 @@
       "prompt": "I have a graph of employees and departments connected by WORKS_IN edges. Using PyGraphistry GFQL, write a query that counts the number of employees per department and computes the average salary by department. Return the department name, employee count, and average salary.",
       "checks": {
         "regex": [
-          "(?i)(group_by|GROUP\\s+BY|count\\()",
+          "(?i)(group_by|groupby|GROUP\\s+BY|count\\()",
           "(?i)(count|COUNT)",
           "(?i)(avg|mean|average|AVG)",
           "(?i)gfql\\("
