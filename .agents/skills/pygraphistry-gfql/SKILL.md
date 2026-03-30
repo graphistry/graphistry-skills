@@ -120,6 +120,21 @@ result = g.gfql(let({
 ```
 
 ```python
+# Nested let: inner DAGs execute as opaque units for parallel-friendly pipelines
+result = g.gfql(let({
+    'social': let({
+        'people': n({'type': 'person'}),
+        'friends': ref('people', [e_forward({'rel': 'knows'}), n()]),
+    }),
+    'infra': let({
+        'servers': n({'type': 'server'}),
+        'traffic': ref('servers', [e_forward({'rel': 'serves'}), n()]),
+    }),
+    'combined': ref('social', [e_forward(), n()])
+}), output='combined')
+```
+
+```python
 # Let + degree computation + visual encoding
 from graphistry import n, e_forward, let, ref, call
 result = g.gfql(let({
@@ -132,7 +147,11 @@ result = result.get_degrees().encode_point_color('degree', as_continuous=True)
 
 - **Independent bindings** operate on the root graph
 - **ref()** bindings operate on the referenced binding's output
-- **Multi-stage DAGs**: chain refs sequentially — each binding can reference earlier bindings
+- **Nested let** scope rules (requires pygraphistry >= 0.53.7):
+  - Inner bindings do NOT leak to outer scope
+  - Inner bindings CAN read outer bindings (lexical closure)
+  - Sibling nested lets may reuse names without collision
+  - Each nested let is an opaque execution unit (parallel-friendly)
 
 ## Targeted patterns (high signal)
 ```python
