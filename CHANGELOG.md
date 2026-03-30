@@ -10,6 +10,26 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [0.4.1 - 2026-03-22]
+
+### Added
+- **Docs / RELEASE.md**: Maintainer release guide with standard workflow (release branch, changelog cut, PR merge, tag, GitHub release).
+- **Skills / internal/release**: Internal release skill pointing to RELEASE.md and validator commands.
+- **CI / validate_release.py**: Automated release flow validator with `--pre`, `--post`, and `--pr` modes. Checks: clean tree, up-to-date branch, changelog state, skills validation, eval JSON validity, common mistakes.
+
+### Changed
+- **Skills / pygraphistry-gfql**: Fixed broken nested let example (replaced with working flat sequential refs, filed pygraphistry#968). Consolidated duplicate deprecation messaging. Clarified Cypher label-to-column guidance (recommend property filter first).
+- **Skills / pygraphistry-core**: Standardized auth to `os.environ.get()` (was `os.environ[]`).
+- **Evals**: Added `python_ast_parse` checks to 15 code-producing cases across skill_pressure, e2e_big_journeys, moltbook. Fixed `groupby` regex variant in row_pipeline.
+
+### Tests
+- **Full sweep (claude, all 63 cases, skills ON vs OFF)**:
+  - `skills=on`: **71% pass (45/63)**, avg 23.4s
+  - `skills=off`: **19% pass (12/63)**, avg 46.6s
+  - **Delta: +52pp (3.7x), 2x faster, 0 regressions**
+
+---
+
 ## [0.4.0 - 2026-03-22]
 
 ### Added
