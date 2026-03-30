@@ -111,6 +111,19 @@ For reproducible commands and sweep workflows, see [DEVELOP.md](DEVELOP.md).
 
 Current checked-in benchmark packs show skills improving pass rates significantly:
 
+### Full sweep (`claude`, all suites, 63 cases × 2)
+
+| | Skills ON | Skills OFF | Delta |
+|---|---|---|---|
+| **Pass rate** | 45/63 (71%) | 12/63 (19%) | **+52pp (3.7x)** |
+| **Avg score** | 0.90 | 0.66 | +0.24 |
+| **Avg latency** | 23.4s | 46.6s | **2x faster** |
+| **Regressions** | | | **0** |
+
+33 cases flip from fail to pass with skills. Zero cases regress.
+
+### Per-suite detail
+
 - PyGraphistry suite (baseline isolation sweep, `codex`, `skills=both`, 56 cases × 2):
   - `skills=on`: **91% pass (51/56)**, avg `47.4s`
   - `skills=off`: **52% pass (29/56)**, avg `46.4s`
@@ -119,7 +132,6 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=on`: **90.9% pass (30/33)**, avg `13.0s`
   - `skills=off`: **27.3% pass (9/33)**, avg `17.0s`
   - **Delta: +63.6pp pass rate improvement**
-
 - GFQL expansion suite (`claude`, GFQL Cypher/Let/DAG/functional journeys, `skills=both`, 33 cases × 2):
   - `skills=on`: **82% pass (27/33)**, avg score 0.95
   - `skills=off`: **6% pass (2/33)**
