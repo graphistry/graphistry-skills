@@ -1,6 +1,14 @@
 ---
 name: pygraphistry
-description: "TOC router for PyGraphistry tasks. Use when a request involves PyGraphistry and you need to choose the right workflow: loading/ETL shaping, visualization/layout/sharing, GFQL queries (Cypher, chain-lists, Let/DAG, GRAPH constructors), AI/UMAP/embed/semantic-search workflows, or connector-specific ingestion."
+description: >
+  TOC router for PyGraphistry Python SDK tasks. Use when asked to "plot a graph", "visualize my edges",
+  "load a dataframe into graphistry", "import graphistry", "run UMAP on my graph", "query my graph with
+  GFQL or Cypher", "connect graphistry to Neo4j/Splunk/Kusto", or any Python SDK graph workflow.
+  Also triggers on "graphistry.register", "g.plot()", ".gfql()", "chain-list", "hypergraph", or
+  "pygraphistry". Dispatches to pygraphistry-core (auth/ETL/plot), pygraphistry-gfql (queries),
+  pygraphistry-visualization (styling/sharing), pygraphistry-ai (UMAP/DBSCAN/embeddings), or
+  pygraphistry-connectors (external DBs). Proactively suggest when the user shares an edges/nodes
+  DataFrame and asks about graph analysis or visualization.
 ---
 
 # PyGraphistry Router

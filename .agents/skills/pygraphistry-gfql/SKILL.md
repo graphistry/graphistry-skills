@@ -1,6 +1,12 @@
 ---
 name: pygraphistry-gfql
-description: "Construct and run GFQL graph queries in PyGraphistry using chain-list syntax OR Cypher strings. Covers pattern matching, hop constraints, predicates, let/DAG bindings, GRAPH constructors, and remote execution. Use when requests involve subgraph extraction, path-style matching, Cypher queries, or GPU/remote graph query workflows."
+description: >
+  Construct and run GFQL graph queries in PyGraphistry using chain-list syntax or Cypher strings.
+  Use when asked to "query my graph with GFQL", "MATCH pattern in graphistry", "find paths between nodes",
+  "hop constraints", "let bindings", "GRAPH constructor", or "run Cypher on my graph".
+  Also triggers on "g.gfql()", "n() e_forward() n()", "chain-list query", "subgraph extraction",
+  "remote graph query", or "pattern matching in graphistry". Proactively suggest when the user
+  wants multi-hop traversal or pattern matching on a graph already loaded in PyGraphistry.
 ---
 
 # PyGraphistry GFQL

@@ -1,0 +1,47 @@
+{
+  "skill_name": "pygraphistry",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a pandas DataFrame with columns 'source', 'target', and 'weight'. How do I turn that into an interactive graph visualization?",
+      "expected_output": "Routes to pygraphistry-core, shows graphistry.register() + .edges(df, 'source', 'target') + .plot()",
+      "assertions": [
+        {"text": "Routes to pygraphistry-core skill", "type": "contains"},
+        {"text": "Uses .edges(df, 'source', 'target') binding", "type": "contains"},
+        {"text": "Calls .plot()", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "How do I write a GFQL query to find all 3-hop paths from fraud nodes to account nodes in my graph?",
+      "expected_output": "Routes to pygraphistry-gfql, shows chain-list or Cypher syntax for multi-hop traversal",
+      "assertions": [
+        {"text": "Routes to pygraphistry-gfql skill", "type": "contains"},
+        {"text": "Shows e_forward() or Cypher MATCH with variable-length path", "type": "contains"},
+        {"text": "Uses g.gfql()", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to run UMAP on my graph nodes using their feature columns and then visualize the clusters",
+      "expected_output": "Routes to pygraphistry-ai, shows g.umap() or g.featurize().umap() workflow with visualization step",
+      "assertions": [
+        {"text": "Routes to pygraphistry-ai skill", "type": "contains"},
+        {"text": "Shows umap() or featurize().umap() call", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I need to call the Graphistry Hub REST API with a Bearer token to download graph metadata. What's the endpoint?",
+      "expected_output": "Does NOT use pygraphistry (Python SDK) skill; routes to graphistry-rest-api for the REST endpoint details",
+      "assertions": [
+        {"text": "Does not suggest graphistry.register() Python SDK for the REST download", "type": "negative"},
+        {"text": "Routes to graphistry-rest-api or references /api/v2/ endpoint", "type": "contains"}
+      ],
+      "files": []
+    }
+  ]
+}

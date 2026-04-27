@@ -1,0 +1,46 @@
+{
+  "skill_name": "pygraphistry-visualization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a working PyGraphistry plot. How do I color nodes by a 'category' column and size them by their 'degree' column?",
+      "expected_output": "Shows .encode_point_color('category', categorical_mapping={...}) and .encode_point_size('degree') with a concrete example",
+      "assertions": [
+        {"text": "Uses encode_point_color() with categorical_mapping", "type": "contains"},
+        {"text": "Uses encode_point_size() or bind(point_size=...)", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "How do I export my PyGraphistry graph as a static PNG image for a report?",
+      "expected_output": "Shows .plot(render=False) and screenshot/export approach or graphistry static export API, including any required settings like play=0",
+      "assertions": [
+        {"text": "References static export or screenshot capability", "type": "contains"},
+        {"text": "Mentions play:0 or disabling animation for static output", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to share a Graphistry graph link with a client but only allow viewing, not editing or downloading the data. How do I set that up?",
+      "expected_output": "Shows privacy mode settings, sharing URL controls, token-safe link generation with privacy: 'private' or url_params for view-only access",
+      "assertions": [
+        {"text": "References privacy mode or private sharing", "type": "contains"},
+        {"text": "Shows how to generate a view-only shareable URL", "type": "contains"},
+        {"text": "Does not put JWT or credentials in a URL query parameter", "type": "negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I want to find all nodes within 2 hops of a fraud node in my graph. What GFQL pattern should I use?",
+      "expected_output": "Does NOT stay in pygraphistry-visualization; routes to pygraphistry-gfql since this is a query/traversal task, not a styling task",
+      "assertions": [
+        {"text": "Routes to pygraphistry-gfql for the traversal query", "type": "contains"},
+        {"text": "Does not answer with visualization bindings or encode_point_color", "type": "negative"}
+      ],
+      "files": []
+    }
+  ]
+}

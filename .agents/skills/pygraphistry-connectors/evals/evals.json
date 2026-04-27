@@ -1,0 +1,46 @@
+{
+  "skill_name": "pygraphistry-connectors",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I load a Neo4j graph into PyGraphistry for visualization? I have nodes and relationships I want to explore.",
+      "expected_output": "Shows graphistry.neo4j(driver) or g.from_neo4j() connector pattern, covers auth and basic query to extract nodes/edges, then .plot()",
+      "assertions": [
+        {"text": "Uses Neo4j connector (graphistry.neo4j or from_neo4j)", "type": "contains"},
+        {"text": "Shows driver/auth setup with env vars", "type": "contains"},
+        {"text": "Does not hardcode Neo4j credentials", "type": "negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm querying Splunk for network connection events and want to visualize the src/dest IP pairs as a graph in Graphistry. How?",
+      "expected_output": "Shows Splunk connector or DataFrame ingest path: run SPL query -> load into DataFrame -> graphistry.edges(df, 'src_ip', 'dest_ip').plot()",
+      "assertions": [
+        {"text": "Shows path from Splunk query result to graphistry.edges()", "type": "contains"},
+        {"text": "References Splunk SDK, splunklib, or DataFrame ingest approach", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "How do I connect PyGraphistry to a Databricks table and build a graph from a SQL query?",
+      "expected_output": "Shows Databricks connector or spark/JDBC approach to read a table into a DataFrame, then bind edges/nodes in PyGraphistry",
+      "assertions": [
+        {"text": "Shows Databricks or Spark DataFrame -> graphistry binding path", "type": "contains"},
+        {"text": "Uses env vars for Databricks credentials", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I already have my data in a pandas DataFrame with src and dst columns. I just want to make a quick graph - no external DB.",
+      "expected_output": "Does NOT use pygraphistry-connectors; routes to pygraphistry-core for the direct DataFrame -> graphistry.edges() -> plot() path",
+      "assertions": [
+        {"text": "Routes to pygraphistry-core for direct DataFrame plot", "type": "contains"},
+        {"text": "Does not suggest a connector or external data source integration", "type": "negative"}
+      ],
+      "files": []
+    }
+  ]
+}

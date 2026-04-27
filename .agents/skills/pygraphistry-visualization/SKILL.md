@@ -1,6 +1,13 @@
 ---
 name: pygraphistry-visualization
-description: "Build PyGraphistry visualizations with bindings, encodings, layout controls, static export, and privacy-aware sharing. Use for color/size/icon/badge styling, layout tuning, map/static output, and plot link sharing workflows."
+description: >
+  PyGraphistry visualization: bindings, color/size/icon encodings, layout controls, static export,
+  and privacy-safe link sharing. Use when asked to "color nodes by type", "set point size",
+  "add icons to nodes", "layout my graph", "export graph as PNG", "share a graphistry link privately",
+  or "url_params". Also triggers on "encode_point_color", "bind(point_label=...)",
+  "settings(url_params=...)", "badge", "static graph image", or "iframe embed".
+  Proactively suggest when the user has a working plot but wants to customize its appearance
+  or control link sharing and privacy.
 ---
 
 # PyGraphistry Visualization

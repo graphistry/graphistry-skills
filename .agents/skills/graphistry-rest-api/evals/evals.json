@@ -1,0 +1,47 @@
+{
+  "skill_name": "graphistry-rest-api",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I get a JWT token from Graphistry Hub using my username and password via the REST API?",
+      "expected_output": "Shows POST /api/v2/o/token/ (or equivalent auth endpoint) with username/password body, returns token to use as Bearer in subsequent requests",
+      "assertions": [
+        {"text": "Shows POST to /api/v2/ auth endpoint", "type": "contains"},
+        {"text": "Returns a JWT/Bearer token", "type": "contains"},
+        {"text": "Uses env vars for username/password, not hardcoded literals", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What's the REST API call to upload a graph (edges CSV) to Graphistry Hub and get back a shareable graph URL?",
+      "expected_output": "Shows POST to /api/v2/upload/edges/ or dataset endpoint with Bearer auth, explains how to get the graph URL from the response",
+      "assertions": [
+        {"text": "Shows upload endpoint /api/v2/upload/ or equivalent", "type": "contains"},
+        {"text": "Uses Bearer token auth header", "type": "contains"},
+        {"text": "Explains how to construct or retrieve the shareable graph.html URL", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I'm embedding a Graphistry graph in an iframe. What URL parameters can I use to disable the toolbar and set the initial zoom level?",
+      "expected_output": "Shows graph.html URL params: toolbar=false/0, zoom/play settings, references the URL options doc section",
+      "assertions": [
+        {"text": "References graph.html URL parameters", "type": "contains"},
+        {"text": "Shows toolbar or play URL param syntax", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "How do I use the PyGraphistry Python library to register with Graphistry and call .plot() on my DataFrame?",
+      "expected_output": "Does NOT stay in graphistry-rest-api; routes to pygraphistry-core since this is a Python SDK task, not a raw REST task",
+      "assertions": [
+        {"text": "Routes to pygraphistry-core for Python SDK usage", "type": "contains"},
+        {"text": "Does not answer with curl or raw /api/v2/ endpoint calls for the Python SDK question", "type": "negative"}
+      ],
+      "files": []
+    }
+  ]
+}

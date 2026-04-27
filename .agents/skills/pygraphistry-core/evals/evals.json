@@ -1,0 +1,47 @@
+{
+  "skill_name": "pygraphistry-core",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just installed pygraphistry. How do I authenticate against Graphistry Hub and plot my first graph from two DataFrames?",
+      "expected_output": "Shows graphistry.register(api=3, username=os.environ[...], password=os.environ[...]), .edges()/.nodes() binding, and .plot(). Uses env vars for credentials.",
+      "assertions": [
+        {"text": "Uses graphistry.register(api=3, ...)", "type": "contains"},
+        {"text": "Reads credentials from os.environ or os.getenv, not hardcoded", "type": "contains"},
+        {"text": "Calls .plot()", "type": "contains"},
+        {"text": "Does not hardcode username or password literals", "type": "negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I have a wide event log table with columns actor, target, event_type, timestamp. How do I build a hypergraph from it?",
+      "expected_output": "Shows graphistry.hypergraph(df, ['actor', 'target', 'event_type']) and hg['graph'].plot()",
+      "assertions": [
+        {"text": "Uses graphistry.hypergraph()", "type": "contains"},
+        {"text": "Accesses hg['graph'].plot() or equivalent", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "My edges DataFrame has null values in the src column and the plot looks wrong. How do I diagnose and fix this?",
+      "expected_output": "Shows null-check/drop pattern on src/dst columns, suggests materialize_nodes() if node list is missing, confirms column type consistency",
+      "assertions": [
+        {"text": "Addresses null handling in src/dst columns", "type": "contains"},
+        {"text": "Mentions materialize_nodes() or node binding", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I have a working plot and now want to color nodes by their 'risk_score' column and add badges showing the severity label. How?",
+      "expected_output": "Does NOT stay in pygraphistry-core; routes to pygraphistry-visualization for encoding/styling work",
+      "assertions": [
+        {"text": "Routes to pygraphistry-visualization for encode_point_color or badge bindings", "type": "contains"},
+        {"text": "Does not try to answer encode_point_color inline without referencing the visualization skill", "type": "negative"}
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "pygraphistry-gfql",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to find all accounts that are within 3 hops of any flagged fraud node in my transaction graph. Show me the GFQL chain-list syntax.",
+      "expected_output": "Shows g.gfql([n({'flagged': True}), e_forward(min_hops=1, max_hops=3), n()]) or equivalent chain-list pattern",
+      "assertions": [
+        {"text": "Uses g.gfql() with chain-list syntax", "type": "contains"},
+        {"text": "Uses e_forward() with min_hops/max_hops or equivalent", "type": "contains"},
+        {"text": "Does not use deprecated hop() or chain() methods", "type": "negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Can I write a Cypher query to find people who know someone over 30 years old in my PyGraphistry graph?",
+      "expected_output": "Shows g.gfql(\"MATCH (p:Person)-[:KNOWS]->(q) WHERE q.age > 30 RETURN p.name\") or equivalent. Explains label__Person column mapping if needed.",
+      "assertions": [
+        {"text": "Uses g.gfql() with a Cypher string argument", "type": "contains"},
+        {"text": "Shows WHERE clause with property filter", "type": "contains"},
+        {"text": "Mentions label__Person column mapping or recommends WHERE p.type='Person' as simpler alternative", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "How do I use Let bindings in GFQL to define reusable subgraph patterns as named variables?",
+      "expected_output": "Shows Let/DAG binding syntax with named pattern variables, explains scoping rules, gives a concrete example",
+      "assertions": [
+        {"text": "Shows Let binding or DAG variable syntax in GFQL", "type": "contains"},
+        {"text": "Includes a concrete example with named pattern variable", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "How do I change the color of nodes in my PyGraphistry plot based on a 'category' column?",
+      "expected_output": "Does NOT stay in pygraphistry-gfql; this is a visualization task and routes to pygraphistry-visualization for encode_point_color",
+      "assertions": [
+        {"text": "Routes to pygraphistry-visualization for color encoding", "type": "contains"},
+        {"text": "Does not answer the styling question with GFQL syntax", "type": "negative"}
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,6 +1,13 @@
 ---
 name: graphistry-rest-api
-description: "Graphistry Hub REST API specialist for auth, upload lifecycle, URL controls, sessions, and sharing safety. Use for curl/requests endpoint guidance independent of SDK choice."
+description: >
+  Graphistry Hub REST API: auth, upload, URL controls, sessions, and sharing.
+  Use when asked to "call the graphistry API with curl", "get a JWT token from graphistry",
+  "upload a graph via REST", "graph.html URL parameters", "graphistry session API",
+  or "share a graph link safely". Also triggers on "/api/v2/", "Bearer token",
+  "graphistry upload endpoint", or any direct HTTP endpoint question about Graphistry Hub.
+  Prefer this over pygraphistry when the user explicitly uses curl, requests, or raw HTTP
+  rather than the Python SDK.
 ---
 
 # Graphistry REST API

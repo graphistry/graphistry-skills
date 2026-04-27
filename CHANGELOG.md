@@ -8,6 +8,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Skills / evals**: Added `evals/evals.json` to all 8 user-facing skills that were missing per-skill evals: `graphistry`, `pygraphistry`, `pygraphistry-ai`, `pygraphistry-connectors`, `pygraphistry-core`, `pygraphistry-gfql`, `pygraphistry-visualization`, `graphistry-rest-api`. Each file includes 3 positive test cases and 1 negative boundary case with assertions.
+
+### Changed
+- **Skills / descriptions**: Updated description frontmatter for all 8 user-facing skills above to include explicit quoted trigger phrases ("Use when asked to..."), secondary trigger patterns ("Also triggers on..."), and proactive suggest clauses - following skill-creator best practices to reduce undertriggering.
+- **Docs**: Added `docs/skill-evals-audit-2026-04.md` with full audit findings, priority matrix, and implementation plan.
+
 ---
 
 ## [0.4.2 - 2026-03-30]

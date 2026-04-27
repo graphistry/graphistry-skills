@@ -1,0 +1,46 @@
+{
+  "skill_name": "pygraphistry-ai",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a graph with node feature columns (transaction_count, avg_amount, days_active). How do I run UMAP to find clusters and visualize them in Graphistry?",
+      "expected_output": "Shows g.featurize(kind='nodes').umap() or g.umap(feature_columns=[...]) workflow, then g.plot() with UMAP-derived x/y positions",
+      "assertions": [
+        {"text": "Uses .umap() or .featurize().umap()", "type": "contains"},
+        {"text": "Calls .plot() on the UMAP result", "type": "contains"},
+        {"text": "References feature columns or featurize()", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "After running UMAP on my graph, how do I identify and label the outlier nodes as anomalies using DBSCAN?",
+      "expected_output": "Shows g.dbscan() or g.umap().dbscan() chaining, explains cluster=-1 as anomaly label, shows how to filter and highlight anomalous nodes",
+      "assertions": [
+        {"text": "Uses .dbscan() after umap()", "type": "contains"},
+        {"text": "Explains cluster label -1 as outlier/anomaly", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to do semantic search over my graph nodes - find nodes similar to a given text query using embeddings. How?",
+      "expected_output": "Shows g.embed() or g.featurize(kind='nodes').embed() and semantic search/nearest-neighbor workflow in PyGraphistry",
+      "assertions": [
+        {"text": "References .embed() or embedding-based search", "type": "contains"},
+        {"text": "Shows nearest-neighbor or similarity search pattern", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I want to run the Louvain community detection algorithm on my graph without using Graphistry. Just pure networkx.",
+      "expected_output": "Does NOT activate pygraphistry-ai; answers with python-louvain or networkx community detection directly without graphistry",
+      "assertions": [
+        {"text": "Does not import graphistry or call graphistry.register()", "type": "negative"},
+        {"text": "Answers with networkx or community.best_partition", "type": "contains"}
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "graphistry",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have an edges CSV with src and dst columns. How do I load it into Graphistry and get an interactive graph?",
+      "expected_output": "Routes to pygraphistry skill, shows graphistry.register() + graphistry.edges() + .plot() pattern with env-var credentials",
+      "assertions": [
+        {"text": "Routes to or invokes pygraphistry skill", "type": "contains"},
+        {"text": "Shows graphistry.register() with api=3", "type": "contains"},
+        {"text": "Uses environment variables for credentials, not hardcoded values", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What's the curl command to upload a graph to Graphistry Hub and get back a shareable URL?",
+      "expected_output": "Routes to graphistry-rest-api skill, shows the /api/v2/upload/ endpoint with Bearer token auth",
+      "assertions": [
+        {"text": "Routes to or invokes graphistry-rest-api skill", "type": "contains"},
+        {"text": "References /api/v2/ upload endpoint", "type": "contains"},
+        {"text": "Shows Bearer token auth pattern", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to both query my graph with Cypher AND share the result as a link. Which graphistry tools do I need?",
+      "expected_output": "Uses graphistry router to identify the mixed-intent request, pulls in pygraphistry-gfql for Cypher and pygraphistry-visualization for sharing",
+      "assertions": [
+        {"text": "Identifies pygraphistry-gfql for Cypher query", "type": "contains"},
+        {"text": "Identifies pygraphistry-visualization for sharing", "type": "contains"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I'm building a networkx graph and want to run Louvain community detection. How do I do that?",
+      "expected_output": "Does NOT activate graphistry skill; responds using networkx/python-louvain directly since no Graphistry component is needed",
+      "assertions": [
+        {"text": "Does not call graphistry.register() or graphistry.edges()", "type": "negative"},
+        {"text": "Answers with networkx or python-louvain community_louvain", "type": "contains"}
+      ],
+      "files": []
+    }
+  ]
+}
