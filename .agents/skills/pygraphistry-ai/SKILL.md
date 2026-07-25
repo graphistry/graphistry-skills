@@ -54,7 +54,8 @@ g_new = g2.transform_umap(df_new, return_graph=True)
 ## Practical guardrails
 - Start with small/representative samples before full runs.
 - Keep explicit feature lists (`X=...`) for reproducibility.
-- Track engine/dataframe type for CPU vs GPU behavior.
+- Track engine/dataframe type for CPU vs GPU behavior. Polars input is supported; use `engine='polars'`/`'polars-gpu'` for GFQL row/traversal work when preserving a Polars result matters.
+- UMAP, hypergraph, layout, and other whole-graph analytics are not native Polars operations. Under a Polars GFQL engine, use the default bridge knowingly or set `call_mode='strict'` to reject off-engine execution.
 - For anomaly workflows, document thresholds and false-positive assumptions.
 - For graph ML tasks, route deeper model workflows to RGCN/link-prediction references.
 - For text workflows, prefer `featurize(...).umap(...).search(...)` when queries are natural language.

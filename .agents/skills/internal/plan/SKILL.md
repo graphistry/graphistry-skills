@@ -1,143 +1,53 @@
 ---
 name: plan
-description: OPT-IN file-based planning for multi-session tasks. Only use when user explicitly requests it or work spans multiple sessions. For single-session work, prefer your platform's native planning features.
+description: Create and maintain a concise file-backed plan for multi-session work, handoffs, or complex multi-PR tasks. Use only when the user explicitly requests a plan file or durable task state is needed; otherwise use the platform's native planning.
 metadata:
   internal: true
-disable-model-invocation: true
 ---
 
-# File-Based Task Plan Template
+# File-backed plans
 
-## Default: Use Your Platform's Native Planning
+Use a plan file only when its persistence is valuable. For ordinary single-session work, use native planning instead.
 
-**For single-session work, prefer your AI platform's built-in planning features.**
-This file-based approach adds overhead that's only justified for specific scenarios.
+## Start
 
-## When to Use THIS Skill (Opt-In)
-
-Only use this file-based plan template when:
-- **User explicitly requests it** ("use the plan template", "create a plan file")
-- **Work spans multiple sessions** and must survive context resets
-- **Handoff to another AI/human** who needs full written context
-- **Complex multi-PR coordination** requiring persistent state
-
-## Setup
-
-1. Copy this template to `AI_PROGRESS/[task_name]/plan.md`
-2. Replace all `[placeholders]` with actual values
-3. Fill out Context sections completely
-4. Start with Step 1 marked as IN_PROGRESS
-
-## Critical Meta-Goals
-
-**THIS PLAN MUST BE:**
-1. **FULLY SELF-DESCRIBING**: All context needed to resume work is IN THIS FILE
-2. **CONSTANTLY UPDATED**: Every action's results recorded IMMEDIATELY in the step
-3. **THE SINGLE SOURCE OF TRUTH**: If it's not in the plan, it didn't happen
-4. **SAFE TO RESUME**: Any AI can pick up work by reading ONLY this file
-
-**REMEMBER**: External memory is unreliable. This plan is your ONLY memory.
-
-## Anti-Drift Protocol
-
-### The Three Commandments
-1. **RELOAD BEFORE EVERY ACTION**: Your memory has been wiped. This plan is all you have.
-2. **UPDATE AFTER EVERY ACTION**: If you don't write it down, it never happened.
-3. **TRUST ONLY THE PLAN**: Not your memory, not your assumptions, ONLY what's written here.
-
-### Critical Rules
-- **ONE TASK AT A TIME** - Never jump ahead
-- **NO ASSUMPTIONS** - The plan is the only truth
-- **NO OFFROADING** - If it's not in the plan, don't do it
-
-### Step Execution Protocol
-**BEFORE EVERY SINGLE ACTION:**
-1. **RELOAD PLAN**: `cat AI_PROGRESS/[task_name]/plan.md | head -200`
-2. **FIND YOUR TASK**: Locate the current IN_PROGRESS step
-3. **EXECUTE**: ONLY do what that step says
-4. **UPDATE IMMEDIATELY**: Edit this plan with results BEFORE doing anything else
-5. **VERIFY**: `tail -50 AI_PROGRESS/[task_name]/plan.md`
-
-### If Confused
-1. STOP
-2. Reload this plan
-3. Find the last completed step
-4. Continue from there
-
-## Plan Template
+1. Create `plans/<task>/plan.md` from the template below.
+2. Record the raw request, branch/base, success criteria, and any constraints.
+3. Split the work into independently verifiable steps. Mark only one `IN_PROGRESS`.
 
 ```markdown
-# [Task Name] Plan
-**THIS PLAN FILE**: `AI_PROGRESS/[task_name]/plan.md`
-**Created**: [DATE TIME TIMEZONE]
-**Current Branch**: [from `git branch --show-current`]
-**PRs**: [PR number + title + plan role]
-**PR Target Branch**: [where this will merge]
-**Base branch**: [FILL ME IN, TYPICALLY PR TARGET BRANCH]
+# <Task> plan
 
-## Context (READ-ONLY)
+**Branch**: `<branch>`
+**Base**: `<base>`
+**PR**: `<URL or pending>`
 
-### Plan Overview
-**Raw Prompt**: [What the user said, verbatim]
-**Goal**: [What we're trying to achieve]
-**Description**: [Brief description of the task]
-**Success Criteria**: [How we know we're done]
-**Key Constraints**: [Important limitations or requirements]
+## Goal
+<Outcome and success criteria>
 
-### Technical Context
-**Initial State**:
-- Working Directory: [pwd output]
-- Current Branch: `[branch-name]` (forked from `[parent]` at `[SHA]`)
-- Target Branch: `[where this merges to]`
+## Context
+<Important constraints, decisions, and links needed to resume>
 
-### Strategy
-**Approach**: [High-level plan]
-**Key Decisions**:
-- [Decision 1]: [Reasoning]
-- [Decision 2]: [Reasoning]
+## Steps
 
-## Quick Reference
-```bash
-# Reload plan
-cat AI_PROGRESS/[task_name]/plan.md | head -200
-
-# Local validation before pushing
-./bin/ruff check --fix && ./bin/mypy
-
-# CI monitoring
-gh pr checks [PR] --watch
-```
-
-## Status Legend
-- TODO: Not started
-- IN_PROGRESS: Currently working on this
-- DONE: Completed successfully
-- FAILED: Failed, needs retry
-- SKIPPED: Not needed
-- BLOCKED: Can't proceed
-
-## LIVE PLAN
-
-### Steps
-
-#### Step 1: [Description]
+### 1. <Step>
 **Status**: IN_PROGRESS
-**Action**: [What to do]
-**Success Criteria**: [How to verify]
-**Result**:
-```
-[Fill in with commands, output, decisions, errors]
-```
+**Verify**: <command or observable outcome>
+**Notes**: <results, decisions, or blocker>
 
-#### Step 2: [Description]
+### 2. <Step>
 **Status**: TODO
-**Action**: [What to do]
-**Success Criteria**: [How to verify]
+**Verify**: <command or observable outcome>
 ```
 
-## Step Compaction
+## Maintain
 
-**Every ~30 completed steps, compact the plan:**
-1. Create history file: `AI_PROGRESS/[task_name]/history/steps<start>-to-<end>.md`
-2. Replace archived steps with summary in plan
-3. Continue with next step number
+- Read the plan at natural handoff points: starting a work block, changing steps, returning after interruption, and before a PR/review.
+- Update it when a step completes, a material decision changes, a command fails, or a blocker appears. Do not turn routine reads or minor edits into plan churn.
+- Keep durable facts in the plan: exact commands worth rerunning, validation results, PR links, unresolved questions, and decisions with rationale.
+- Keep only one step `IN_PROGRESS`; use `TODO`, `DONE`, `BLOCKED`, or `SKIPPED` for the rest.
+- For a long plan, replace completed detail with a short verified-results summary. Preserve the commands and decisions needed for a safe resume.
+
+## Finish
+
+Before handoff or PR, record the current commit/PR, validation performed, remaining risks, and the next concrete action. Do not commit `plans/` unless repository convention or the user asks.

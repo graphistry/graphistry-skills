@@ -98,6 +98,94 @@ cd ~/Work/pygraphistry && PYTHONPATH="$PWD" python3 \
 
 The functional checker extracts Python code blocks from responses, runs them with pygraphistry, and validates: no exceptions, expected output strings, correct result shapes.
 
+**Precondition — keep the eval box's `graphistry` current.** Agents under evaluation often probe the
+installed package before answering. If the importable `graphistry` predates a feature the skills
+document, the agent "verifies" against a stale install and answers wrongly — e.g. a 0.45.x install
+reports `'polars-gpu' is not a valid EngineAbstract`, so `pygraphistry_gfql_polars_engines_v1` cases
+get answered with `engine='cudf'` and invented policy hooks. The Polars/Polars-GPU engines require
+`graphistry>=0.58`. Check with `python3 -c "import graphistry; print(graphistry.__version__)"` before a
+sweep, and prefer running against a source checkout via `PYTHONPATH` when evaluating unreleased
+behavior. This confound hits `skills=on` and `skills=off` equally, so it does not bias the delta, but it
+does depress both.
+
+Non-invasive fix for a sweep — point the agents' `python3` at a current checkout instead of upgrading
+the system interpreter:
+
+```bash
+PYTHONPATH="$HOME/Work/pygraphistry" ./bin/agent.sh --claude \
+  --journeys pygraphistry_gfql_polars_engines_v1 --skills-mode both ...
+```
+
+Or benchmark the configuration a real user has — a venv holding the released package. `python3 -m venv`
+may be unusable on Debian/Ubuntu boxes without `ensurepip`; `uv` works:
+
+```bash
+uv venv /tmp/gs-eval-venv
+uv pip install --python /tmp/gs-eval-venv/bin/python 'graphistry==0.58.0' 'polars>=1.29' pandas pyarrow
+PATH="/tmp/gs-eval-venv/bin:$PATH" ./bin/agent.sh --claude --journeys ... --skills-mode both
+```
+
+### Protect the eval environment from the agents under test
+
+Agents under evaluation run with the eval venv on `PATH` and can **write to it**. This is not
+hypothetical: during the 2026-07-25 Polars sweep an agent edited the installed
+`graphistry/Engine.py` (`resolve_engine`'s polars branch, `Engine.PANDAS` → `Engine.POLARS`) inside the
+venv. Every cell that ran afterwards — including a full published matrix — executed against a library
+that no longer matched the version the report claimed. Prompts that ask why a library behaves a certain
+way are the ones most likely to induce a patch instead of a code fix.
+
+Write-protect the environment and, more importantly, **verify it afterwards** — protection can be undone
+by the same agent, so treat the checksum as the source of truth and discard any run whose environment
+moved:
+
+```bash
+SP=/tmp/gs-clean-venv/lib/python3.13/site-packages
+find "$SP/graphistry" -name '*.py' -type f | sort | xargs sha256sum | sha256sum > /tmp/gs_env_baseline.sha
+chmod -R a-w "$SP/graphistry"
+
+# ... run the sweep ...
+
+find "$SP/graphistry" -name '*.py' -type f | sort | xargs sha256sum | sha256sum > /tmp/gs_env_after.sha
+diff /tmp/gs_env_baseline.sha /tmp/gs_env_after.sha \
+  && echo "environment intact — results valid" \
+  || echo "CONTAMINATED: discard this run, rebuild the venv, re-run"
+```
+
+Never publish a pack without that post-run diff. A benchmark that names a package version is making a
+claim about the environment, and only the checksum substantiates it.
+
+### GPU verification (`polars-gpu`) on a RAPIDS host
+
+`engine='polars-gpu'` needs the RAPIDS `cudf_polars` stack, which is not installed on the CPU dev box.
+Use the prebuilt NVIDIA RAPIDS image on a GPU host (`$GPU_HOST`, e.g. an ssh alias for an
+NVIDIA GB10 aarch64 box) — the same image family
+`pygraphistry/docker/test-rapids-official-local.sh` uses. A named volume keeps the graphistry install
+warm across runs, so only the first invocation pays for the pip step:
+
+```bash
+# one-time: reusable venv volume layered on the image's RAPIDS stack
+ssh "$GPU_HOST" 'docker volume create gfql-gpu-venv'
+ssh "$GPU_HOST" 'docker run --rm --gpus all --user root -v gfql-gpu-venv:/opt/gfql-venv \
+  nvcr.io/nvidia/rapidsai/base:26.02-cuda13-py3.13 bash -lc "
+    python -m venv --system-site-packages /opt/gfql-venv &&
+    /opt/gfql-venv/bin/pip -q install --no-cache-dir graphistry==0.58.0 &&
+    chmod -R a+rwX /opt/gfql-venv"'
+
+# each run: mount the volume plus /tmp for the script under test
+scp probe.py "$GPU_HOST":/tmp/
+ssh "$GPU_HOST" 'docker run --rm --gpus all --user root \
+  -v gfql-gpu-venv:/opt/gfql-venv -v /tmp:/hosttmp \
+  nvcr.io/nvidia/rapidsai/base:26.02-cuda13-py3.13 /opt/gfql-venv/bin/python /hosttmp/probe.py'
+```
+
+`--system-site-packages` is what makes the image's `cudf` / `cudf_polars` visible to the venv. Verified
+stack: `graphistry 0.58.0`, `polars 1.35.2`, `cudf_polars 26.02.01`.
+
+Use this to check claims that cannot be tested on CPU — that `polars-gpu` executes on device and returns
+Polars frames matching the CPU result, and where the GPU actually wins. Measured on a GB10 for a single-hop
+`MATCH ... RETURN b`: **0.83x at 100k rows (slower than CPU), 1.41x at 1M, 0.98x at 5M** — so treat
+"GPU is faster" as a claim to verify per query shape, not a default.
+
 ## Grading Modes (Deterministic / Oracle / Hybrid)
 
 Default eval scoring is deterministic checks from each journey case.

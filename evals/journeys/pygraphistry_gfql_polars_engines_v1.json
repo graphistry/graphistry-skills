@@ -1,0 +1,370 @@
+{
+  "id": "pygraphistry_gfql_polars_engines_v1",
+  "description": "GFQL engine-selection and tuning journey: explicit Polars / Polars-GPU execution, output frame types, auto-engine regression, strict off-engine analytic policy, the unsupported hypergraph Polars path, GPU-or-error fallback ownership, and the perf/tuning layer (GPU crossover, CPU streaming tradeoff, parity-or-decline boundaries, executor selection, conversion validation).",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "pygraphistry",
+    "gfql",
+    "polars",
+    "polars-gpu",
+    "skills-expansion"
+  ],
+  "cases": [
+    {
+      "id": "polars_explicit_native_output",
+      "prompt": "I have a PyGraphistry graph built from Polars DataFrames and need to run a Cypher GFQL query while keeping the result in Polars. Show a concise example that finds high-risk nodes, explains why I should select the engine explicitly, and shows how to convert the result only if a pandas-only library needs it.",
+      "checks": {
+        "regex": [
+          "(?i)engine\\s*=\\s*['\"]polars['\"]",
+          "(?i)gfql\\(",
+          "(?i)MATCH",
+          "(?i)to_pandas\\(\\)",
+          "(?i)(auto.*pandas|pandas.*auto|explicit)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Calls g.gfql() with a Cypher string and engine='polars'.",
+          "Explains that automatic/default engine selection does not preserve Polars and resolves to pandas for Polars input.",
+          "States that Polars-engine results are Polars DataFrames.",
+          "Uses .to_pandas() only as an intentional downstream conversion."
+        ]
+      }
+    },
+    {
+      "id": "polars_gpu_and_strict_analytics",
+      "prompt": "I want to run a GPU GFQL traversal with PyGraphistry's Polars-GPU engine, then run an analytic only if it can stay within my engine policy. Show the engine selection and how to configure GFQL to reject an off-engine analytic rather than silently bridge it. Mention what happens if the GPU stack is unavailable.",
+      "checks": {
+        "regex": [
+          "(?i)engine\\s*=\\s*['\"]polars-gpu['\"]",
+          "(?i)set_call_mode\\(",
+          "(?i)['\"]strict['\"]",
+          "(?i)(GPU-or-error|gpu.*error|declin|unavailable)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL",
+          "silent CPU fallback"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses engine='polars-gpu' for GFQL execution.",
+          "Imports and calls set_call_mode('strict') before the analytic path.",
+          "Explains that strict mode declines an off-engine analytic before execution.",
+          "Explains that Polars-GPU is GPU-or-error when the GPU/cuDF stack is unavailable."
+        ]
+      }
+    },
+    {
+      "id": "polars_functional_native_roundtrip",
+      "prompt": "Reply with the complete program inline in a single ```python code block in your message (writing it only to a file does not count). It must be self-contained, run offline, use no authentication and no upload step, and build a PyGraphistry graph from Polars DataFrames only: a nodes frame of 6 accounts with an integer 'risk' column and an 'id' column, and an edges frame of 6 'src'/'dst' rows. Run a Cypher GFQL query via g.gfql() that returns the nodes with risk greater than 80, keeping execution and results native to Polars end to end without any pandas conversion. Finish by printing exactly: print('RESULT_COUNT:', len(result._nodes)) and print('NODES_MODULE:', type(result._nodes).__module__).",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": [
+          "gfql"
+        ],
+        "python_ast_call_kwargs": [
+          {
+            "call": "gfql",
+            "kw": "engine",
+            "value": "polars"
+          }
+        ],
+        "regex": [
+          "(?i)import\\s+polars",
+          "(?i)pl\\.DataFrame\\(",
+          "(?i)MATCH",
+          "RESULT_COUNT",
+          "NODES_MODULE"
+        ],
+        "must_not_regex": [
+          "(?i)import\\s+pandas",
+          "pd\\.DataFrame\\("
+        ]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "NODES_MODULE: polars",
+        "expect_result_nodes_gt": 0
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Builds both nodes and edges as Polars DataFrames and binds them with graphistry.edges(...).nodes(...).",
+          "Calls g.gfql() with a Cypher string and engine='polars'.",
+          "Performs no pandas conversion anywhere in the pipeline.",
+          "Prints RESULT_COUNT and NODES_MODULE exactly as requested."
+        ]
+      }
+    },
+    {
+      "id": "polars_auto_engine_regression",
+      "prompt": "Bug report from my team: our graph is built entirely from Polars DataFrames, but after calling g.gfql(query) the result._nodes is a pandas DataFrame, so the downstream Polars code raises AttributeError. We never passed an engine argument. Explain the actual root cause and give the minimal one-line fix. Do not recommend converting the result back with pl.from_pandas or pl.DataFrame.",
+      "checks": {
+        "regex": [
+          "(?i)engine\\s*=\\s*['\"]polars['\"]",
+          "(?i)auto",
+          "(?i)(resolv|default|select).{0,60}pandas"
+        ],
+        "must_not_regex": [
+          "(?i)=\\s*pl\\.from_pandas\\(",
+          "(?i)=\\s*pl\\.DataFrame\\(\\s*result"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Identifies that the default/automatic engine selection resolves a Polars input graph to pandas rather than preserving Polars.",
+          "Gives the minimal fix as passing engine='polars' to gfql().",
+          "Does not propose converting the pandas result back into Polars as the fix.",
+          "States that result frame type follows the selected engine, so no conversion is needed once the engine is explicit."
+        ]
+      }
+    },
+    {
+      "id": "polars_strict_call_mode_benchmark_integrity",
+      "prompt": "I am benchmarking a GFQL pipeline under engine='polars' and the numbers must reflect Polars execution only. A colleague's step calls a whole-graph analytic such as umap or compute_cugraph inside the query. I need that pipeline to fail loudly instead of quietly moving the graph off-engine. Show the exact configuration to enforce that, including the import path and the environment-variable equivalent for CI, plus how to handle the resulting error.",
+      "checks": {
+        "regex": [
+          "(?i)graphistry\\.compute\\.gfql\\.lazy",
+          "(?i)set_call_mode\\(\\s*['\"]strict['\"]",
+          "(?i)GFQL_POLARS_CALL_MODE",
+          "(?i)NotImplementedError",
+          "(?i)except"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Imports set_call_mode from graphistry.compute.gfql.lazy and calls it with 'strict'.",
+          "Names GFQL_POLARS_CALL_MODE as the environment-variable equivalent.",
+          "Explains that the default call_mode='auto' bridges the analytic off-engine (pandas for Polars) and coerces the result back, which is what strict mode prevents.",
+          "Handles the strict-mode decline as a NotImplementedError rather than assuming a silent skip."
+        ]
+      }
+    },
+    {
+      "id": "hypergraph_polars_engine_refusal",
+      "prompt": "My event table is a Polars DataFrame and I want graphistry.hypergraph(events, ['src_ip','dst_ip','user'], engine='polars-gpu') so nothing leaves Polars/GPU. The engine argument's type hint accepts 'polars-gpu', so this should work, right? Give me the code.",
+      "checks": {
+        "regex": [
+          "(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?(dispatch|branch)|zero\\s+\\**\\s*polars|unsupported|fails? at runtime|does not.{0,40}(support|implement))",
+          "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]",
+          "(?i)(type hint|annotation|signature)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Declines the request: hypergraph() does not actually execute the Polars/Polars-GPU engines despite the type annotation listing them.",
+          "Explains that the annotation is ahead of the implementation, so the call fails at runtime rather than running natively.",
+          "Gives a working alternative: hypergraph with the supported pandas or cuDF engine, converting the Polars events as needed.",
+          "Notes that Polars/Polars-GPU can still be used for subsequent GFQL work on the resulting graph."
+        ]
+      }
+    },
+    {
+      "id": "polars_gpu_availability_fallback_ownership",
+      "prompt": "We deploy the same GFQL job to GPU workers and CPU-only workers. We want engine='polars-gpu' when the RAPIDS stack is present and engine='polars' otherwise, and we must not misreport which engine actually ran. Show the production pattern and state plainly whether PyGraphistry does this for us.",
+      "checks": {
+        "regex": [
+          "(?i)engine\\s*=\\s*['\"]polars-gpu['\"]",
+          "(?i)engine\\s*=\\s*['\"]polars['\"]",
+          "(?i)except",
+          "(?i)(ImportError|RuntimeError|Exception)",
+          "(?i)(GPU-or-error|never selects|explicit opt-in|does not (pick|choose|select|automatic)|doesn't (pick|choose|select)|no (silent|automatic)|not (silently|automatically))"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL",
+          "silent CPU fallback"
+        ],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "States that PyGraphistry does not fall back automatically: polars-gpu is GPU-or-error and raises when the RAPIDS/cudf_polars stack is missing.",
+          "Shows the application owning the fallback, e.g. attempting engine='polars-gpu' and catching the error to retry with engine='polars'.",
+          "Records or logs which engine actually executed rather than assuming the requested one.",
+          "Does not claim a silent or automatic CPU fallback."
+        ]
+      }
+    },
+    {
+      "id": "polars_gpu_not_blanket_speedup",
+      "prompt": "We run a single-hop GFQL MATCH over about 100k edges and someone proposed switching engine='polars' to engine='polars-gpu' on our GPU box to make it faster. Should we? Give a direct recommendation and say what you would need to see before committing to it. Answer inline in your reply; do not create files or a library as the deliverable.",
+      "checks": {
+        "regex": [
+          "(?i)(measure|benchmark|profile)",
+          "(?i)100k|100,000|small"
+        ],
+        "must_not_regex": [
+          "(?i)(always|guaranteed to be|will be) faster",
+          "(?i)gpu is (always|strictly) (faster|better)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Declines to promise a speedup at ~100k rows and says GPU can be slower at that size.",
+          "Explains the win depends on scale and plan shape, not merely on having a GPU.",
+          "Asks for a benchmark of the actual query on a representative slice before switching.",
+          "Does not claim polars-gpu is unconditionally faster than polars."
+        ]
+      }
+    },
+    {
+      "id": "polars_cpu_streaming_tradeoff",
+      "prompt": "I found GFQL_POLARS_CPU_STREAMING. Streaming sounds like it should be faster, so I want to set it globally for every job in our fleet, including small interactive queries. Talk me through whether that is right, and show how to set it from Python for just the jobs where it helps. Answer inline in your reply; do not create files or a library as the deliverable.",
+      "checks": {
+        "regex": [
+          "(?i)set_cpu_streaming",
+          "(?i)(slower|regress|overhead).{0,80}(small|interactive)",
+          "(?i)(large|batch|10M|big)"
+        ],
+        "must_not_regex": [
+          "(?i)(always|globally) enable it",
+          "(?i)streaming is (always|strictly) faster"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Advises against enabling CPU streaming globally.",
+          "States it is opt-in and off by default, and is slower on small/interactive queries.",
+          "Scopes it to large batch CPU traversals where it measures faster.",
+          "Shows set_cpu_streaming(...) from graphistry.compute.gfql.lazy rather than only the env var."
+        ]
+      }
+    },
+    {
+      "id": "polars_parity_or_decline_no_fake_fallback",
+      "prompt": "Under engine='polars' my undirected variable-length traversal with min_hops=2 raises NotImplementedError. Our pipeline must not stop. Write me a wrapper that catches that and keeps everything running so the results still come back as Polars and my dashboard keeps reporting engine='polars'. Answer inline in your reply; do not create files or a library as the deliverable.",
+      "checks": {
+        "regex": [
+          "(?i)engine\\s*=\\s*['\"]pandas['\"]",
+          "(?i)(not (native|implemented|supported)|declin|honest|no silent)"
+        ],
+        "must_not_regex": [
+          "(?i)report(ing)? it as polars",
+          "(?i)pretend|disguise|hide the fallback"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Pushes back on labeling pandas-executed work as engine='polars'.",
+          "Explains the polars engine is parity-or-NotImplementedError by design and never silently bridges traversal ops.",
+          "Offers running that step on engine='pandas' (converting the result if needed) as the legitimate path.",
+          "Insists the reported engine reflect what actually executed."
+        ]
+      }
+    },
+    {
+      "id": "polars_gpu_executor_selection",
+      "prompt": "For GFQL on our GPU workers, what execution-target options exist for the Polars GPU backend, what is the default, and how do I change it for one job without editing the environment? Also explain briefly why GFQL builds one plan and collects once rather than collecting after each operation. Answer inline in your reply; do not create files or a library as the deliverable.",
+      "checks": {
+        "regex": [
+          "(?i)set_gpu_executor",
+          "(?i)in-memory",
+          "(?i)streaming",
+          "(?i)GFQL_POLARS_GPU_EXECUTOR",
+          "(?i)(collect(s|ing)? once|one plan|single collect|transfer.?once)",
+          "(?i)(host.?to.?device|h2d|transfer|copy)"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Names both executors, 'in-memory' and 'streaming', with 'in-memory' as the default.",
+          "Shows set_gpu_executor from graphistry.compute.gfql.lazy as the per-process override and names GFQL_POLARS_GPU_EXECUTOR as the env equivalent.",
+          "States the Python override beats the env var and is read live.",
+          "Explains collect-once avoids repeated host-to-device transfers that made per-op eager GPU collection a regression."
+        ]
+      }
+    },
+    {
+      "id": "polars_conversion_validate_semantics",
+      "prompt": "Our node table has an object column mixing strings and dicts. When we run GFQL with engine='polars' the pipeline behaves differently depending on how we configure validation. Explain what strict validation versus autofix does to that column, and which one belongs in a nightly job that must never silently change data. Answer inline in your reply; do not create files or a library as the deliverable.",
+      "checks": {
+        "regex": [
+          "(?i)strict",
+          "(?i)autofix",
+          "(?i)(rais|error|NotImplementedError)",
+          "(?i)(coerc|cast|convert).{0,40}string",
+          "(?i)warn"
+        ],
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Explains strict validation raises on a column Arrow/polars cannot represent rather than altering it.",
+          "Explains autofix coerces the offending column to string and warns.",
+          "Recommends strict for a job that must not silently change data.",
+          "Does not claim the conversion is lossless in the autofix case."
+        ]
+      }
+    }
+  ]
+}

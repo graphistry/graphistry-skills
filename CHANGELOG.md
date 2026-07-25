@@ -8,6 +8,28 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Skills / internal/review**: New maintainer review skill. Builds context by walking from every changed file to the repo root and reading applicable Markdown guidance (`AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `DEVELOP.md`, `README.md`) before judging the diff; severity-ordered findings; drafts GitHub comments locally and requires confirmation before posting.
+- **Skills / pygraphistry-gfql**: Execution-engine section for `pandas` / `polars` / `cudf` / `polars-gpu` — explicit engine selection, result frame types, the exact engine literals (`polars-gpu` is hyphenated), off-engine analytic bridging under `call_mode='auto'`, `set_call_mode('strict')` / `GFQL_POLARS_CALL_MODE` for benchmark integrity, and GPU-or-error semantics for `polars-gpu`.
+- **Skills / pygraphistry-core, pygraphistry-ai, pygraphistry**: Polars/Polars-GPU engine guidance and routing; `gfql()` has no `strict=` argument.
+- **Evals / pygraphistry_gfql_polars_engines_v1**: New 7-case journey covering explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership.
+
+### Tests
+- **GFQL Polars engine pack (2026-07-25, `claude`, verified-clean `graphistry==0.58.0`, 7 cases x skills on/off, hybrid grading)**:
+  - `skills=on`: 85.7% pass (6/7), avg score 0.94, avg `70.3s`
+  - `skills=off`: 85.7% pass (6/7), avg score 0.92, avg `102.1s`
+  - **0pp pass-rate delta**; the measurable difference is latency (~1.45x faster with skills). Both arms fail the same case. Baseline isolation verified; environment SHA-verified before and after the run.
+  - Kept as a regression harness for the Polars/Polars-GPU surface — **not** as evidence of pass-rate improvement.
+  - Data: `benchmarks/data/2026-07-25-gfql-polars-engines`, report: `benchmarks/reports/2026-07-25-gfql-polars-engines.md`.
+- **Retracted**: an earlier run of this pack reported `skills=off` 5/7 vs `skills=on` 7/7 (+28.6pp). An agent *under evaluation* had patched the installed library inside the eval venv (`graphistry/Engine.py`, `resolve_engine` polars branch, `Engine.PANDAS` -> `Engine.POLARS`) at 07:21 UTC; every row of that matrix ran at 07:41 UTC or later. The case driving the delta asks why a result is pandas without an explicit engine — a premise the patch invalidated. In a clean environment that baseline cell passes.
+- **Grading**: judgment cases need `--grading hybrid --oracle-harness claude`. Deterministic regex repeatedly failed substantively correct answers, which inflated apparent lift.
+- **Claude only.** The `codex` half could not run — usage credits exhausted for the window; every cell returned `You've hit your usage limit`, produced no model output, and was discarded rather than scored. Re-run on `codex` before treating the pack as cross-harness.
+- **Eval environment is load-bearing for this pack.** Agents probe the installed `graphistry` before answering. Against a stale 0.45.4 install (predating the Polars engines) both arms collapse; against a source checkout on `PYTHONPATH` both reach 100%. Only a released `graphistry>=0.58` install measures the skill. `DEVELOP.md` documents the precondition and the venv/`PYTHONPATH` setup.
+
+### Changed
+- **Skills / internal/plan**: Slimmed to periodic plan-file maintenance at natural handoff points instead of per-action reloads; plan files are opt-in rather than the default for single-session work.
+- **Skills / pygraphistry-core**: Do not recommend `hypergraph(..., engine='polars'|'polars-gpu')`. The type annotation lists both, but `graphistry/hyper_dask.py` has no dispatch and the call fails at runtime (`AttributeError: 'ValueError' object has no attribute 'copy'`). Filed upstream as [pygraphistry#1775](https://github.com/graphistry/pygraphistry/issues/1775).
+
 ---
 
 ## [0.4.2 - 2026-03-30]
