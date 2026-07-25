@@ -90,16 +90,18 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)pygraphistry\\-core"
+          "(?i)register\\s*\\(",
+          "(?i)\\.plot\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-core for Python SDK usage"
+          "Answers with the PyGraphistry Python SDK path: graphistry.register(api=3) then .edges(...).plot()",
+          "Does not answer a Python SDK question with raw REST/curl calls"
         ],
-        "reference_answer": "Does NOT stay in graphistry-rest-api; routes to pygraphistry-core since this is a Python SDK task, not a raw REST task",
+        "reference_answer": "Uses the PyGraphistry Python SDK: graphistry.register(api=3, ...) then g.edges(df, 'src', 'dst').plot(). Not raw REST/curl.",
         "forbidden_concepts": [
           "Does not answer with curl or raw /api/v2/ endpoint calls for the Python SDK question"
         ]
@@ -122,11 +124,11 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to or invokes pygraphistry skill",
+          "Gives the pygraphistry load-and-plot workflow (register, edges binding, plot)",
           "Shows graphistry.register() with api=3",
           "Uses environment variables for credentials, not hardcoded values"
         ],
-        "reference_answer": "Routes to pygraphistry skill, shows graphistry.register() + graphistry.edges() + .plot() pattern with env-var credentials"
+        "reference_answer": "Shows graphistry.register(api=3) plus graphistry.edges(df,'src','dst').plot(), with credentials read from environment variables."
       }
     },
     {
@@ -146,11 +148,11 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to or invokes graphistry-rest-api skill",
+          "Gives the REST upload workflow rather than the Python SDK",
           "References /api/v2/ upload endpoint",
           "Shows Bearer token auth pattern"
         ],
-        "reference_answer": "Routes to graphistry-rest-api skill, shows the /api/v2/upload/ endpoint with Bearer token auth"
+        "reference_answer": "Shows the /api/v2/upload/ endpoint with Bearer token auth, returning a shareable URL."
       }
     },
     {
@@ -173,7 +175,7 @@
           "Identifies pygraphistry-gfql for Cypher query",
           "Identifies pygraphistry-visualization for sharing"
         ],
-        "reference_answer": "Uses graphistry router to identify the mixed-intent request, pulls in pygraphistry-gfql for Cypher and pygraphistry-visualization for sharing"
+        "reference_answer": "Covers both halves: a GFQL/Cypher query for the traversal, and a shareable link (privacy-aware) for the result."
       }
     },
     {
@@ -194,7 +196,7 @@
         "rubric": [
           "Answers with networkx or python-louvain community_louvain"
         ],
-        "reference_answer": "Does NOT activate graphistry skill; responds using networkx/python-louvain directly since no Graphistry component is needed",
+        "reference_answer": "Answers with networkx / python-louvain community detection directly; no Graphistry component is needed for Louvain.",
         "forbidden_concepts": [
           "Does not call graphistry.register() or graphistry.edges()"
         ]
@@ -288,7 +290,7 @@
         "rubric": [
           "Answers with networkx or community.best_partition"
         ],
-        "reference_answer": "Does NOT activate pygraphistry-ai; answers with python-louvain or networkx community detection directly without graphistry",
+        "reference_answer": "Answers with python-louvain or networkx community detection directly, without graphistry featurize/UMAP.",
         "forbidden_concepts": [
           "Does not import graphistry or call graphistry.register()"
         ]
@@ -383,9 +385,9 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-core for direct DataFrame plot"
+          "Gives the direct DataFrame path (graphistry.edges(...).plot()) with no connector detour"
         ],
-        "reference_answer": "Does NOT use pygraphistry-connectors; routes to pygraphistry-core for the direct DataFrame -> graphistry.edges() -> plot() path",
+        "reference_answer": "Shows the direct path: graphistry.edges(df,'src','dst').plot(). No connector is needed for an in-memory DataFrame.",
         "forbidden_concepts": [
           "Does not suggest a connector or external data source integration"
         ]
@@ -474,19 +476,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)pygraphistry\\-visualization"
+          "(?i)encode_point_color\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-visualization for encode_point_color or badge bindings"
+          "Shows encode_point_color for the risk_score column",
+          "Covers badge/icon encoding for the severity indicator"
         ],
-        "reference_answer": "Does NOT stay in pygraphistry-core; routes to pygraphistry-visualization for encoding/styling work",
-        "forbidden_concepts": [
-          "Does not try to answer encode_point_color inline without referencing the visualization skill"
-        ]
+        "reference_answer": "Shows encode_point_color for the risk_score column and encode_point_badge / encode_point_icon for the severity indicator."
       }
     },
     {
@@ -572,16 +572,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)pygraphistry\\-visualization"
+          "(?i)encode_point_color\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-visualization for color encoding"
+          "Shows encode_point_color keyed on the 'category' column",
+          "Uses a categorical mapping rather than a continuous/gradient encoding"
         ],
-        "reference_answer": "Does NOT stay in pygraphistry-gfql; this is a visualization task and routes to pygraphistry-visualization for encode_point_color",
+        "reference_answer": "Shows encode_point_color keyed on the 'category' column using a categorical mapping.",
         "forbidden_concepts": [
           "Does not answer the styling question with GFQL syntax"
         ]
@@ -619,17 +620,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)(png|static|screenshot)"
+          "(?i)plot_static\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "References static export or screenshot capability",
-          "Mentions play:0 or disabling animation for static output"
+          "Names a real static-export mechanism: g.plot_static(format='png', path=...)",
+          "Does not invent a non-existent export API"
         ],
-        "reference_answer": "Shows .plot(render=False) and screenshot/export approach or graphistry static export API, including any required settings like play=0"
+        "reference_answer": "g.plot_static(format='png', path='out.png') renders a static image via the graphviz engine; returns bytes/display object."
       }
     },
     {
@@ -666,16 +667,18 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)pygraphistry\\-gfql"
+          "(?i)gfql\\s*\\(",
+          "(?i)(e_forward|hops|MATCH)"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-gfql for the traversal query"
+          "Gives a GFQL traversal for 2 hops from the fraud node",
+          "Uses g.gfql() with a chain-list or Cypher pattern bounded to 2 hops"
         ],
-        "reference_answer": "Does NOT stay in pygraphistry-visualization; routes to pygraphistry-gfql since this is a query/traversal task, not a styling task",
+        "reference_answer": "Shows a GFQL 2-hop traversal from the fraud node via g.gfql(), using a chain-list or Cypher pattern.",
         "forbidden_concepts": [
           "Does not answer with visualization bindings or encode_point_color"
         ]
@@ -697,11 +700,11 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-core skill",
+          "Gives the core DataFrame-to-plot workflow",
           "Uses .edges(df, 'source', 'target') binding",
           "Calls .plot()"
         ],
-        "reference_answer": "Routes to pygraphistry-core, shows graphistry.register() + .edges(df, 'source', 'target') + .plot()"
+        "reference_answer": "Shows graphistry.register() plus .edges(df,'source','target') and .plot()."
       }
     },
     {
@@ -722,11 +725,11 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-gfql skill",
+          "Gives a GFQL query rather than deferring elsewhere",
           "Shows e_forward() or Cypher MATCH with variable-length path",
           "Uses g.gfql()"
         ],
-        "reference_answer": "Routes to pygraphistry-gfql, shows chain-list or Cypher syntax for multi-hop traversal"
+        "reference_answer": "Shows chain-list or Cypher syntax for a 3-hop traversal via g.gfql()."
       }
     },
     {
@@ -746,10 +749,10 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to pygraphistry-ai skill",
+          "Gives the UMAP/featurize workflow",
           "Shows umap() or featurize().umap() call"
         ],
-        "reference_answer": "Routes to pygraphistry-ai, shows g.umap() or g.featurize().umap() workflow with visualization step"
+        "reference_answer": "Shows g.umap() or g.featurize().umap(), then plots the resulting clusters."
       }
     },
     {
@@ -768,9 +771,9 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Routes to graphistry-rest-api or references /api/v2/ endpoint"
+          "Gives the REST endpoint and auth pattern"
         ],
-        "reference_answer": "Does NOT use pygraphistry (Python SDK) skill; routes to graphistry-rest-api for the REST endpoint details",
+        "reference_answer": "Gives the /api/v2/ endpoint and the Bearer-token auth pattern for downloading graph metadata.",
         "forbidden_concepts": [
           "Does not suggest graphistry.register() Python SDK for the REST download"
         ]
