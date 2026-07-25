@@ -1,6 +1,13 @@
 ---
 name: pygraphistry-connectors
-description: "Select and use PyGraphistry connector and plugin workflows for graph databases, SQL/data platforms, SIEM/log sources, and layout/compute plugins. Use when requests involve Neo4j/Neptune/Splunk/Kusto/Databricks/SQL/TigerGraph and similar integrations."
+description: >
+  PyGraphistry connector workflows for external data sources and graph databases.
+  Use when asked to "connect graphistry to Neo4j", "load from Splunk into graphistry",
+  "query Kusto/ADX and visualize", "Databricks graph", "TigerGraph with pygraphistry",
+  "ingest SQL into a graph", or any "graphistry + [external platform]" request.
+  Also triggers on Neptune, Postgres, BigQuery, Memgraph, or connector/plugin keywords.
+  Proactively suggest when the user has data in an external system and wants graph visualization
+  without first loading it into a DataFrame.
 ---
 
 # PyGraphistry Connectors

@@ -1,6 +1,13 @@
 ---
 name: pygraphistry-core
-description: "Core PyGraphistry workflow for authentication, shaping edges/nodes/hypergraphs, and plotting. Use for first-run setup, converting tables to graphs, and producing an initial interactive graph quickly and safely."
+description: >
+  Core PyGraphistry workflow: auth, DataFrame-to-graph shaping, and first interactive plot.
+  Use when asked to "register graphistry", "get started with pygraphistry", "plot my edges dataframe",
+  "graphistry.register()", "bind src and dst columns", "make a hypergraph", "materialize nodes",
+  or any first-graph / ETL-to-plot task. Also triggers on "first graphistry graph",
+  "graphistry install", "api=3", or questions about graphistry auth credentials.
+  Proactively suggest when the user is setting up graphistry for the first time or can't
+  get a basic plot working from a DataFrame.
 ---
 
 # PyGraphistry Core

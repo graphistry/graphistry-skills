@@ -1,0 +1,780 @@
+{
+  "id": "pygraphistry_skill_evals_v1",
+  "description": "Per-skill capability evals ported from the 2026-04 skill-evals audit (originally .agents/skills/*/evals/evals.json, which nothing executed). Routing, auth/ETL, GFQL, visualization, AI, connectors, REST. The original assertions are semantic, so they are graded by oracle rubric and forbidden_concepts; deterministic checks only anchor explicit code/API tokens. RUN WITH --grading hybrid (or oracle): under deterministic-only grading the semantic assertions are not evaluated.",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "pygraphistry",
+    "per-skill",
+    "skill-evals-audit",
+    "routing"
+  ],
+  "cases": [
+    {
+      "id": "graphistry_rest_api_01",
+      "prompt": "How do I get a JWT token from Graphistry Hub using my username and password via the REST API?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)/api/v2/",
+          "(?i)\\bPOST\\b",
+          "(?i)\\bJWT\\b"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Shows POST to /api/v2/ auth endpoint",
+          "Returns a JWT/Bearer token",
+          "Uses env vars for username/password, not hardcoded literals"
+        ],
+        "reference_answer": "Shows POST /api/v2/o/token/ (or equivalent auth endpoint) with username/password body, returns token to use as Bearer in subsequent requests"
+      }
+    },
+    {
+      "id": "graphistry_rest_api_02",
+      "prompt": "What's the REST API call to upload a graph (edges CSV) to Graphistry Hub and get back a shareable graph URL?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)/api/v2/upload/",
+          "(?i)\\bBearer\\b",
+          "(?i)graph\\.html"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Shows upload endpoint /api/v2/upload/ or equivalent",
+          "Uses Bearer token auth header",
+          "Explains how to construct or retrieve the shareable graph.html URL"
+        ],
+        "reference_answer": "Shows POST to /api/v2/upload/edges/ or dataset endpoint with Bearer auth, explains how to get the graph URL from the response"
+      }
+    },
+    {
+      "id": "graphistry_rest_api_03",
+      "prompt": "I'm embedding a Graphistry graph in an iframe. What URL parameters can I use to disable the toolbar and set the initial zoom level?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)graph\\.html"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "References graph.html URL parameters",
+          "Shows toolbar or play URL param syntax"
+        ],
+        "reference_answer": "Shows graph.html URL params: toolbar=false/0, zoom/play settings, references the URL options doc section"
+      }
+    },
+    {
+      "id": "graphistry_rest_api_04",
+      "prompt": "How do I use the PyGraphistry Python library to register with Graphistry and call .plot() on my DataFrame?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)pygraphistry\\-core"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-core for Python SDK usage"
+        ],
+        "reference_answer": "Does NOT stay in graphistry-rest-api; routes to pygraphistry-core since this is a Python SDK task, not a raw REST task",
+        "forbidden_concepts": [
+          "Does not answer with curl or raw /api/v2/ endpoint calls for the Python SDK question"
+        ]
+      }
+    },
+    {
+      "id": "graphistry_01",
+      "prompt": "I have an edges CSV with src and dst columns. How do I load it into Graphistry and get an interactive graph?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)register\\s*\\(",
+          "(?i)graphistry\\.register"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to or invokes pygraphistry skill",
+          "Shows graphistry.register() with api=3",
+          "Uses environment variables for credentials, not hardcoded values"
+        ],
+        "reference_answer": "Routes to pygraphistry skill, shows graphistry.register() + graphistry.edges() + .plot() pattern with env-var credentials"
+      }
+    },
+    {
+      "id": "graphistry_02",
+      "prompt": "What's the curl command to upload a graph to Graphistry Hub and get back a shareable URL?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)/api/v2/",
+          "(?i)\\bBearer\\b"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to or invokes graphistry-rest-api skill",
+          "References /api/v2/ upload endpoint",
+          "Shows Bearer token auth pattern"
+        ],
+        "reference_answer": "Routes to graphistry-rest-api skill, shows the /api/v2/upload/ endpoint with Bearer token auth"
+      }
+    },
+    {
+      "id": "graphistry_03",
+      "prompt": "I want to both query my graph with Cypher AND share the result as a link. Which graphistry tools do I need?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)pygraphistry\\-gfql",
+          "(?i)pygraphistry\\-visualization"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Identifies pygraphistry-gfql for Cypher query",
+          "Identifies pygraphistry-visualization for sharing"
+        ],
+        "reference_answer": "Uses graphistry router to identify the mixed-intent request, pulls in pygraphistry-gfql for Cypher and pygraphistry-visualization for sharing"
+      }
+    },
+    {
+      "id": "graphistry_04",
+      "prompt": "I'm building a networkx graph and want to run Louvain community detection. How do I do that?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)(networkx|louvain)"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Answers with networkx or python-louvain community_louvain"
+        ],
+        "reference_answer": "Does NOT activate graphistry skill; responds using networkx/python-louvain directly since no Graphistry component is needed",
+        "forbidden_concepts": [
+          "Does not call graphistry.register() or graphistry.edges()"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_ai_01",
+      "prompt": "I have a graph with node feature columns (transaction_count, avg_amount, days_active). How do I run UMAP to find clusters and visualize them in Graphistry?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)umap\\s*\\(",
+          "(?i)featurize\\s*\\(",
+          "(?i)plot\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses .umap() or .featurize().umap()",
+          "Calls .plot() on the UMAP result",
+          "References feature columns or featurize()"
+        ],
+        "reference_answer": "Shows g.featurize(kind='nodes').umap() or g.umap(feature_columns=[...]) workflow, then g.plot() with UMAP-derived x/y positions"
+      }
+    },
+    {
+      "id": "pygraphistry_ai_02",
+      "prompt": "After running UMAP on my graph, how do I identify and label the outlier nodes as anomalies using DBSCAN?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)dbscan\\s*\\(",
+          "(?i)umap\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses .dbscan() after umap()",
+          "Explains cluster label -1 as outlier/anomaly"
+        ],
+        "reference_answer": "Shows g.dbscan() or g.umap().dbscan() chaining, explains cluster=-1 as anomaly label, shows how to filter and highlight anomalous nodes"
+      }
+    },
+    {
+      "id": "pygraphistry_ai_03",
+      "prompt": "I want to do semantic search over my graph nodes - find nodes similar to a given text query using embeddings. How?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)embed\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "References .embed() or embedding-based search",
+          "Shows nearest-neighbor or similarity search pattern"
+        ],
+        "reference_answer": "Shows g.embed() or g.featurize(kind='nodes').embed() and semantic search/nearest-neighbor workflow in PyGraphistry"
+      }
+    },
+    {
+      "id": "pygraphistry_ai_04",
+      "prompt": "I want to run the Louvain community detection algorithm on my graph without using Graphistry. Just pure networkx.",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)community\\.best_partition"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Answers with networkx or community.best_partition"
+        ],
+        "reference_answer": "Does NOT activate pygraphistry-ai; answers with python-louvain or networkx community detection directly without graphistry",
+        "forbidden_concepts": [
+          "Does not import graphistry or call graphistry.register()"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_connectors_01",
+      "prompt": "How do I load a Neo4j graph into PyGraphistry for visualization? I have nodes and relationships I want to explore.",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)from_neo4j\\s*\\(",
+          "(?i)plot\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses Neo4j connector (graphistry.neo4j or from_neo4j)",
+          "Shows driver/auth setup with env vars"
+        ],
+        "reference_answer": "Shows graphistry.neo4j(driver) or g.from_neo4j() connector pattern, covers auth and basic query to extract nodes/edges, then .plot()",
+        "forbidden_concepts": [
+          "Does not hardcode Neo4j credentials"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_connectors_02",
+      "prompt": "I'm querying Splunk for network connection events and want to visualize the src/dest IP pairs as a graph in Graphistry. How?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)edges\\s*\\(",
+          "(?i)graphistry\\.edges"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Shows path from Splunk query result to graphistry.edges()",
+          "References Splunk SDK, splunklib, or DataFrame ingest approach"
+        ],
+        "reference_answer": "Shows Splunk connector or DataFrame ingest path: run SPL query -> load into DataFrame -> graphistry.edges(df, 'src_ip', 'dest_ip').plot()"
+      }
+    },
+    {
+      "id": "pygraphistry_connectors_03",
+      "prompt": "How do I connect PyGraphistry to a Databricks table and build a graph from a SQL query?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)(databricks|spark)"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Shows Databricks or Spark DataFrame -> graphistry binding path",
+          "Uses env vars for Databricks credentials"
+        ],
+        "reference_answer": "Shows Databricks connector or spark/JDBC approach to read a table into a DataFrame, then bind edges/nodes in PyGraphistry"
+      }
+    },
+    {
+      "id": "pygraphistry_connectors_04",
+      "prompt": "I already have my data in a pandas DataFrame with src and dst columns. I just want to make a quick graph - no external DB.",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)edges\\s*\\(",
+          "(?i)plot\\s*\\(",
+          "(?i)graphistry\\.edges"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-core for direct DataFrame plot"
+        ],
+        "reference_answer": "Does NOT use pygraphistry-connectors; routes to pygraphistry-core for the direct DataFrame -> graphistry.edges() -> plot() path",
+        "forbidden_concepts": [
+          "Does not suggest a connector or external data source integration"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_core_01",
+      "prompt": "I just installed pygraphistry. How do I authenticate against Graphistry Hub and plot my first graph from two DataFrames?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)graphistry\\.register",
+          "(?i)os\\.environ",
+          "(?i)os\\.getenv"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses graphistry.register(api=3, ...)",
+          "Reads credentials from os.environ or os.getenv, not hardcoded",
+          "Calls .plot()"
+        ],
+        "reference_answer": "Shows graphistry.register(api=3, username=os.environ[...], password=os.environ[...]), .edges()/.nodes() binding, and .plot(). Uses env vars for credentials.",
+        "forbidden_concepts": [
+          "Does not hardcode username or password literals"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_core_02",
+      "prompt": "I have a wide event log table with columns actor, target, event_type, timestamp. How do I build a hypergraph from it?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)hypergraph\\s*\\(",
+          "(?i)graphistry\\.hypergraph",
+          "(?i)plot\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses graphistry.hypergraph()",
+          "Accesses hg['graph'].plot() or equivalent"
+        ],
+        "reference_answer": "Shows graphistry.hypergraph(df, ['actor', 'target', 'event_type']) and hg['graph'].plot()"
+      }
+    },
+    {
+      "id": "pygraphistry_core_03",
+      "prompt": "My edges DataFrame has null values in the src column and the plot looks wrong. How do I diagnose and fix this?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)materialize_nodes\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Addresses null handling in src/dst columns",
+          "Mentions materialize_nodes() or node binding"
+        ],
+        "reference_answer": "Shows null-check/drop pattern on src/dst columns, suggests materialize_nodes() if node list is missing, confirms column type consistency"
+      }
+    },
+    {
+      "id": "pygraphistry_core_04",
+      "prompt": "I have a working plot and now want to color nodes by their 'risk_score' column and add badges showing the severity label. How?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)pygraphistry\\-visualization"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-visualization for encode_point_color or badge bindings"
+        ],
+        "reference_answer": "Does NOT stay in pygraphistry-core; routes to pygraphistry-visualization for encoding/styling work",
+        "forbidden_concepts": [
+          "Does not try to answer encode_point_color inline without referencing the visualization skill"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_gfql_01",
+      "prompt": "I want to find all accounts that are within 3 hops of any flagged fraud node in my transaction graph. Show me the GFQL chain-list syntax.",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)gfql\\s*\\(",
+          "(?i)g\\.gfql",
+          "(?i)e_forward\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses g.gfql() with chain-list syntax",
+          "Uses e_forward() with min_hops/max_hops or equivalent"
+        ],
+        "reference_answer": "Shows g.gfql([n({'flagged': True}), e_forward(min_hops=1, max_hops=3), n()]) or equivalent chain-list pattern",
+        "forbidden_concepts": [
+          "Does not use deprecated hop() or chain() methods"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_gfql_02",
+      "prompt": "Can I write a Cypher query to find people who know someone over 30 years old in my PyGraphistry graph?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)gfql\\s*\\(",
+          "(?i)g\\.gfql",
+          "WHERE"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses g.gfql() with a Cypher string argument",
+          "Shows WHERE clause with property filter",
+          "Mentions label__Person column mapping or recommends WHERE p.type='Person' as simpler alternative"
+        ],
+        "reference_answer": "Shows g.gfql(\"MATCH (p:Person)-[:KNOWS]->(q) WHERE q.age > 30 RETURN p.name\") or equivalent. Explains label__Person column mapping if needed."
+      }
+    },
+    {
+      "id": "pygraphistry_gfql_03",
+      "prompt": "How do I use Let bindings in GFQL to define reusable subgraph patterns as named variables?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)\\blet\\b"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Shows Let binding or DAG variable syntax in GFQL",
+          "Includes a concrete example with named pattern variable"
+        ],
+        "reference_answer": "Shows Let/DAG binding syntax with named pattern variables, explains scoping rules, gives a concrete example"
+      }
+    },
+    {
+      "id": "pygraphistry_gfql_04",
+      "prompt": "How do I change the color of nodes in my PyGraphistry plot based on a 'category' column?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)pygraphistry\\-visualization"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-visualization for color encoding"
+        ],
+        "reference_answer": "Does NOT stay in pygraphistry-gfql; this is a visualization task and routes to pygraphistry-visualization for encode_point_color",
+        "forbidden_concepts": [
+          "Does not answer the styling question with GFQL syntax"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_visualization_01",
+      "prompt": "I have a working PyGraphistry plot. How do I color nodes by a 'category' column and size them by their 'degree' column?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)encode_point_color\\s*\\(",
+          "(?i)encode_point_size\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Uses encode_point_color() with categorical_mapping",
+          "Uses encode_point_size() or bind(point_size=...)"
+        ],
+        "reference_answer": "Shows .encode_point_color('category', categorical_mapping={...}) and .encode_point_size('degree') with a concrete example"
+      }
+    },
+    {
+      "id": "pygraphistry_visualization_02",
+      "prompt": "How do I export my PyGraphistry graph as a static PNG image for a report?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)(png|static|screenshot)"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "References static export or screenshot capability",
+          "Mentions play:0 or disabling animation for static output"
+        ],
+        "reference_answer": "Shows .plot(render=False) and screenshot/export approach or graphistry static export API, including any required settings like play=0"
+      }
+    },
+    {
+      "id": "pygraphistry_visualization_03",
+      "prompt": "I want to share a Graphistry graph link with a client but only allow viewing, not editing or downloading the data. How do I set that up?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)privacy"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "References privacy mode or private sharing",
+          "Shows how to generate a view-only shareable URL"
+        ],
+        "reference_answer": "Shows privacy mode settings, sharing URL controls, token-safe link generation with privacy: 'private' or url_params for view-only access",
+        "forbidden_concepts": [
+          "Does not put JWT or credentials in a URL query parameter"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_visualization_04",
+      "prompt": "I want to find all nodes within 2 hops of a fraud node in my graph. What GFQL pattern should I use?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)pygraphistry\\-gfql"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-gfql for the traversal query"
+        ],
+        "reference_answer": "Does NOT stay in pygraphistry-visualization; routes to pygraphistry-gfql since this is a query/traversal task, not a styling task",
+        "forbidden_concepts": [
+          "Does not answer with visualization bindings or encode_point_color"
+        ]
+      }
+    },
+    {
+      "id": "pygraphistry_01",
+      "prompt": "I have a pandas DataFrame with columns 'source', 'target', and 'weight'. How do I turn that into an interactive graph visualization?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)plot\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-core skill",
+          "Uses .edges(df, 'source', 'target') binding",
+          "Calls .plot()"
+        ],
+        "reference_answer": "Routes to pygraphistry-core, shows graphistry.register() + .edges(df, 'source', 'target') + .plot()"
+      }
+    },
+    {
+      "id": "pygraphistry_02",
+      "prompt": "How do I write a GFQL query to find all 3-hop paths from fraud nodes to account nodes in my graph?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)e_forward\\s*\\(",
+          "MATCH",
+          "(?i)gfql\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-gfql skill",
+          "Shows e_forward() or Cypher MATCH with variable-length path",
+          "Uses g.gfql()"
+        ],
+        "reference_answer": "Routes to pygraphistry-gfql, shows chain-list or Cypher syntax for multi-hop traversal"
+      }
+    },
+    {
+      "id": "pygraphistry_03",
+      "prompt": "I want to run UMAP on my graph nodes using their feature columns and then visualize the clusters",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)umap\\s*\\(",
+          "(?i)featurize\\s*\\("
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to pygraphistry-ai skill",
+          "Shows umap() or featurize().umap() call"
+        ],
+        "reference_answer": "Routes to pygraphistry-ai, shows g.umap() or g.featurize().umap() workflow with visualization step"
+      }
+    },
+    {
+      "id": "pygraphistry_04",
+      "prompt": "I need to call the Graphistry Hub REST API with a Bearer token to download graph metadata. What's the endpoint?",
+      "checks": {
+        "must_not_contain": [
+          "EXAMPLE_USERNAME_LITERAL",
+          "EXAMPLE_PASSWORD_LITERAL"
+        ],
+        "regex": [
+          "(?i)/api/v2/"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": [
+          "Routes to graphistry-rest-api or references /api/v2/ endpoint"
+        ],
+        "reference_answer": "Does NOT use pygraphistry (Python SDK) skill; routes to graphistry-rest-api for the REST endpoint details",
+        "forbidden_concepts": [
+          "Does not suggest graphistry.register() Python SDK for the REST download"
+        ]
+      }
+    }
+  ]
+}
