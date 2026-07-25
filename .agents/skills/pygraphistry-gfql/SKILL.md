@@ -262,6 +262,33 @@ steps[0]['path']             # 'index' or 'scan'
 steps[0]['decision_reason']  # e.g. 'frontier below cost gate -> index'
 ```
 
+Index behavior *is* per-call, via the `index_policy=` keyword on `gfql()` (handled in `ComputeMixin.gfql`,
+so it does not appear in the unified `gfql()` signature):
+
+| `index_policy` | behavior |
+| --- | --- |
+| `'use'` | default — use a resident index, cost-gated |
+| `'auto'` | build on demand, then use |
+| `'force'` | always probe the index, skipping the cost gate |
+| `'off'` | never use an index |
+
+`'use'` only picks up an index that is already resident, so a plain `create_index` (or `'auto'`) has to
+happen first — with no resident index, `'use'` silently scans.
+
+`gfql()` also accepts index DDL as the query, routed to the registry instead of the traversal executor.
+The exact accepted forms:
+
+```python
+g2 = g.gfql('CREATE GFQL INDEX FOR edge_out_adj')   # -> Plottable carrying the index
+g2.gfql('SHOW GFQL INDEXES')                        # -> DataFrame of resident indexes
+g3 = g2.gfql('DROP GFQL INDEX FOR edge_out_adj')    # -> Plottable without it
+```
+
+Contrast with call mode: `set_call_mode` is **not** a `gfql()` parameter. The released signature is
+`query, engine, output, policy, where, language, params, validate, shortest_path_backend` — no
+`call_mode` and no `strict`. Call mode is process-level (Python override > env > default, read live);
+index policy is per-call.
+
 Two rules decide whether the index actually helps:
 
 - **Query shape.** Only the chain/hop form consults the index. Measured on 200k nodes / 1.6M edges,
