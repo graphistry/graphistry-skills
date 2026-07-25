@@ -98,6 +98,24 @@ cd ~/Work/pygraphistry && PYTHONPATH="$PWD" python3 \
 
 The functional checker extracts Python code blocks from responses, runs them with pygraphistry, and validates: no exceptions, expected output strings, correct result shapes.
 
+**Precondition — keep the eval box's `graphistry` current.** Agents under evaluation often probe the
+installed package before answering. If the importable `graphistry` predates a feature the skills
+document, the agent "verifies" against a stale install and answers wrongly — e.g. a 0.45.x install
+reports `'polars-gpu' is not a valid EngineAbstract`, so `pygraphistry_gfql_polars_engines_v1` cases
+get answered with `engine='cudf'` and invented policy hooks. The Polars/Polars-GPU engines require
+`graphistry>=0.58`. Check with `python3 -c "import graphistry; print(graphistry.__version__)"` before a
+sweep, and prefer running against a source checkout via `PYTHONPATH` when evaluating unreleased
+behavior. This confound hits `skills=on` and `skills=off` equally, so it does not bias the delta, but it
+does depress both.
+
+Non-invasive fix for a sweep — point the agents' `python3` at a current checkout instead of upgrading
+the system interpreter:
+
+```bash
+PYTHONPATH="$HOME/Work/pygraphistry" ./bin/agent.sh --claude \
+  --journeys pygraphistry_gfql_polars_engines_v1 --skills-mode both ...
+```
+
 ## Grading Modes (Deterministic / Oracle / Hybrid)
 
 Default eval scoring is deterministic checks from each journey case.
