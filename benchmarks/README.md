@@ -3,12 +3,14 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
-- GFQL Polars engine pack (2026-07-25, Claude, released `graphistry==0.58.0`):
+- GFQL Polars engine pack (2026-07-25, Claude, verified-clean `graphistry==0.58.0`):
   - Data: `data/2026-07-25-gfql-polars-engines`
   - Report: `reports/2026-07-25-gfql-polars-engines.md`
-  - Skills ON: 100% pass (7/7), avg score 1.00, avg 83.4s; Skills OFF: 71.4% pass (5/7), avg score 0.92, avg 132.3s — **+28.6pp delta, 0 regressions**
+  - Skills ON: 85.7% pass (6/7), avg score 0.94, avg 70.3s; Skills OFF: 85.7% pass (6/7), avg score 0.92, avg 102.1s — **0pp delta**; the difference is latency (~1.45x faster with skills)
+  - **Not evidence of pass-rate improvement.** Kept as a regression harness for the Polars/Polars-GPU surface and as the record of two methodology findings
+  - A first run of this pack reported +28.6pp and was **retracted**: an agent under evaluation edited the installed `graphistry/Engine.py` inside the eval venv mid-sweep, and every row ran after that patch. Environment now SHA-verified before and after
   - Claude only — the `codex` half was blocked by exhausted usage credits and is not represented
-  - Environment-sensitive: run against a released `graphistry>=0.58` install. A stale install collapses both arms; a source checkout on `PYTHONPATH` sends both to 100%. See the report's methodology section.
+  - Environment-sensitive: a stale install collapses both arms; a source checkout on `PYTHONPATH` sends both to 100%. See the report's methodology section.
 - GFQL expansion eval (2026-03-21, Claude):
   - Data: `data/2026-03-21-gfql-expansion`
   - Report: `reports/2026-03-21-gfql-expansion.md`

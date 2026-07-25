@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T08:13:34.380922+00:00",
+  "generated_at": "2026-07-25T16:46:46.808323+00:00",
   "inputs": [],
   "inputs_redacted": true,
   "input_count": 1,
@@ -11,23 +11,23 @@
   "by_harness_and_mode": [
     {
       "total": 7,
-      "passed": 5,
-      "pass_rate": 0.7142857142857143,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 132300.0,
-      "avg_score": 0.9224489795918368,
+      "avg_latency_ms": 102058.71428571429,
+      "avg_score": 0.9228571428571428,
       "harness": "claude",
       "skills_mode": "off"
     },
     {
       "total": 7,
-      "passed": 7,
-      "pass_rate": 1.0,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 83351.0,
-      "avg_score": 1.0,
+      "avg_latency_ms": 70268.28571428571,
+      "avg_score": 0.9364285714285714,
       "harness": "claude",
       "skills_mode": "on"
     }
@@ -35,24 +35,24 @@
   "by_harness_model_and_mode": [
     {
       "total": 7,
-      "passed": 5,
-      "pass_rate": 0.7142857142857143,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 132300.0,
-      "avg_score": 0.9224489795918368,
+      "avg_latency_ms": 102058.71428571429,
+      "avg_score": 0.9228571428571428,
       "harness": "claude",
       "model": "default",
       "skills_mode": "off"
     },
     {
       "total": 7,
-      "passed": 7,
-      "pass_rate": 1.0,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 83351.0,
-      "avg_score": 1.0,
+      "avg_latency_ms": 70268.28571428571,
+      "avg_score": 0.9364285714285714,
       "harness": "claude",
       "model": "default",
       "skills_mode": "on"
@@ -65,32 +65,32 @@
       "pass_rate": 0.8571428571428571,
       "harness_ok": 14,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 107825.5,
-      "avg_score": 0.9612244897959183,
+      "avg_latency_ms": 86163.5,
+      "avg_score": 0.9296428571428572,
       "eval_intent": "realistic_capability"
     }
   ],
   "by_eval_intent_harness_and_mode": [
     {
       "total": 7,
-      "passed": 5,
-      "pass_rate": 0.7142857142857143,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 132300.0,
-      "avg_score": 0.9224489795918368,
+      "avg_latency_ms": 102058.71428571429,
+      "avg_score": 0.9228571428571428,
       "eval_intent": "realistic_capability",
       "harness": "claude",
       "skills_mode": "off"
     },
     {
       "total": 7,
-      "passed": 7,
-      "pass_rate": 1.0,
+      "passed": 6,
+      "pass_rate": 0.8571428571428571,
       "harness_ok": 7,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 83351.0,
-      "avg_score": 1.0,
+      "avg_latency_ms": 70268.28571428571,
+      "avg_score": 0.9364285714285714,
       "eval_intent": "realistic_capability",
       "harness": "claude",
       "skills_mode": "on"
@@ -103,9 +103,9 @@
       "pass_rate": 0.8571428571428571,
       "harness_ok": 14,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 107825.5,
-      "avg_score": 0.9612244897959183,
-      "grading_mode": "deterministic"
+      "avg_latency_ms": 86163.5,
+      "avg_score": 0.9296428571428572,
+      "grading_mode": "hybrid"
     }
   ],
   "by_grading_source": [
@@ -115,9 +115,9 @@
       "pass_rate": 0.8571428571428571,
       "harness_ok": 14,
       "harness_ok_rate": 1.0,
-      "avg_latency_ms": 107825.5,
-      "avg_score": 0.9612244897959183,
-      "grading_source": "deterministic"
+      "avg_latency_ms": 86163.5,
+      "avg_score": 0.9296428571428572,
+      "grading_source": "hybrid"
     }
   ],
   "kpi": {
@@ -131,23 +131,23 @@
     "by_harness_and_mode": [
       {
         "total": 7,
-        "passed": 5,
-        "pass_rate": 0.7142857142857143,
+        "passed": 6,
+        "pass_rate": 0.8571428571428571,
         "harness_ok": 7,
         "harness_ok_rate": 1.0,
-        "avg_latency_ms": 132300.0,
-        "avg_score": 0.9224489795918368,
+        "avg_latency_ms": 102058.71428571429,
+        "avg_score": 0.9228571428571428,
         "harness": "claude",
         "skills_mode": "off"
       },
       {
         "total": 7,
-        "passed": 7,
-        "pass_rate": 1.0,
+        "passed": 6,
+        "pass_rate": 0.8571428571428571,
         "harness_ok": 7,
         "harness_ok_rate": 1.0,
-        "avg_latency_ms": 83351.0,
-        "avg_score": 1.0,
+        "avg_latency_ms": 70268.28571428571,
+        "avg_score": 0.9364285714285714,
         "harness": "claude",
         "skills_mode": "on"
       }
@@ -160,19 +160,19 @@
       "skills_mode": "off",
       "eval_intent": "realistic_capability",
       "journey_id": "pygraphistry_gfql_polars_engines_v1",
-      "case_id": "polars_auto_engine_regression",
-      "score": 0.8571428571428571,
-      "latency_ms": 343047.0
+      "case_id": "polars_gpu_availability_fallback_ownership",
+      "score": 0.8,
+      "latency_ms": 134467.0
     },
     {
       "harness": "claude",
       "model": "default",
-      "skills_mode": "off",
+      "skills_mode": "on",
       "eval_intent": "realistic_capability",
       "journey_id": "pygraphistry_gfql_polars_engines_v1",
       "case_id": "polars_gpu_availability_fallback_ownership",
-      "score": 0.6,
-      "latency_ms": 135042.0
+      "score": 0.8200000000000001,
+      "latency_ms": 84255.0
     }
   ]
 }
