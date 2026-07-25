@@ -229,6 +229,50 @@ raises `NotImplementedError` instead of bridging.
 
 `polars-gpu` analytics are GPU-or-error: if the GPU/cuDF stack is unavailable, they decline rather than move the work to host pandas.
 
+### Engine tuning knobs
+
+Three process-level settings live in `graphistry.compute.gfql.lazy`, each resolving
+**Python override > env var > default** and read live per collect (not frozen at import):
+
+| setting | values | default | env var |
+| --- | --- | --- | --- |
+| `set_call_mode` | `'auto'`, `'strict'` | `'auto'` | `GFQL_POLARS_CALL_MODE` |
+| `set_gpu_executor` | `'in-memory'`, `'streaming'` | `'in-memory'` | `GFQL_POLARS_GPU_EXECUTOR` |
+| `set_cpu_streaming` | `True`, `False` | `False` | `GFQL_POLARS_CPU_STREAMING` |
+
+Read the current value with `call_mode()`, `gpu_executor()`, `cpu_streaming()`; pass `None` to a setter to
+reset to env/default. `'polars'` and `'polars-gpu'` are one lazy engine with two collect targets, so the plan
+is built once and collected once — that transfer-once design is what makes GPU pay off, and it is why
+per-op eager collection is a GPU regression (repeated host-to-device copies).
+
+### Choosing an engine on performance
+
+Do not promise a speedup you have not measured. The honest defaults:
+
+- **pandas → polars**: worth it above roughly 50–100k rows; below that, pandas is competitive and the
+  conversion can dominate. Upstream reports 5.6–38x on the Cypher row-pipeline surface at 1M rows.
+- **polars → polars-gpu is not a blanket win.** Measured on an NVIDIA GB10, single-hop
+  `MATCH (a)-[e]->(b) WHERE ... RETURN b`: **0.83x at 100k rows (slower than CPU), 1.41x at 1M, 0.98x at 5M.**
+  The GPU win is a band, not a curve that keeps rising — it depends on plan shape and how much of the work
+  is GPU-executable. Benchmark the actual query before switching.
+- **`set_cpu_streaming(True)` is opt-in and can be slower.** Upstream measures ~1.04–1.11x on large
+  traversals (10M nodes / 80M edges) but ~0.86x — a regression — on small/interactive sizes. Use it for
+  large batch CPU work only; do not enable it by default because the name sounds faster.
+- Prefer measuring both engines on a representative slice over reasoning about which "should" be faster.
+
+### Parity-or-decline: do not invent workarounds
+
+Traversal, filter, and row ops under a Polars engine are **parity-or-`NotImplementedError`** — the engine
+never silently falls back to pandas, because a hidden bridge would misreport pandas performance as Polars.
+Surfaces that decline today include undirected `min_hops>1`, a direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
+multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, and exotic expressions
+(CASE/list/map/temporal). When one of these raises, the correct advice is `engine='pandas'` for that step —
+not a hand-rolled conversion presented as a Polars result.
+
+Conversion into an engine follows the repo-wide `validate`/`warn` convention: on a mixed-type object column
+that Arrow cannot represent, `validate='strict'` raises (`NotImplementedError` for polars) and `'autofix'`
+coerces the column to string and warns.
+
 ## Remote mode
 ```python
 # Remote with chain-list
