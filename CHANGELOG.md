@@ -8,11 +8,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+---
+
+## [0.5.0 - 2026-07-25]
+
 ### Added
 - **Skills / internal/review**: New maintainer review skill. Builds context by walking from every changed file to the repo root and reading applicable Markdown guidance (`AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `DEVELOP.md`, `README.md`) before judging the diff; severity-ordered findings; drafts GitHub comments locally and requires confirmation before posting.
 - **Skills / pygraphistry-gfql**: Execution-engine section for `pandas` / `polars` / `cudf` / `polars-gpu` — explicit engine selection, result frame types, the exact engine literals (`polars-gpu` is hyphenated), off-engine analytic bridging under `call_mode='auto'`, `set_call_mode('strict')` / `GFQL_POLARS_CALL_MODE` for benchmark integrity, and GPU-or-error semantics for `polars-gpu`.
 - **Skills / pygraphistry-core, pygraphistry-ai, pygraphistry**: Polars/Polars-GPU engine guidance and routing; `gfql()` has no `strict=` argument.
-- **Evals / pygraphistry_gfql_polars_engines_v1**: New 7-case journey covering explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership.
+- **Evals / pygraphistry_gfql_polars_engines_v1**: New 12-case journey. Seven cover explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership. Five more target the perf/tuning layer where reading the source misleads: GPU-is-not-a-blanket-speedup, the CPU-streaming tradeoff, refusing to relabel a pandas fallback as `engine='polars'`, executor selection, and strict-vs-autofix conversion.
+- **Skills / pygraphistry-gfql**: Engine tuning section (`set_gpu_executor`, `set_cpu_streaming`, `set_call_mode` with values/defaults/env vars and Python-override > env > default live resolution), the parity-or-`NotImplementedError` contract with the surfaces that decline today, and performance guidance that refuses to promise a speedup.
+- **Skills / pygraphistry-gfql**: Physical indexes — `create_index` / `show_indexes` / `index_trace`, the per-call `index_policy` kwarg (`'off'|'use'|'auto'|'force'`), index DDL (`CREATE GFQL INDEX FOR <kind>`, `SHOW GFQL INDEXES`, `DROP ...`), and the engine-aware cost gate (pandas ~0.5 of distinct source keys, polars/GPU ~0.02). Measured: a seeded chain query goes 8.90ms -> 1.68ms (5.3x) with an index, while both Cypher spellings never consult one.
+- **Skills / pygraphistry-gfql**: "Which engine when" decision procedure ordered declines -> where the frames already live -> indexing -> CPU engine -> GPU, with measured numbers rather than assumed ones.
+- **Docs / DEVELOP.md**: GPU verification harness (prebuilt `nvcr.io` RAPIDS image + named volume so the graphistry install stays warm, `--system-site-packages` to expose `cudf_polars`), the stale-install precondition, and the environment-integrity checksum procedure.
 
 ### Tests
 - **GFQL Polars engine pack (2026-07-25, `claude`, verified-clean `graphistry==0.58.0`, 7 cases x skills on/off, hybrid grading)**:
