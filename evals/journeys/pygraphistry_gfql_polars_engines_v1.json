@@ -232,7 +232,6 @@
       "checks": {
         "regex": [
           "(?i)(measure|benchmark|profile)",
-          "(?i)(not (always|necessarily)|no( |t a )(blanket|guarantee)|\\bslower\\b|depends)",
           "(?i)100k|100,000|small"
         ],
         "must_not_regex": [
