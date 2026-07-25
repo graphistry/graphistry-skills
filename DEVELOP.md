@@ -154,25 +154,26 @@ diff /tmp/gs_env_baseline.sha /tmp/gs_env_after.sha \
 Never publish a pack without that post-run diff. A benchmark that names a package version is making a
 claim about the environment, and only the checksum substantiates it.
 
-### GPU verification (`polars-gpu`) on dgx-spark
+### GPU verification (`polars-gpu`) on a RAPIDS host
 
 `engine='polars-gpu'` needs the RAPIDS `cudf_polars` stack, which is not installed on the CPU dev box.
-Use the prebuilt NVIDIA RAPIDS image on `dgx-spark` (NVIDIA GB10, aarch64) — the same image family
+Use the prebuilt NVIDIA RAPIDS image on a GPU host (`$GPU_HOST`, e.g. an ssh alias for an
+NVIDIA GB10 aarch64 box) — the same image family
 `pygraphistry/docker/test-rapids-official-local.sh` uses. A named volume keeps the graphistry install
 warm across runs, so only the first invocation pays for the pip step:
 
 ```bash
 # one-time: reusable venv volume layered on the image's RAPIDS stack
-ssh dgx-spark 'docker volume create gfql-gpu-venv'
-ssh dgx-spark 'docker run --rm --gpus all --user root -v gfql-gpu-venv:/opt/gfql-venv \
+ssh "$GPU_HOST" 'docker volume create gfql-gpu-venv'
+ssh "$GPU_HOST" 'docker run --rm --gpus all --user root -v gfql-gpu-venv:/opt/gfql-venv \
   nvcr.io/nvidia/rapidsai/base:26.02-cuda13-py3.13 bash -lc "
     python -m venv --system-site-packages /opt/gfql-venv &&
     /opt/gfql-venv/bin/pip -q install --no-cache-dir graphistry==0.58.0 &&
     chmod -R a+rwX /opt/gfql-venv"'
 
 # each run: mount the volume plus /tmp for the script under test
-scp probe.py dgx-spark:/tmp/
-ssh dgx-spark 'docker run --rm --gpus all --user root \
+scp probe.py "$GPU_HOST":/tmp/
+ssh "$GPU_HOST" 'docker run --rm --gpus all --user root \
   -v gfql-gpu-venv:/opt/gfql-venv -v /tmp:/hosttmp \
   nvcr.io/nvidia/rapidsai/base:26.02-cuda13-py3.13 /opt/gfql-venv/bin/python /hosttmp/probe.py'
 ```
@@ -181,7 +182,7 @@ ssh dgx-spark 'docker run --rm --gpus all --user root \
 stack: `graphistry 0.58.0`, `polars 1.35.2`, `cudf_polars 26.02.01`.
 
 Use this to check claims that cannot be tested on CPU — that `polars-gpu` executes on device and returns
-Polars frames matching the CPU result, and where the GPU actually wins. Measured on GB10 for a single-hop
+Polars frames matching the CPU result, and where the GPU actually wins. Measured on a GB10 for a single-hop
 `MATCH ... RETURN b`: **0.83x at 100k rows (slower than CPU), 1.41x at 1M, 0.98x at 5M** — so treat
 "GPU is faster" as a claim to verify per query shape, not a default.
 
