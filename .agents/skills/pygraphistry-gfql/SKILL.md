@@ -223,9 +223,13 @@ except NotImplementedError as exc:
     ...  # strict mode declined an off-engine analytic
 ```
 
-`gfql()` takes no `strict=` argument: mode is process-level via `set_call_mode('auto'|'strict')` or the
-`GFQL_POLARS_CALL_MODE` env var (Python override > env > default `'auto'`), read live per call. Strict mode
-raises `NotImplementedError` instead of bridging.
+`gfql()` takes no `strict=` or `call_mode=` argument: mode is process-level via
+`set_call_mode('auto'|'strict')` or the `GFQL_POLARS_CALL_MODE` env var (Python override > env >
+default `'auto'`), read live per call. Strict mode raises `NotImplementedError` instead of bridging.
+Because it is process-global, scope it yourself around a call and restore it in a `finally:` when only
+one step must be strict. A per-call parameter is requested upstream in
+[pygraphistry#1778](https://github.com/graphistry/pygraphistry/issues/1778) — update this section and the
+`polars_strict_call_mode_benchmark_integrity` eval case if it lands.
 
 `polars-gpu` analytics are GPU-or-error: if the GPU/cuDF stack is unavailable, they decline rather than move the work to host pandas.
 
