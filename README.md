@@ -137,11 +137,17 @@ Current checked-in benchmark packs show skills improving pass rates significantl
   - `skills=off`: **6% pass (2/33)**
   - **Delta: +76pp pass rate improvement**
   - Separate functional execution check (code actually runs with pygraphistry): 4/7 produce correct results
+- GFQL Polars engine pack (`claude`, Polars/Polars-GPU engine journey, `skills=both`, 7 cases × 2, released `graphistry==0.58.0`):
+  - `skills=on`: **100% pass (7/7)**, avg score 1.00, avg `83.4s`
+  - `skills=off`: **71.4% pass (5/7)**, avg score 0.92, avg `132.3s`
+  - **Delta: +28.6pp pass rate improvement, 0 regressions**
+  - Claude only; the `codex` half was blocked by exhausted usage credits. Results are sensitive to the installed `graphistry` version — see the report's methodology section.
 
 See:
 - [benchmarks/reports/2026-03-01-baseline-isolation-sweep.md](benchmarks/reports/2026-03-01-baseline-isolation-sweep.md) - PyGraphistry suite benchmark
 - [benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md](benchmarks/reports/2026-03-07-rest-phase2-full-sweep.md) - REST suite benchmark
 - [benchmarks/reports/2026-03-21-gfql-expansion.md](benchmarks/reports/2026-03-21-gfql-expansion.md) - GFQL expansion benchmark
+- [benchmarks/reports/2026-07-25-gfql-polars-engines.md](benchmarks/reports/2026-07-25-gfql-polars-engines.md) - GFQL Polars engine benchmark
 - [benchmarks/README.md](benchmarks/README.md) - full benchmark pack history
 
 ## Docs

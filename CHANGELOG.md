@@ -15,8 +15,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Evals / pygraphistry_gfql_polars_engines_v1**: New 7-case journey covering explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership.
 
 ### Tests
-- **Claude, `pygraphistry_gfql_polars_engines_v1`, 7 cases x skills on/off (14/14 rows, baseline isolation clean)**: `skills=off` 1/7, `skills=on` 3/7 (+28.6pp). Functional case executed for real — `off` raised `NameError: name 'polars' is not defined`, `on` printed `RESULT_COUNT: 3` / `NODES_MODULE: polars.dataframe.frame`.
-- **README/benchmark numbers intentionally unchanged.** The result above is environment-dominated: the eval box's importable `graphistry` is 0.45.4, which predates the Polars engines, so agents "verify" that Polars does not exist. Rerunning the four affected cases with a Polars-capable checkout on `PYTHONPATH` gives 4/4 in **both** modes. The publishable configuration — released `graphistry>=0.58` installed, no source tree — is untested, and the Codex half is blocked by exhausted usage credits until 2026-07-29. See `DEVELOP.md` for the precondition.
+- **GFQL Polars engine pack (2026-07-25, `claude`, released `graphistry==0.58.0`, 7 cases x skills on/off)**:
+  - `skills=on`: **100% pass (7/7)**, avg score 1.00, avg `83.4s`
+  - `skills=off`: **71.4% pass (5/7)**, avg score 0.92, avg `132.3s`
+  - **Delta: +28.6pp, 0 regressions.** Baseline isolation verified (no `skills=off` run read a `SKILL.md`).
+  - Baseline losses are substantive, not timeouts: it fails to state that the default engine resolves a Polars input graph to pandas, and fails to establish that `polars-gpu` is GPU-or-error with application-owned fallback.
+  - Data: `benchmarks/data/2026-07-25-gfql-polars-engines`, report: `benchmarks/reports/2026-07-25-gfql-polars-engines.md`.
+- **Claude only.** The `codex` half could not run — usage credits exhausted for the window; every cell returned `You've hit your usage limit`, produced no model output, and was discarded rather than scored. Re-run on `codex` before treating the pack as cross-harness.
+- **Eval environment is load-bearing for this pack.** Agents probe the installed `graphistry` before answering. Against a stale 0.45.4 install (predating the Polars engines) both arms collapse; against a source checkout on `PYTHONPATH` both reach 100%. Only a released `graphistry>=0.58` install measures the skill. `DEVELOP.md` documents the precondition and the venv/`PYTHONPATH` setup.
 
 ### Changed
 - **Skills / internal/plan**: Slimmed to periodic plan-file maintenance at natural handoff points instead of per-action reloads; plan files are opt-in rather than the default for single-session work.

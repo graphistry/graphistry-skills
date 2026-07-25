@@ -90,7 +90,7 @@
       "id": "hypergraph_polars_engine_refusal",
       "prompt": "My event table is a Polars DataFrame and I want graphistry.hypergraph(events, ['src_ip','dst_ip','user'], engine='polars-gpu') so nothing leaves Polars/GPU. The engine argument's type hint accepts 'polars-gpu', so this should work, right? Give me the code.",
       "checks": {
-        "regex": ["(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?(dispatch|branch)|unsupported|does not.{0,40}(support|implement))", "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]", "(?i)(type hint|annotation|signature)"],
+        "regex": ["(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?(dispatch|branch)|zero\\s+\\**\\s*polars|unsupported|fails? at runtime|does not.{0,40}(support|implement))", "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]", "(?i)(type hint|annotation|signature)"],
         "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"]
       },
       "oracle": {

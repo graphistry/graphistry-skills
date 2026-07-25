@@ -3,6 +3,12 @@
 Checked-in benchmark artifacts for skills/eval regression tracking.
 
 ## Latest Checked-in Packs
+- GFQL Polars engine pack (2026-07-25, Claude, released `graphistry==0.58.0`):
+  - Data: `data/2026-07-25-gfql-polars-engines`
+  - Report: `reports/2026-07-25-gfql-polars-engines.md`
+  - Skills ON: 100% pass (7/7), avg score 1.00, avg 83.4s; Skills OFF: 71.4% pass (5/7), avg score 0.92, avg 132.3s — **+28.6pp delta, 0 regressions**
+  - Claude only — the `codex` half was blocked by exhausted usage credits and is not represented
+  - Environment-sensitive: run against a released `graphistry>=0.58` install. A stale install collapses both arms; a source checkout on `PYTHONPATH` sends both to 100%. See the report's methodology section.
 - GFQL expansion eval (2026-03-21, Claude):
   - Data: `data/2026-03-21-gfql-expansion`
   - Report: `reports/2026-03-21-gfql-expansion.md`
