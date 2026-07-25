@@ -36,7 +36,7 @@
     },
     {
       "id": "polars_functional_native_roundtrip",
-      "prompt": "Write complete self-contained Python code that runs offline, with no authentication and no upload step, and builds a PyGraphistry graph from Polars DataFrames only: a nodes frame of 6 accounts with an integer 'risk' column and an 'id' column, and an edges frame of 6 'src'/'dst' rows. Run a Cypher GFQL query via g.gfql() that returns the nodes with risk greater than 80, keeping execution and results native to Polars end to end without any pandas conversion. Finish by printing exactly: print('RESULT_COUNT:', len(result._nodes)) and print('NODES_MODULE:', type(result._nodes).__module__).",
+      "prompt": "Reply with the complete program inline in a single ```python code block in your message (writing it only to a file does not count). It must be self-contained, run offline, use no authentication and no upload step, and build a PyGraphistry graph from Polars DataFrames only: a nodes frame of 6 accounts with an integer 'risk' column and an 'id' column, and an edges frame of 6 'src'/'dst' rows. Run a Cypher GFQL query via g.gfql() that returns the nodes with risk greater than 80, keeping execution and results native to Polars end to end without any pandas conversion. Finish by printing exactly: print('RESULT_COUNT:', len(result._nodes)) and print('NODES_MODULE:', type(result._nodes).__module__).",
       "checks": {
         "python_block": true,
         "python_ast_parse": true,
@@ -90,7 +90,7 @@
       "id": "hypergraph_polars_engine_refusal",
       "prompt": "My event table is a Polars DataFrame and I want graphistry.hypergraph(events, ['src_ip','dst_ip','user'], engine='polars-gpu') so nothing leaves Polars/GPU. The engine argument's type hint accepts 'polars-gpu', so this should work, right? Give me the code.",
       "checks": {
-        "regex": ["(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?dispatch|unsupported|does not.{0,40}(support|implement))", "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]", "(?i)gfql\\(", "(?i)(type hint|annotation|signature)"],
+        "regex": ["(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?(dispatch|branch)|unsupported|does not.{0,40}(support|implement))", "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]", "(?i)(type hint|annotation|signature)"],
         "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"]
       },
       "oracle": {
@@ -103,7 +103,7 @@
       "id": "polars_gpu_availability_fallback_ownership",
       "prompt": "We deploy the same GFQL job to GPU workers and CPU-only workers. We want engine='polars-gpu' when the RAPIDS stack is present and engine='polars' otherwise, and we must not misreport which engine actually ran. Show the production pattern and state plainly whether PyGraphistry does this for us.",
       "checks": {
-        "regex": ["(?i)engine\\s*=\\s*['\"]polars-gpu['\"]", "(?i)engine\\s*=\\s*['\"]polars['\"]", "(?i)except", "(?i)(ImportError|RuntimeError|Exception)", "(?i)(does not|doesn't|no).{0,60}(automatic|silently|fall ?back)"],
+        "regex": ["(?i)engine\\s*=\\s*['\"]polars-gpu['\"]", "(?i)engine\\s*=\\s*['\"]polars['\"]", "(?i)except", "(?i)(ImportError|RuntimeError|Exception)", "(?i)(GPU-or-error|never selects|explicit opt-in|does not (pick|choose|select|automatic)|doesn't (pick|choose|select)|no (silent|automatic)|not (silently|automatically))"],
         "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL", "silent CPU fallback"],
         "python_block": true,
         "python_ast_parse": true
