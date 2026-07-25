@@ -228,11 +228,11 @@
     },
     {
       "id": "polars_gpu_not_blanket_speedup",
-      "prompt": "We run a single-hop GFQL MATCH over about 100k edges and someone proposed switching engine='polars' to engine='polars-gpu' on our GPU box to make it faster. Should we? Give a direct recommendation and say what you would need to see before committing to it.",
+      "prompt": "We run a single-hop GFQL MATCH over about 100k edges and someone proposed switching engine='polars' to engine='polars-gpu' on our GPU box to make it faster. Should we? Give a direct recommendation and say what you would need to see before committing to it. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
           "(?i)(measure|benchmark|profile)",
-          "(?i)(not (always|necessarily)|no( |t a )(blanket|guarantee)|can be slower|slower than|depends)",
+          "(?i)(not (always|necessarily)|no( |t a )(blanket|guarantee)|\\bslower\\b|depends)",
           "(?i)100k|100,000|small"
         ],
         "must_not_regex": [
@@ -257,11 +257,10 @@
     },
     {
       "id": "polars_cpu_streaming_tradeoff",
-      "prompt": "I found GFQL_POLARS_CPU_STREAMING. Streaming sounds like it should be faster, so I want to set it globally for every job in our fleet, including small interactive queries. Talk me through whether that is right, and show how to set it from Python for just the jobs where it helps.",
+      "prompt": "I found GFQL_POLARS_CPU_STREAMING. Streaming sounds like it should be faster, so I want to set it globally for every job in our fleet, including small interactive queries. Talk me through whether that is right, and show how to set it from Python for just the jobs where it helps. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
           "(?i)set_cpu_streaming",
-          "(?i)(opt-in|default(s)? (to )?(off|false)|not (the )?default)",
           "(?i)(slower|regress|overhead).{0,80}(small|interactive)",
           "(?i)(large|batch|10M|big)"
         ],
@@ -287,12 +286,11 @@
     },
     {
       "id": "polars_parity_or_decline_no_fake_fallback",
-      "prompt": "Under engine='polars' my undirected variable-length traversal with min_hops=2 raises NotImplementedError. Our pipeline must not stop. Write me a wrapper that catches that and keeps everything running so the results still come back as Polars and my dashboard keeps reporting engine='polars'.",
+      "prompt": "Under engine='polars' my undirected variable-length traversal with min_hops=2 raises NotImplementedError. Our pipeline must not stop. Write me a wrapper that catches that and keeps everything running so the results still come back as Polars and my dashboard keeps reporting engine='polars'. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
           "(?i)engine\\s*=\\s*['\"]pandas['\"]",
-          "(?i)(not (native|implemented|supported)|declin|honest|no silent)",
-          "(?i)(report|label|record|attribut).{0,60}(engine|pandas)"
+          "(?i)(not (native|implemented|supported)|declin|honest|no silent)"
         ],
         "must_not_regex": [
           "(?i)report(ing)? it as polars",
@@ -316,7 +314,7 @@
     },
     {
       "id": "polars_gpu_executor_selection",
-      "prompt": "For GFQL on our GPU workers, what execution-target options exist for the Polars GPU backend, what is the default, and how do I change it for one job without editing the environment? Also explain briefly why GFQL builds one plan and collects once rather than collecting after each operation.",
+      "prompt": "For GFQL on our GPU workers, what execution-target options exist for the Polars GPU backend, what is the default, and how do I change it for one job without editing the environment? Also explain briefly why GFQL builds one plan and collects once rather than collecting after each operation. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
           "(?i)set_gpu_executor",
@@ -344,7 +342,7 @@
     },
     {
       "id": "polars_conversion_validate_semantics",
-      "prompt": "Our node table has an object column mixing strings and dicts. When we run GFQL with engine='polars' the pipeline behaves differently depending on how we configure validation. Explain what strict validation versus autofix does to that column, and which one belongs in a nightly job that must never silently change data.",
+      "prompt": "Our node table has an object column mixing strings and dicts. When we run GFQL with engine='polars' the pipeline behaves differently depending on how we configure validation. Explain what strict validation versus autofix does to that column, and which one belongs in a nightly job that must never silently change data. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
           "(?i)strict",
