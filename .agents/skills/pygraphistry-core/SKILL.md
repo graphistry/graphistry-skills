@@ -73,7 +73,8 @@ g = graphistry.edges(edges_df, 'src', 'dst').materialize_nodes()
 - Confirm source/destination columns are non-null and correctly typed.
 - Materialize nodes if needed (`g.materialize_nodes()`) before node-centric operations.
 - Start with smaller slices for first render on large data.
-- For GFQL execution, explicitly request `engine='polars'` to retain Polars results; the automatic/default path does not select Polars.
+- For GFQL execution, explicitly request `engine='polars'` to retain Polars results; the automatic/default path does not select Polars. The exact engine literals are `'pandas'`, `'cudf'`, `'dask'`, `'dask_cudf'`, `'polars'`, `'polars-gpu'`, `'auto'` — `'polars-gpu'` is hyphenated, and there is no `polars_gpu` spelling.
+- `gfql()` has no `strict=` argument. Off-engine analytic policy is set with `graphistry.compute.gfql.lazy.set_call_mode('auto'|'strict')` or the `GFQL_POLARS_CALL_MODE` env var; see `pygraphistry-gfql` for the engine section.
 - Do not recommend `hypergraph(..., engine='polars'|'polars-gpu')` yet: the current API annotation lists them, but the upstream hypergraph frame implementation still lacks their dispatch path. Use the supported pandas/cuDF hypergraph engines, then opt into Polars/Polars-GPU for subsequent GFQL work when appropriate.
 - For neighborhood expansion and pattern mining, always use `.gfql([...])` or `.gfql("MATCH ...")`. The methods `hop()` and `chain()` are deprecated.
 - Keep credentials in environment variables only; do not hardcode usernames/passwords/tokens.

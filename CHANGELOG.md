@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Skills / internal/review**: New maintainer review skill. Builds context by walking from every changed file to the repo root and reading applicable Markdown guidance (`AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `DEVELOP.md`, `README.md`) before judging the diff; severity-ordered findings; drafts GitHub comments locally and requires confirmation before posting.
+- **Skills / pygraphistry-gfql**: Execution-engine section for `pandas` / `polars` / `cudf` / `polars-gpu` — explicit engine selection, result frame types, the exact engine literals (`polars-gpu` is hyphenated), off-engine analytic bridging under `call_mode='auto'`, `set_call_mode('strict')` / `GFQL_POLARS_CALL_MODE` for benchmark integrity, and GPU-or-error semantics for `polars-gpu`.
+- **Skills / pygraphistry-core, pygraphistry-ai, pygraphistry**: Polars/Polars-GPU engine guidance and routing; `gfql()` has no `strict=` argument.
+- **Evals / pygraphistry_gfql_polars_engines_v1**: New 7-case journey covering explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership.
+
+### Changed
+- **Skills / internal/plan**: Slimmed to periodic plan-file maintenance at natural handoff points instead of per-action reloads; plan files are opt-in rather than the default for single-session work.
+- **Skills / pygraphistry-core**: Do not recommend `hypergraph(..., engine='polars'|'polars-gpu')`. The type annotation lists both, but `graphistry/hyper_dask.py` has no dispatch and the call fails at runtime (`AttributeError: 'ValueError' object has no attribute 'copy'`). Filed upstream as [pygraphistry#1775](https://github.com/graphistry/pygraphistry/issues/1775).
+
 ---
 
 ## [0.4.2 - 2026-03-30]

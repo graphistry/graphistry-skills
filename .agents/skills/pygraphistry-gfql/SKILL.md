@@ -205,6 +205,7 @@ nodes_pd = cpu_out._nodes.to_pandas()  # only for pandas-only downstream APIs
 - `polars`: explicit CPU columnar engine; choose it for common traversal, filter, order, and aggregation workloads without a GPU.
 - `cudf`: RAPIDS GPU engine.
 - `polars-gpu`: explicit GPU Polars execution. Require the compatible GPU/cuDF stack; do not describe it as silently falling back to CPU.
+- Valid literals are exactly `'pandas'`, `'cudf'`, `'dask'`, `'dask_cudf'`, `'polars'`, `'polars-gpu'`, `'auto'`. `'polars-gpu'` is hyphenated; `polars_gpu` is not a valid engine.
 - For a Polars input graph, `engine='auto'` resolves to pandas, so use `engine='polars'` to remain native end-to-end.
 - Outputs follow the selected engine: Polars for `polars`/`polars-gpu`, cuDF for `cudf`. Convert intentionally before pandas-specific operations such as `.iloc` or `groupby().apply()`.
 
@@ -216,8 +217,15 @@ Whole-graph `call()` analytics such as UMAP, hypergraph, layouts, or `compute_cu
 from graphistry.compute.gfql.lazy import set_call_mode
 
 set_call_mode('strict')  # reject an off-engine analytic before it runs
-result = g.gfql(query, engine='polars')
+try:
+    result = g.gfql(query, engine='polars')
+except NotImplementedError as exc:
+    ...  # strict mode declined an off-engine analytic
 ```
+
+`gfql()` takes no `strict=` argument: mode is process-level via `set_call_mode('auto'|'strict')` or the
+`GFQL_POLARS_CALL_MODE` env var (Python override > env > default `'auto'`), read live per call. Strict mode
+raises `NotImplementedError` instead of bridging.
 
 `polars-gpu` analytics are GPU-or-error: if the GPU/cuDF stack is unavailable, they decline rather than move the work to host pandas.
 

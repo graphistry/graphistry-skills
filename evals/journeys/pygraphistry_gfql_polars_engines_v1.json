@@ -1,6 +1,6 @@
 {
   "id": "pygraphistry_gfql_polars_engines_v1",
-  "description": "GFQL engine-selection journey cases for explicit Polars and Polars-GPU execution, output types, and safe analytic bridging.",
+  "description": "GFQL engine-selection journey for explicit Polars and Polars-GPU execution: output frame types, auto-engine regression debugging, strict off-engine analytic policy, the unsupported hypergraph Polars path, and GPU-or-error fallback ownership.",
   "eval_intent": "realistic_capability",
   "tags": ["pygraphistry", "gfql", "polars", "polars-gpu", "skills-expansion"],
   "cases": [
@@ -32,6 +32,86 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": ["Uses engine='polars-gpu' for GFQL execution.", "Imports and calls set_call_mode('strict') before the analytic path.", "Explains that strict mode declines an off-engine analytic before execution.", "Explains that Polars-GPU is GPU-or-error when the GPU/cuDF stack is unavailable."]
+      }
+    },
+    {
+      "id": "polars_functional_native_roundtrip",
+      "prompt": "Write complete self-contained Python code (no register(), no plot(), no network calls) that builds a PyGraphistry graph from Polars DataFrames only: a nodes frame of 6 accounts with an integer 'risk' column and an 'id' column, and an edges frame of 6 'src'/'dst' rows. Run a Cypher GFQL query via g.gfql() that returns the nodes with risk greater than 80, keeping execution and results native to Polars end to end without any pandas conversion. Finish by printing exactly: print('RESULT_COUNT:', len(result._nodes)) and print('NODES_MODULE:', type(result._nodes).__module__).",
+      "checks": {
+        "python_block": true,
+        "python_ast_parse": true,
+        "python_ast_calls": ["gfql"],
+        "python_ast_call_kwargs": [{"call": "gfql", "kw": "engine", "value": "polars"}],
+        "regex": ["(?i)import\\s+polars", "(?i)pl\\.DataFrame\\(", "(?i)MATCH", "RESULT_COUNT", "NODES_MODULE"],
+        "must_not_regex": ["to_pandas\\(", "(?i)import\\s+pandas", "pd\\.DataFrame\\(", "register\\(", "\\.plot\\("]
+      },
+      "functional": {
+        "enabled": true,
+        "expect_no_exception": true,
+        "expect_output_contains": "NODES_MODULE: polars",
+        "expect_result_nodes_gt": 0
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Builds both nodes and edges as Polars DataFrames and binds them with graphistry.edges(...).nodes(...).", "Calls g.gfql() with a Cypher string and engine='polars'.", "Performs no pandas conversion anywhere in the pipeline.", "Prints RESULT_COUNT and NODES_MODULE exactly as requested."]
+      }
+    },
+    {
+      "id": "polars_auto_engine_regression",
+      "prompt": "Bug report from my team: our graph is built entirely from Polars DataFrames, but after calling g.gfql(query) the result._nodes is a pandas DataFrame, so the downstream Polars code raises AttributeError. We never passed an engine argument. Explain the actual root cause and give the minimal one-line fix. Do not recommend converting the result back with pl.from_pandas or pl.DataFrame.",
+      "checks": {
+        "regex": ["(?i)engine\\s*=\\s*['\"]polars['\"]", "(?i)auto", "(?i)(resolv|default|select).{0,60}pandas"],
+        "must_not_regex": ["(?i)=\\s*pl\\.from_pandas\\(", "(?i)=\\s*pl\\.DataFrame\\(\\s*result"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Identifies that the default/automatic engine selection resolves a Polars input graph to pandas rather than preserving Polars.", "Gives the minimal fix as passing engine='polars' to gfql().", "Does not propose converting the pandas result back into Polars as the fix.", "States that result frame type follows the selected engine, so no conversion is needed once the engine is explicit."]
+      }
+    },
+    {
+      "id": "polars_strict_call_mode_benchmark_integrity",
+      "prompt": "I am benchmarking a GFQL pipeline under engine='polars' and the numbers must reflect Polars execution only. A colleague's step calls a whole-graph analytic such as umap or compute_cugraph inside the query. I need that pipeline to fail loudly instead of quietly moving the graph off-engine. Show the exact configuration to enforce that, including the import path and the environment-variable equivalent for CI, plus how to handle the resulting error.",
+      "checks": {
+        "regex": ["(?i)graphistry\\.compute\\.gfql\\.lazy", "(?i)set_call_mode\\(\\s*['\"]strict['\"]", "(?i)GFQL_POLARS_CALL_MODE", "(?i)NotImplementedError", "(?i)except"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Imports set_call_mode from graphistry.compute.gfql.lazy and calls it with 'strict'.", "Names GFQL_POLARS_CALL_MODE as the environment-variable equivalent.", "Explains that the default call_mode='auto' bridges the analytic off-engine (pandas for Polars) and coerces the result back, which is what strict mode prevents.", "Handles the strict-mode decline as a NotImplementedError rather than assuming a silent skip."]
+      }
+    },
+    {
+      "id": "hypergraph_polars_engine_refusal",
+      "prompt": "My event table is a Polars DataFrame and I want graphistry.hypergraph(events, ['src_ip','dst_ip','user'], engine='polars-gpu') so nothing leaves Polars/GPU. The engine argument's type hint accepts 'polars-gpu', so this should work, right? Give me the code.",
+      "checks": {
+        "regex": ["(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?dispatch|unsupported|does not.{0,40}(support|implement))", "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]", "(?i)gfql\\(", "(?i)(type hint|annotation|signature)"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Declines the request: hypergraph() does not actually execute the Polars/Polars-GPU engines despite the type annotation listing them.", "Explains that the annotation is ahead of the implementation, so the call fails at runtime rather than running natively.", "Gives a working alternative: hypergraph with the supported pandas or cuDF engine, converting the Polars events as needed.", "Notes that Polars/Polars-GPU can still be used for subsequent GFQL work on the resulting graph."]
+      }
+    },
+    {
+      "id": "polars_gpu_availability_fallback_ownership",
+      "prompt": "We deploy the same GFQL job to GPU workers and CPU-only workers. We want engine='polars-gpu' when the RAPIDS stack is present and engine='polars' otherwise, and we must not misreport which engine actually ran. Show the production pattern and state plainly whether PyGraphistry does this for us.",
+      "checks": {
+        "regex": ["(?i)engine\\s*=\\s*['\"]polars-gpu['\"]", "(?i)engine\\s*=\\s*['\"]polars['\"]", "(?i)except", "(?i)(ImportError|RuntimeError|Exception)", "(?i)(does not|doesn't|no).{0,60}(automatic|silently|fall ?back)"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL", "silent CPU fallback"],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["States that PyGraphistry does not fall back automatically: polars-gpu is GPU-or-error and raises when the RAPIDS/cudf_polars stack is missing.", "Shows the application owning the fallback, e.g. attempting engine='polars-gpu' and catching the error to retry with engine='polars'.", "Records or logs which engine actually executed rather than assuming the requested one.", "Does not claim a silent or automatic CPU fallback."]
       }
     }
   ]
