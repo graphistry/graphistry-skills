@@ -125,6 +125,35 @@ uv pip install --python /tmp/gs-eval-venv/bin/python 'graphistry==0.58.0' 'polar
 PATH="/tmp/gs-eval-venv/bin:$PATH" ./bin/agent.sh --claude --journeys ... --skills-mode both
 ```
 
+### Protect the eval environment from the agents under test
+
+Agents under evaluation run with the eval venv on `PATH` and can **write to it**. This is not
+hypothetical: during the 2026-07-25 Polars sweep an agent edited the installed
+`graphistry/Engine.py` (`resolve_engine`'s polars branch, `Engine.PANDAS` → `Engine.POLARS`) inside the
+venv. Every cell that ran afterwards — including a full published matrix — executed against a library
+that no longer matched the version the report claimed. Prompts that ask why a library behaves a certain
+way are the ones most likely to induce a patch instead of a code fix.
+
+Write-protect the environment and, more importantly, **verify it afterwards** — protection can be undone
+by the same agent, so treat the checksum as the source of truth and discard any run whose environment
+moved:
+
+```bash
+SP=/tmp/gs-clean-venv/lib/python3.13/site-packages
+find "$SP/graphistry" -name '*.py' -type f | sort | xargs sha256sum | sha256sum > /tmp/gs_env_baseline.sha
+chmod -R a-w "$SP/graphistry"
+
+# ... run the sweep ...
+
+find "$SP/graphistry" -name '*.py' -type f | sort | xargs sha256sum | sha256sum > /tmp/gs_env_after.sha
+diff /tmp/gs_env_baseline.sha /tmp/gs_env_after.sha \
+  && echo "environment intact — results valid" \
+  || echo "CONTAMINATED: discard this run, rebuild the venv, re-run"
+```
+
+Never publish a pack without that post-run diff. A benchmark that names a package version is making a
+claim about the environment, and only the checksum substantiates it.
+
 ### GPU verification (`polars-gpu`) on dgx-spark
 
 `engine='polars-gpu'` needs the RAPIDS `cudf_polars` stack, which is not installed on the CPU dev box.
