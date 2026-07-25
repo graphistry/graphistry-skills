@@ -245,6 +245,36 @@ reset to env/default. `'polars'` and `'polars-gpu'` are one lazy engine with two
 is built once and collected once — that transfer-once design is what makes GPU pay off, and it is why
 per-op eager collection is a GPU regression (repeated host-to-device copies).
 
+### Physical indexes: seeded lookups
+
+GFQL ships pay-as-you-go adjacency/node-id indexes for seeded traversal
+(`graphistry.compute.gfql.index`): `create_index`, `drop_index`, `show_indexes`, `index_trace`, and the
+Cypher DDL parsed by `parse_index_ddl`. Build cost is O(E log E) once, amortized over later seeded queries.
+
+```python
+from graphistry.compute.gfql.index import create_index, index_trace
+from graphistry.compute.ast import n, e_forward
+
+gi = create_index(g, 'edge_out_adj', engine='polars')   # kinds: edge_out_adj | edge_in_adj | node_id
+with index_trace() as steps:
+    out = gi.gfql([n({'id': 'acct-42'}), e_forward(), n()], engine='polars')
+steps[0]['path']             # 'index' or 'scan'
+steps[0]['decision_reason']  # e.g. 'frontier below cost gate -> index'
+```
+
+Two rules decide whether the index actually helps:
+
+- **Query shape.** Only the chain/hop form consults the index. Measured on 200k nodes / 1.6M edges,
+  polars: chain `[n({'id':...}), e_forward(), n()]` went **8.90ms → 1.68ms (5.3x)** with an index, while the
+  Cypher forms (`WHERE a.id = ...` and inline `{id: ...}`) were **not consulted at all** and did not
+  improve. If you want index acceleration for repeated seeded lookups, write the chain form.
+- **Frontier size, engine-aware.** The planner gates index-vs-scan on the frontier as a fraction of
+  distinct source keys: **pandas ~0.5, polars/cuDF/GPU ~0.02** (GPU values provisional upstream). Vectorized
+  engines scan so fast that an index only wins for very selective seeds. Past the gate it falls back to
+  scan, so `use` never loses to the un-indexed path. Override with `set_cost_gate_frac(engine, frac)`.
+
+Use `index_trace()` to confirm `path == 'index'` rather than assuming the index is doing anything.
+
 ### Choosing an engine on performance
 
 Do not promise a speedup you have not measured. The honest defaults:
@@ -259,6 +289,38 @@ Do not promise a speedup you have not measured. The honest defaults:
   traversals (10M nodes / 80M edges) but ~0.86x — a regression — on small/interactive sizes. Use it for
   large batch CPU work only; do not enable it by default because the name sounds faster.
 - Prefer measuring both engines on a representative slice over reasoning about which "should" be faster.
+
+### Which engine when — a decision procedure
+
+Work these in order; stop at the first that decides.
+
+1. **Does a step decline under Polars?** Parity-or-`NotImplementedError` surfaces (above) settle it: run
+   that step on `engine='pandas'`. Never relabel the result as Polars.
+2. **Where do the frames already live?** Conversion is real work, and `polars-gpu` still ingests a *host*
+   polars frame — it does not read device memory directly. So already-cuDF (on-device) frames favor
+   `engine='cudf'`; host Polars frames favor `'polars'`/`'polars-gpu'`.
+3. **Is it a seeded lookup with a small frontier?** Build a physical index and use the **chain** form.
+   That is the biggest single win available on small/selective queries (5.3x measured) and it is
+   independent of engine choice.
+4. **CPU: prefer `polars` over `pandas`** for anything non-trivial. Measured ~2x on seeded 1-hop at both
+   80k edges (1.53ms vs 3.06ms) and 1.6M edges (6.97ms vs 12.77ms); upstream reports far larger wins on
+   the Cypher row-pipeline surface. Below ~50-100k rows the gap narrows and conversion can dominate.
+5. **GPU: only when the workload is big enough, and pick the GPU engine by measurement, not by name.**
+   Measured on an NVIDIA GB10, string-keyed graphs:
+
+   | workload | `polars` (CPU) | `cudf` | `polars-gpu` |
+   | --- | --- | --- | --- |
+   | 1.6M edges, 2-hop | 486.9ms | 322.6ms | **284.8ms** |
+   | 8M edges, 1-hop | 1379.4ms | **762.8ms** | 1499.6ms |
+   | 8M edges, 2-hop | 2433.5ms | **1376.6ms** | 3410.0ms |
+
+   `polars-gpu` won at the middle size and **lost to CPU Polars at 8M edges**, where `cudf` was roughly
+   2x faster than either. Do not state a general "`polars-gpu` beats `cudf`" rule. Two upstream facts
+   explain the shape: the host round trip above, and multi-hop GPU fusion being an acknowledged follow-up
+   where the GPU win "dilutes".
+
+Below roughly a few milliseconds of work, engine choice is noise — indexing and query shape matter more.
+
 
 ### Parity-or-decline: do not invent workarounds
 
