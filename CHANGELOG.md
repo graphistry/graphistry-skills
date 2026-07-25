@@ -14,6 +14,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Skills / pygraphistry-core, pygraphistry-ai, pygraphistry**: Polars/Polars-GPU engine guidance and routing; `gfql()` has no `strict=` argument.
 - **Evals / pygraphistry_gfql_polars_engines_v1**: New 7-case journey covering explicit Polars output types, a functional native-Polars round trip (asserts the result frame module is `polars`), auto-engine regression debugging, strict off-engine analytic policy, the unsupported `hypergraph()` Polars path, and GPU fallback ownership.
 
+### Tests
+- **Claude, `pygraphistry_gfql_polars_engines_v1`, 7 cases x skills on/off (14/14 rows, baseline isolation clean)**: `skills=off` 1/7, `skills=on` 3/7 (+28.6pp). Functional case executed for real — `off` raised `NameError: name 'polars' is not defined`, `on` printed `RESULT_COUNT: 3` / `NODES_MODULE: polars.dataframe.frame`.
+- **README/benchmark numbers intentionally unchanged.** The result above is environment-dominated: the eval box's importable `graphistry` is 0.45.4, which predates the Polars engines, so agents "verify" that Polars does not exist. Rerunning the four affected cases with a Polars-capable checkout on `PYTHONPATH` gives 4/4 in **both** modes. The publishable configuration — released `graphistry>=0.58` installed, no source tree — is untested, and the Codex half is blocked by exhausted usage credits until 2026-07-29. See `DEVELOP.md` for the precondition.
+
 ### Changed
 - **Skills / internal/plan**: Slimmed to periodic plan-file maintenance at natural handoff points instead of per-action reloads; plan files are opt-in rather than the default for single-session work.
 - **Skills / pygraphistry-core**: Do not recommend `hypergraph(..., engine='polars'|'polars-gpu')`. The type annotation lists both, but `graphistry/hyper_dask.py` has no dispatch and the call fails at runtime (`AttributeError: 'ValueError' object has no attribute 'copy'`). Filed upstream as [pygraphistry#1775](https://github.com/graphistry/pygraphistry/issues/1775).
