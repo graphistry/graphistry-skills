@@ -185,7 +185,41 @@ g2 = g.gfql([e_forward(min_hops=2, max_hops=4, output_min_hops=3, output_max_hop
 - Use `where=[...]` for cross-step/path constraints.
 - Use `min_hops`/`max_hops` and `output_min_hops`/`output_max_hops` for traversal vs returned slice.
 - Use predicates (`is_in`, numeric/date predicates) for concise filtering.
-- Use `engine='auto'` by default; force `cudf`/`pandas` only when needed.
+- Use an explicit engine when performance or result frame type matters; `engine='auto'` does not select Polars.
+
+## Execution engines: pandas, Polars, cuDF, and Polars-GPU
+
+Use the same query with the engine suited to the workload. Input frame type and execution engine are independent; GFQL converts inputs once and returns frames in the selected engine's type.
+
+```python
+query = "MATCH (a)-[e]->(b) WHERE a.risk_score > $cutoff RETURN b"
+
+cpu_out = g.gfql(query, params={'cutoff': 7}, engine='polars')
+gpu_out = g.gfql(query, params={'cutoff': 7}, engine='polars-gpu')
+
+# Polars/Polars-GPU outputs are polars.DataFrame objects
+nodes_pd = cpu_out._nodes.to_pandas()  # only for pandas-only downstream APIs
+```
+
+- `pandas`: default-compatible option and fallback for a few unsupported/exotic features.
+- `polars`: explicit CPU columnar engine; choose it for common traversal, filter, order, and aggregation workloads without a GPU.
+- `cudf`: RAPIDS GPU engine.
+- `polars-gpu`: explicit GPU Polars execution. Require the compatible GPU/cuDF stack; do not describe it as silently falling back to CPU.
+- For a Polars input graph, `engine='auto'` resolves to pandas, so use `engine='polars'` to remain native end-to-end.
+- Outputs follow the selected engine: Polars for `polars`/`polars-gpu`, cuDF for `cudf`. Convert intentionally before pandas-specific operations such as `.iloc` or `groupby().apply()`.
+
+### Analytics under Polars engines
+
+Whole-graph `call()` analytics such as UMAP, hypergraph, layouts, or `compute_cugraph` are not native Polars operations. With the default `call_mode='auto'`, GFQL bridges them off-engine (pandas for Polars; cuDF for Polars-GPU) and converts the result back. Use strict mode when an off-engine bridge would violate a benchmark, memory, or execution constraint:
+
+```python
+from graphistry.compute.gfql.lazy import set_call_mode
+
+set_call_mode('strict')  # reject an off-engine analytic before it runs
+result = g.gfql(query, engine='polars')
+```
+
+`polars-gpu` analytics are GPU-or-error: if the GPU/cuDF stack is unavailable, they decline rather than move the work to host pandas.
 
 ## Remote mode
 ```python
@@ -227,6 +261,7 @@ res = rg.python_remote_table(lambda g: g._edges[['src', 'dst']].head(1000))
 - Predicate quick reference: https://pygraphistry.readthedocs.io/en/latest/gfql/predicates/quick.html
 - GFQL remote mode: https://pygraphistry.readthedocs.io/en/latest/gfql/remote.html
 - GFQL validation: https://pygraphistry.readthedocs.io/en/latest/gfql/validation/index.html
+- Engine guide: https://pygraphistry.readthedocs.io/en/latest/gfql/engines.html
 - GFQL + loaders/AI patterns: https://pygraphistry.readthedocs.io/en/latest/gfql/combo.html
 - Cypher syntax guide: https://pygraphistry.readthedocs.io/en/latest/gfql/cypher.html
 - Cypher-GFQL mapping: https://pygraphistry.readthedocs.io/en/latest/gfql/spec/cypher_mapping.html

@@ -1,0 +1,38 @@
+{
+  "id": "pygraphistry_gfql_polars_engines_v1",
+  "description": "GFQL engine-selection journey cases for explicit Polars and Polars-GPU execution, output types, and safe analytic bridging.",
+  "eval_intent": "realistic_capability",
+  "tags": ["pygraphistry", "gfql", "polars", "polars-gpu", "skills-expansion"],
+  "cases": [
+    {
+      "id": "polars_explicit_native_output",
+      "prompt": "I have a PyGraphistry graph built from Polars DataFrames and need to run a Cypher GFQL query while keeping the result in Polars. Show a concise example that finds high-risk nodes, explains why I should select the engine explicitly, and shows how to convert the result only if a pandas-only library needs it.",
+      "checks": {
+        "regex": ["(?i)engine\\s*=\\s*['\"]polars['\"]", "(?i)gfql\\(", "(?i)MATCH", "(?i)to_pandas\\(\\)", "(?i)(auto.*pandas|pandas.*auto|explicit)"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL"],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Calls g.gfql() with a Cypher string and engine='polars'.", "Explains that automatic/default engine selection does not preserve Polars and resolves to pandas for Polars input.", "States that Polars-engine results are Polars DataFrames.", "Uses .to_pandas() only as an intentional downstream conversion."]
+      }
+    },
+    {
+      "id": "polars_gpu_and_strict_analytics",
+      "prompt": "I want to run a GPU GFQL traversal with PyGraphistry's Polars-GPU engine, then run an analytic only if it can stay within my engine policy. Show the engine selection and how to configure GFQL to reject an off-engine analytic rather than silently bridge it. Mention what happens if the GPU stack is unavailable.",
+      "checks": {
+        "regex": ["(?i)engine\\s*=\\s*['\"]polars-gpu['\"]", "(?i)set_call_mode\\(", "(?i)['\"]strict['\"]", "(?i)(GPU-or-error|gpu.*error|declin|unavailable)"],
+        "must_not_contain": ["EXAMPLE_USERNAME_LITERAL", "EXAMPLE_PASSWORD_LITERAL", "silent CPU fallback"],
+        "python_block": true,
+        "python_ast_parse": true
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "rubric": ["Uses engine='polars-gpu' for GFQL execution.", "Imports and calls set_call_mode('strict') before the analytic path.", "Explains that strict mode declines an off-engine analytic before execution.", "Explains that Polars-GPU is GPU-or-error when the GPU/cuDF stack is unavailable."]
+      }
+    }
+  ]
+}
