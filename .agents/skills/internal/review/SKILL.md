@@ -17,7 +17,7 @@ metadata:
 ## Workflow
 
 1. Establish intent from the user request, PR description, linked issue/spec, and changed-file list.
-2. Read repository guidance relevant to each changed path.
+2. For every changed file, walk from its containing directory to the repository root and inspect applicable Markdown guidance before judging the diff. Check path-local and root-level `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`, `ARCHITECTURE.md`, `DEVELOP.md`, `README.md`, and any package-specific policy/spec files; load only documents relevant to the changed path or review dimension. Record the guidance that applies and any security/privacy requirements.
 3. Inspect the diff and surrounding implementation for correctness, compatibility, error handling, security/secret exposure, performance, and maintainability.
 4. Check tests and validation proportionate to the change. Run safe read-only checks when useful; distinguish unrun checks from passing checks.
 5. Record only actionable findings with severity, file/line, evidence, impact, and a concrete suggestion. Do not invent findings to fill a category.
