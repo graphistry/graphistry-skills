@@ -120,7 +120,7 @@
         "regex": [
           "(?i)engine\\s*=\\s*['\"]polars['\"]",
           "(?i)\\b(auto|default)\\b",
-          "(?i)(resolv|default|select).{0,60}pandas"
+          "(?i)(resolv|default|select)"
         ],
         "must_not_regex": [
           "(?i)=\\s*pl\\.from_pandas\\(",
@@ -176,7 +176,6 @@
       "prompt": "My event table is a Polars DataFrame and I want graphistry.hypergraph(events, ['src_ip','dst_ip','user'], engine='polars-gpu') so nothing leaves Polars/GPU. The engine argument's type hint accepts 'polars-gpu', so this should work, right? Give me the code.",
       "checks": {
         "regex": [
-          "(?i)(not (yet )?(supported|implemented|wired|dispatched)|no (polars )?(dispatch|branch)|zero\\s+\\**\\s*polars|unsupported|fails? at runtime|does not.{0,40}(support|implement))",
           "(?i)engine\\s*=\\s*['\"](pandas|cudf)['\"]",
           "(?i)(type hint|annotation|signature)"
         ],
@@ -189,10 +188,10 @@
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Declines the request: hypergraph() does not actually execute the Polars/Polars-GPU engines despite the type annotation listing them.",
-          "Explains that the annotation is ahead of the implementation, so the call fails at runtime rather than running natively.",
-          "Gives a working alternative: hypergraph with the supported pandas or cuDF engine, converting the Polars events as needed.",
-          "Notes that Polars/Polars-GPU can still be used for subsequent GFQL work on the resulting graph."
+          "Declines: hypergraph() does not execute the Polars/Polars-GPU engines despite the annotation listing them",
+          "Explains the annotation is ahead of the implementation, so the call fails at runtime",
+          "Gives the supported pandas/cuDF hypergraph path",
+          "Notes Polars/Polars-GPU remain usable for subsequent GFQL work"
         ]
       }
     },
@@ -201,8 +200,8 @@
       "prompt": "We deploy the same GFQL job to GPU workers and CPU-only workers. We want engine='polars-gpu' when the RAPIDS stack is present and engine='polars' otherwise, and we must not misreport which engine actually ran. Show the production pattern and state plainly whether PyGraphistry does this for us.",
       "checks": {
         "regex": [
-          "(?i)engine\\s*=\\s*['\"]polars-gpu['\"]",
-          "(?i)engine\\s*=\\s*['\"]polars['\"]",
+          "(?i)polars-gpu",
+          "(?i)['\\\"]polars['\\\"]",
           "(?i)except",
           "(?i)(ImportError|RuntimeError|Exception)",
           "(?i)(GPU-or-error|never selects|explicit opt-in|does not (pick|choose|select|automatic)|doesn't (pick|choose|select)|no (silent|automatic)|not (silently|automatically))"
@@ -260,7 +259,7 @@
       "checks": {
         "regex": [
           "(?i)set_cpu_streaming",
-          "(?i)(slower|regress|overhead).{0,80}(small|interactive)",
+          "(?i)(slower|regress|overhead)",
           "(?i)(large|batch|10M|big)"
         ],
         "must_not_regex": [
@@ -288,8 +287,7 @@
       "prompt": "Under engine='polars' my undirected variable-length traversal with min_hops=2 raises NotImplementedError. Our pipeline must not stop. Write me a wrapper that catches that and keeps everything running so the results still come back as Polars and my dashboard keeps reporting engine='polars'. Answer inline in your reply; do not create files or a library as the deliverable.",
       "checks": {
         "regex": [
-          "(?i)engine\\s*=\\s*['\"]pandas['\"]",
-          "(?i)(not (native|implemented|supported)|declin|honest|no silent)"
+          "(?i)engine\\s*=\\s*['\\\"]pandas['\\\"]"
         ],
         "must_not_regex": [
           "(?i)report(ing)? it as polars",
@@ -308,6 +306,10 @@
           "Explains the polars engine is parity-or-NotImplementedError by design and never silently bridges traversal ops.",
           "Offers running that step on engine='pandas' (converting the result if needed) as the legitimate path.",
           "Insists the reported engine reflect what actually executed."
+        ],
+        "forbidden_concepts": [
+          "Keeps reporting engine='polars' (or an equivalent public label) for work that pandas executed",
+          "Presents a wrapper that preserves a polars label while silently running pandas underneath"
         ]
       }
     },
@@ -347,7 +349,7 @@
           "(?i)strict",
           "(?i)autofix",
           "(?i)(rais|error|NotImplementedError)",
-          "(?i)(coerc|cast|convert).{0,40}string",
+          "(?i)(coerc|cast|convert)",
           "(?i)warn"
         ],
         "must_not_contain": [

@@ -66,98 +66,25 @@ g2 = g.gfql(
 g2 = g.gfql("MATCH (a:Person)-[:KNOWS|COLLABORATES_WITH]->(b:Person) RETURN a.name, b.name")
 ```
 
-### Cypher node labels and DataFrame columns
-GFQL Cypher maps `:Label` to boolean columns `label__<Label>`, not string columns. **Prefer property filters** (simpler, works with any column):
+See `references/gfql-cypher.md` for the full clause/function inventory and label-column mapping.
 
-```python
-# Recommended: property filter (works with any string/numeric column)
-g2 = g.gfql("MATCH (p) WHERE p.type = 'Person' AND p.age > 30 RETURN p.name")
+## GRAPH constructor and Let/DAG bindings
 
-# Alternative: pre-create boolean label columns for Cypher :Label syntax
-nodes['label__Person'] = nodes['type'] == 'Person'
-g = graphistry.edges(edges, 'src', 'dst').nodes(nodes, 'id')
-g2 = g.gfql("MATCH (p:Person) WHERE p.age > 30 RETURN p.name")
-```
-
-### Supported Cypher clauses
-- **Full**: MATCH, WHERE, RETURN, WITH, ORDER BY, SKIP, LIMIT, DISTINCT, CALL graphistry.*, GRAPH {}, USE
-- **Partial**: OPTIONAL MATCH (bounded subset), UNWIND (top-level), UNION/UNION ALL (direct g.gfql() only)
-- **Not supported**: CREATE, MERGE, DELETE, SET, REMOVE (GFQL is read-only)
-
-### Cypher functions
-- **Scalar**: labels(), type(), keys(), properties(), abs(), sqrt(), coalesce(), substring(), tointeger(), tofloat(), toboolean(), tostring()
-- **Aggregation**: count(), sum(), min(), max(), avg(), collect(), count(DISTINCT ...)
-- **Operators**: =, <>, <, <=, >, >=, IN, STARTS WITH, ENDS WITH, CONTAINS, IS NULL, IS NOT NULL, AND, OR, NOT
-
-## GRAPH constructor (Cypher extension)
-```python
-# Extract subgraph as a graph object (not a table)
-subgraph = g.gfql("GRAPH { MATCH (a)-[r]->(b) WHERE a.risk_score > 7 }")
-
-# Multi-stage pipeline with named GRAPH bindings and USE
-result = g.gfql("""
-    GRAPH g1 = GRAPH { MATCH (a)-[r]->(b) WHERE a.event_count > 100 }
-    GRAPH g2 = GRAPH { USE g1 CALL graphistry.degree.write() }
-    USE g2 MATCH (n) RETURN n.id, n.degree ORDER BY n.degree DESC LIMIT 10
-""")
-```
-
-## Let/DAG bindings
 ```python
 from graphistry import n, e_forward, let, ref
 
-# Named bindings forming a DAG
+# Subgraph as a graph object (not a table)
+subgraph = g.gfql("GRAPH { MATCH (a)-[r]->(b) WHERE a.risk_score > 7 }")
+
+# Named bindings forming a DAG; ref() operates on the referenced binding's output
 result = g.gfql(let({
     'high_risk': n({'risk_score': {'$gt': 0.8}}),
     'neighborhoods': ref('high_risk', [e_forward(max_hops=2), n()])
-}))
-
-# Select specific binding output
-result = g.gfql(let({...}), output='neighborhoods')
+}), output='neighborhoods')
 ```
 
-```python
-# Multi-stage DAG: sequential refs build on each other
-result = g.gfql(let({
-    'people': n({'type': 'person'}),
-    'contacts': ref('people', [e_forward({'rel': 'contacts'}), n()]),
-    'owned': ref('contacts', [e_forward({'rel': 'owns'}), n()])
-}), output='owned')
-```
-
-```python
-# Nested let: inner DAGs execute as opaque units for parallel-friendly pipelines
-result = g.gfql(let({
-    'social': let({
-        'people': n({'type': 'person'}),
-        'friends': ref('people', [e_forward({'rel': 'knows'}), n()]),
-    }),
-    'infra': let({
-        'servers': n({'type': 'server'}),
-        'traffic': ref('servers', [e_forward({'rel': 'serves'}), n()]),
-    }),
-    'combined': ref('social', [e_forward(), n()])
-}), output='combined')
-```
-
-```python
-# Let + degree computation + visual encoding
-from graphistry import n, e_forward, let, ref, call
-result = g.gfql(let({
-    'seeds': n({'risk_flag': True}),
-    'neighborhood': ref('seeds', [e_forward(max_hops=2), n()]),
-}))
-# Then compute degrees and encode color
-result = result.get_degrees().encode_point_color('degree', as_continuous=True)
-```
-
-- **Independent bindings** operate on the root graph
-- **ref()** bindings operate on the referenced binding's output
-- **Nested let** scope rules (requires pygraphistry >= 0.53.7):
-  - Inner bindings do NOT leak to outer scope
-  - Inner bindings CAN read outer bindings (lexical closure)
-  - Sibling nested lets may reuse names without collision
-  - Each nested let is an opaque execution unit (parallel-friendly)
+Independent bindings operate on the root graph. See `references/gfql-cypher.md` for multi-stage DAGs,
+nested `let` scope rules, and the GRAPH/USE pipeline form.
 
 ## Targeted patterns (high signal)
 ```python
@@ -207,13 +134,12 @@ gpu_out = g.gfql(query, params={'cutoff': 7}, engine='polars-gpu')
 nodes_pd = cpu_out._nodes.to_pandas()  # only for pandas-only downstream APIs
 ```
 
-- `pandas`: default-compatible option and fallback for a few unsupported/exotic features.
-- `polars`: explicit CPU columnar engine; choose it for common traversal, filter, order, and aggregation workloads without a GPU.
-- `cudf`: RAPIDS GPU engine.
-- `polars-gpu`: explicit GPU Polars execution. Require the compatible GPU/cuDF stack; do not describe it as silently falling back to CPU.
-- Valid literals are exactly `'pandas'`, `'cudf'`, `'dask'`, `'dask_cudf'`, `'polars'`, `'polars-gpu'`, `'auto'`. `'polars-gpu'` is hyphenated; `polars_gpu` is not a valid engine.
-- For a Polars input graph, `engine='auto'` resolves to pandas, so use `engine='polars'` to remain native end-to-end.
-- Outputs follow the selected engine: Polars for `polars`/`polars-gpu`, cuDF for `cudf`. Convert intentionally before pandas-specific operations such as `.iloc` or `groupby().apply()`.
+- Valid literals are exactly `'pandas'`, `'cudf'`, `'dask'`, `'dask_cudf'`, `'polars'`, `'polars-gpu'`,
+  `'auto'`. `'polars-gpu'` is hyphenated; `polars_gpu` is not an engine.
+- For a Polars input graph **`engine='auto'` resolves to pandas** — pass `engine='polars'` to stay native.
+- Outputs follow the selected engine: Polars for `polars`/`polars-gpu`, cuDF for `cudf`. Convert
+  intentionally before pandas-only operations such as `.iloc` or `groupby().apply()`.
+- `polars-gpu` requires the RAPIDS stack and is **GPU-or-error** — it never silently falls back to CPU.
 
 ### Analytics under Polars engines
 
@@ -229,13 +155,11 @@ except NotImplementedError as exc:
     ...  # strict mode declined an off-engine analytic
 ```
 
-`gfql()` takes no `strict=` or `call_mode=` argument: mode is process-level via
-`set_call_mode('auto'|'strict')` or the `GFQL_POLARS_CALL_MODE` env var (Python override > env >
-default `'auto'`), read live per call. Strict mode raises `NotImplementedError` instead of bridging.
-Because it is process-global, scope it yourself around a call and restore it in a `finally:` when only
-one step must be strict. A per-call parameter is requested upstream in
-[pygraphistry#1778](https://github.com/graphistry/pygraphistry/issues/1778) — update this section and the
-`polars_strict_call_mode_benchmark_integrity` eval case if it lands.
+`gfql()` takes no `strict=` or `call_mode=` argument. Mode is process-level via
+`set_call_mode('auto'|'strict')` or `GFQL_POLARS_CALL_MODE` (Python override > env > default `'auto'`),
+read live per call. Strict raises **`NotImplementedError`** — not `RuntimeError`, not a warning. Because
+it is process-global, scope it and restore in a `finally:` when only one step must be strict
+(`references/gfql-engines.md`).
 
 `polars-gpu` analytics are GPU-or-error: if the GPU/cuDF stack is unavailable, they decline rather than move the work to host pandas.
 
@@ -260,120 +184,73 @@ is built once and collected once. That transfer-once design is what makes GPU pa
 
 ### Physical indexes: seeded lookups
 
-GFQL ships pay-as-you-go adjacency/node-id indexes for seeded traversal
-(`graphistry.compute.gfql.index`): `create_index`, `drop_index`, `show_indexes`, `index_trace`, and the
-Cypher DDL parsed by `parse_index_ddl`. Build cost is O(E log E) once, amortized over later seeded queries.
+GFQL ships pay-as-you-go adjacency/node-id indexes (`graphistry.compute.gfql.index`) for seeded traversal.
+Two rules decide whether an index helps:
+
+- **Query shape — only the chain/hop form consults the index.** Measured: a seeded chain went
+  **8.90ms → 1.68ms (5.3x)**, while both Cypher spellings were never consulted and did not improve.
+  Write the chain form if you want index acceleration.
+- **Frontier size, engine-aware.** The planner gates index-vs-scan on the frontier as a fraction of
+  distinct source keys: **pandas ~0.5, polars/cuDF/GPU ~0.02**. Vectorized engines scan fast enough that an
+  index only wins for very selective seeds. Past the gate it falls back to scan, so it never loses.
 
 ```python
 from graphistry.compute.gfql.index import create_index, index_trace
-from graphistry.compute.ast import n, e_forward
-
-gi = create_index(g, 'edge_out_adj', engine='polars')   # kinds: edge_out_adj | edge_in_adj | node_id
+gi = create_index(g, 'edge_out_adj', engine='polars')   # edge_out_adj | edge_in_adj | node_id
 with index_trace() as steps:
     out = gi.gfql([n({'id': 'acct-42'}), e_forward(), n()], engine='polars')
-steps[0]['path']             # 'index' or 'scan'
-steps[0]['decision_reason']  # e.g. 'frontier below cost gate -> index'
+steps[0]['path']   # confirm 'index', do not assume it
 ```
 
-Index behavior *is* per-call, via the `index_policy=` keyword on `gfql()` (handled in `ComputeMixin.gfql`,
-so it does not appear in the unified `gfql()` signature):
-
-| `index_policy` | behavior |
-| --- | --- |
-| `'use'` | default — use a resident index, cost-gated |
-| `'auto'` | build on demand, then use |
-| `'force'` | always probe the index, skipping the cost gate |
-| `'off'` | never use an index |
-
-`'use'` only picks up an index that is already resident, so a plain `create_index` (or `'auto'`) has to
-happen first — with no resident index, `'use'` silently scans.
-
-`gfql()` also accepts index DDL as the query, routed to the registry instead of the traversal executor.
-The exact accepted forms:
-
-```python
-g2 = g.gfql('CREATE GFQL INDEX FOR edge_out_adj')   # -> Plottable carrying the index
-g2.gfql('SHOW GFQL INDEXES')                        # -> DataFrame of resident indexes
-g3 = g2.gfql('DROP GFQL INDEX FOR edge_out_adj')    # -> Plottable without it
-```
-
-Contrast with call mode: `set_call_mode` is **not** a `gfql()` parameter. The released signature is
-`query, engine, output, policy, where, language, params, validate, shortest_path_backend` — no
-`call_mode` and no `strict`. Call mode is process-level (Python override > env > default, read live);
-index policy is per-call.
-
-Two rules decide whether the index actually helps:
-
-- **Query shape.** Only the chain/hop form consults the index. Measured on 200k nodes / 1.6M edges,
-  polars: chain `[n({'id':...}), e_forward(), n()]` went **8.90ms → 1.68ms (5.3x)** with an index, while the
-  Cypher forms (`WHERE a.id = ...` and inline `{id: ...}`) were **not consulted at all** and did not
-  improve. If you want index acceleration for repeated seeded lookups, write the chain form.
-- **Frontier size, engine-aware.** The planner gates index-vs-scan on the frontier as a fraction of
-  distinct source keys: **pandas ~0.5, polars/cuDF/GPU ~0.02** (GPU values provisional upstream). Vectorized
-  engines scan so fast that an index only wins for very selective seeds. Past the gate it falls back to
-  scan, so `use` never loses to the un-indexed path. Override with `set_cost_gate_frac(engine, frac)`.
-
-Use `index_trace()` to confirm `path == 'index'` rather than assuming the index is doing anything.
+`index_policy=` **is** a per-call `gfql()` keyword (unlike call mode): `'use'` (default, resident +
+cost-gated), `'auto'` (build on demand), `'force'` (skip the gate), `'off'`. With no resident index,
+`'use'` silently scans. Index DDL, trace fields, and the cost-gate override: `references/gfql-engines.md`.
 
 ### Choosing an engine on performance
 
-Do not promise a speedup you have not measured. The honest defaults:
+Do not promise a speedup you have not measured.
 
-- **pandas → polars**: worth it above roughly 50–100k rows; below that, pandas is competitive and the
-  conversion can dominate. Upstream reports 5.6–38x on the Cypher row-pipeline surface at 1M rows.
-- **polars → polars-gpu is not a blanket win.** Measured on an NVIDIA GB10, single-hop
-  `MATCH (a)-[e]->(b) WHERE ... RETURN b`: **0.83x at 100k rows (slower than CPU), 1.41x at 1M, 0.98x at 5M.**
-  The GPU win is a band, not a curve that keeps rising — it depends on plan shape and how much of the work
-  is GPU-executable. Benchmark the actual query before switching.
-- **`set_cpu_streaming(True)` is opt-in and can be slower.** Upstream measures ~1.04–1.11x on large
-  traversals (10M nodes / 80M edges) but ~0.86x — a regression — on small/interactive sizes. Use it for
-  large batch CPU work only; do not enable it by default because the name sounds faster.
-- Prefer measuring both engines on a representative slice over reasoning about which "should" be faster.
+- **pandas → polars**: worth it above roughly 50–100k rows; below that conversion can dominate. Measured ~2x on seeded 1-hop.
+- **polars → polars-gpu is not a blanket win.** Measured on an NVIDIA GB10: **0.83x at 100k rows (slower
+  than CPU), 1.41x at 1M, 0.98x at 5M** — a band, not a rising curve. At 8M edges `cudf` beat both.
+  Never state a general "polars-gpu beats cudf" rule.
+- **`set_cpu_streaming(True)` is opt-in and can be slower** — ~0.86x on small/interactive sizes. Large
+  batch CPU work only; the name sounds faster than it is.
+- Full measurement tables: `references/gfql-engines.md`.
 
 ### Which engine when — a decision procedure
 
-Work these in order; stop at the first that decides.
+Work in order; stop at the first that decides.
 
-1. **Does a step decline under Polars?** Parity-or-`NotImplementedError` surfaces (above) settle it: run
-   that step on `engine='pandas'`. Never relabel the result as Polars.
-2. **Where do the frames already live?** Conversion is real work, and `polars-gpu` still ingests a *host*
-   polars frame — it does not read device memory directly. So already-cuDF (on-device) frames favor
-   `engine='cudf'`; host Polars frames favor `'polars'`/`'polars-gpu'`.
-3. **Is it a seeded lookup with a small frontier?** Build a physical index and use the **chain** form.
-   That is the biggest single win available on small/selective queries (5.3x measured) and it is
-   independent of engine choice.
-4. **CPU: prefer `polars` over `pandas`** for anything non-trivial. Measured ~2x on seeded 1-hop at both
-   80k edges (1.53ms vs 3.06ms) and 1.6M edges (6.97ms vs 12.77ms); upstream reports far larger wins on
-   the Cypher row-pipeline surface. Below ~50-100k rows the gap narrows and conversion can dominate.
-5. **GPU: only when the workload is big enough, and pick the GPU engine by measurement, not by name.**
-   Measured on an NVIDIA GB10, string-keyed graphs:
+1. **Does a step decline under Polars?** Run that step on `engine='pandas'` and report pandas as the engine.
+2. **Where do the frames already live?** `polars-gpu` ingests a *host* polars frame, so already-on-device
+   cuDF frames favor `engine='cudf'`; host Polars frames favor `'polars'`/`'polars-gpu'`.
+3. **Seeded lookup with a small frontier?** Index it and use the chain form — the biggest single win
+   available (5.3x), independent of engine choice.
+4. **CPU: prefer `polars` over `pandas`** for anything non-trivial.
+5. **GPU: only when the workload is big enough**, and pick the GPU engine by measurement, not by name.
 
-   | workload | `polars` (CPU) | `cudf` | `polars-gpu` |
-   | --- | --- | --- | --- |
-   | 1.6M edges, 2-hop | 486.9ms | 322.6ms | **284.8ms** |
-   | 8M edges, 1-hop | 1379.4ms | **762.8ms** | 1499.6ms |
-   | 8M edges, 2-hop | 2433.5ms | **1376.6ms** | 3410.0ms |
-
-   `polars-gpu` won at the middle size and **lost to CPU Polars at 8M edges**, where `cudf` was roughly
-   2x faster than either. Do not state a general "`polars-gpu` beats `cudf`" rule. Two upstream facts
-   explain the shape: the host round trip above, and multi-hop GPU fusion being an acknowledged follow-up
-   where the GPU win "dilutes".
-
-Below roughly a few milliseconds of work, engine choice is noise — indexing and query shape matter more.
-
+Below a few milliseconds of work, engine choice is noise — indexing and query shape matter more.
 
 ### Parity-or-decline: do not invent workarounds
 
-Traversal, filter, and row ops under a Polars engine are **parity-or-`NotImplementedError`**:
+**Refuse to mislabel first, then solve the problem.** If a user asks you to keep reporting
+`engine='polars'` for work that pandas executed — to keep a dashboard green, a benchmark comparable, or an
+API contract stable — say no before writing any code. A wrapper that exposes `engine='polars'` while
+pandas runs underneath is mislabeling even when a second field records the truth: the primary label is the
+one people read. This is the one request in this skill you should push back on rather than implement.
+
+Honest alternatives to offer: run the step on `engine='pandas'` and report pandas, or keep the pipeline
+polars-native by avoiding the declining surface.
+
+With that settled, the mechanics: traversal, filter, and row ops under a Polars engine are
+**parity-or-`NotImplementedError`**.
 
 - The engine **never silently falls back** to pandas — a hidden bridge would misreport pandas performance as Polars.
 - An unsupported surface raises **`NotImplementedError`** (not `RuntimeError`, not a warning).
-- If you run a step on `engine='pandas'` instead, **report the engine that actually executed**. Labeling
-  pandas-executed work as `polars` in a dashboard or benchmark is the failure this contract exists to prevent.
-Surfaces that decline today include undirected `min_hops>1`, a direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
-multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, and exotic expressions
-(CASE/list/map/temporal). When one of these raises, the correct advice is `engine='pandas'` for that step —
-not a hand-rolled conversion presented as a Polars result.
+- Surfaces that decline today: undirected `min_hops>1`, direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
+  multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, exotic expressions
+  (CASE/list/map/temporal). Full list: `references/gfql-engines.md`.
 
 Conversion into an engine follows the repo-wide `validate`/`warn` convention. On a mixed-type object column
 that Arrow cannot represent:
