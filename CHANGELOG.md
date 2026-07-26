@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+---
+
+## [0.5.1 - 2026-07-26]
+
 ### Added
 - **Evals / pygraphistry_skill_evals_v1**: 32 per-skill capability cases covering routing, auth/ETL, GFQL, visualization, AI, connectors, and REST — ported from the April 2026 skill-evals audit (originally `.agents/skills/*/evals/evals.json`, a parallel format nothing in the repo executed). The original semantic assertions became oracle `rubric` entries and `forbidden_concepts`; deterministic checks anchor only explicit code/API tokens, so run this journey with `--grading hybrid`.
 
