@@ -14,13 +14,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Moved to references**: GB10 benchmark tables, the full list of declining surfaces, index DDL forms and trace fields, Cypher clause/function inventories, and extended Let/DAG examples.
   - All 22 decision-critical facts verified present after the move.
 
+### Known issues
+- **The GFQL skill currently makes one case worse on `codex gpt-5.6-terra`.** `polars_parity_or_decline_no_fake_fallback` scores **0.90-0.92 with skills off and 0.52 with skills on**, reproducible across runs. Asked to keep reporting `engine='polars'` for pandas-executed work, baseline terra pushes back on its own; with the skill loaded it treats the request as an engineering task and builds the wrapper. The skill supplies a mechanism (run declining steps on pandas) and the model optimizes for satisfying the request. Leading the section with the refusal did not fix it. Tracked in graphistry/graphistry-skills#30.
+- **`hypergraph_polars_engine_refusal` is unstable across runs** — claude-on scored 0.82 then 0.45 on identical inputs, codex-on 0.37. Its guidance lives in `pygraphistry-core`; neither model reliably surfaces it from a GFQL-shaped question. Tracked in the same issue.
+
 ### Tests
 - **Post-restructure re-eval, `pygraphistry_gfql_polars_engines_v1` (12 cases x skills on/off, hybrid grading, released `graphistry==0.58.0`)**:
   - `claude-sonnet-5`: **9/12 on vs 6/12 off (+25pp)**; latency **23s on vs 92s off (~4x faster)**.
   - `codex gpt-5.6-terra` (high effort): **7/12 on vs 5/12 off (+16.7pp)**, up from 6/12 and +8.3pp before the restructure.
   - Per-case vs the pre-restructure codex run: 2 gains (`polars_auto_engine_regression`, `polars_strict_call_mode_benchmark_integrity`), 1 regression (`polars_gpu_executor_selection` at 0.7975 against a 0.80 threshold, on a fact still stated inline — threshold noise, not a lost fact).
   - **Attribution caveat**: the codex comparison also changed reasoning effort (medium -> high), so its improvement cannot be credited to the restructure alone. The Claude run has no matched pre-restructure baseline on this 12-case journey.
-  - Both harnesses still fail `hypergraph_polars_engine_refusal` and `polars_gpu_availability_fallback_ownership` with skills on — the clearest candidates for further work.
+  - **Trace analysis (tool calls per run)**: claude `skills=off` 8.8 tools (6.5 bash, 1.5 web) / 93s vs `skills=on` 2.0 tools / 24s — the skill replaces empirical probing of the installed package, which is the speedup. On codex the opposite holds: `skills=on` uses **more** tools (4.8 vs 3.8) and more time (50s vs 41s), so the skill is not displacing terra's verification instinct.
+  - **Six failures were deterministic-regex artifacts, not skill or model gaps** — the oracle certified content-present each time ("same meaning is conveyed"). One answer wrote `ENGINE = 'polars-gpu' if _rapids_available() else 'polars'` and failed for lacking a contiguous `engine='polars'`, which is better code than the literal demanded. Proximity couplings (`.{0,40}`, `.{0,80}`) removed; refusal phrasing is now graded by rubric rather than regex, after failing across three models.
+  - After those fixes, verified passing on **both** harnesses: `polars_gpu_availability_fallback_ownership` (claude 0.96, codex 0.94) and `polars_cpu_streaming_tradeoff`.
 
 ---
 
