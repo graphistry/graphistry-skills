@@ -8,6 +8,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Changed
+- **Skills / pygraphistry-gfql**: Restructured from **431 to 301 lines** (-30%), moving detail into `references/gfql-engines.md` and `references/gfql-cypher.md` (170 lines). The repo's own April 2026 audit had asked for this at 232 lines ("keep SKILL.md under 200 lines"); it had since grown to 2.2x that target, and the codex run showed facts being missed because they were buried in prose.
+  - **Kept inline** (decision-critical, and exactly what codex had been missing): engine literals, `auto`->pandas, the parity-or-`NotImplementedError` contract, strict-vs-autofix table, collect-once host-to-device bullet, `index_policy` values, the engine-aware cost gate (pandas ~0.5, polars/GPU ~0.02), and the five-step decision procedure.
+  - **Moved to references**: GB10 benchmark tables, the full list of declining surfaces, index DDL forms and trace fields, Cypher clause/function inventories, and extended Let/DAG examples.
+  - All 22 decision-critical facts verified present after the move.
+
+### Tests
+- **Post-restructure re-eval, `pygraphistry_gfql_polars_engines_v1` (12 cases x skills on/off, hybrid grading, released `graphistry==0.58.0`)**:
+  - `claude-sonnet-5`: **9/12 on vs 6/12 off (+25pp)**; latency **23s on vs 92s off (~4x faster)**.
+  - `codex gpt-5.6-terra` (high effort): **7/12 on vs 5/12 off (+16.7pp)**, up from 6/12 and +8.3pp before the restructure.
+  - Per-case vs the pre-restructure codex run: 2 gains (`polars_auto_engine_regression`, `polars_strict_call_mode_benchmark_integrity`), 1 regression (`polars_gpu_executor_selection` at 0.7975 against a 0.80 threshold, on a fact still stated inline — threshold noise, not a lost fact).
+  - **Attribution caveat**: the codex comparison also changed reasoning effort (medium -> high), so its improvement cannot be credited to the restructure alone. The Claude run has no matched pre-restructure baseline on this 12-case journey.
+  - Both harnesses still fail `hypergraph_polars_engine_refusal` and `polars_gpu_availability_fallback_ownership` with skills on — the clearest candidates for further work.
+
 ---
 
 ## [0.5.1 - 2026-07-26]
