@@ -68,17 +68,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)graph\\.html"
+          "(?i)(graph\\.html|url_params|menu\\s*[=:])"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "References graph.html URL parameters",
-          "Shows toolbar or play URL param syntax"
+          "Names a real parameter that hides the toolbar/menu (e.g. menu=false, info=false), either as a graph.html query param or via settings(url_params=...)",
+          "Explains the initial view correctly: there is no single zoom parameter; the camera is set via bounds (left/right/top/bottom)"
         ],
-        "reference_answer": "Shows graph.html URL params: toolbar=false/0, zoom/play settings, references the URL options doc section"
+        "reference_answer": "Either graph.html?dataset=<id>&menu=false&info=false or g.settings(url_params={'menu': False, 'info': False}). Initial view is set with left/right/top/bottom bounds, not a zoom scalar."
       }
     },
     {
@@ -257,17 +257,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)embed\\s*\\("
+          "(?i)(embed|search|search_graph)\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "References .embed() or embedding-based search",
-          "Shows nearest-neighbor or similarity search pattern"
+          "Uses a real semantic-search entry point: g.search(...) / g.search_graph(...) for a text query, or g.embed(...) when building embeddings",
+          "Explains that the text query is matched against node embeddings/features"
         ],
-        "reference_answer": "Shows g.embed() or g.featurize(kind='nodes').embed() and semantic search/nearest-neighbor workflow in PyGraphistry"
+        "reference_answer": "g.search('query text') or g.search_graph('query text') for text-to-node semantic search; g.embed() builds the embedding model."
       }
     },
     {
@@ -279,7 +279,7 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)community\\.best_partition"
+          "(?i)(community[_a-z]*\\.best_partition|best_partition)"
         ]
       },
       "oracle": {
@@ -303,18 +303,18 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)from_neo4j\\s*\\(",
-          "(?i)plot\\s*\\("
+          "(?i)(graphistry\\.cypher\\s*\\(|\\bbolt\\b)"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Uses Neo4j connector (graphistry.neo4j or from_neo4j)",
-          "Shows driver/auth setup with env vars"
+          "Uses the real Neo4j path: graphistry.register(..., bolt={...}) then graphistry.cypher('MATCH ...')",
+          "Or binds a manually-fetched nodes/edges DataFrame with .edges(...).nodes(...)",
+          "Keeps Neo4j credentials in environment variables"
         ],
-        "reference_answer": "Shows graphistry.neo4j(driver) or g.from_neo4j() connector pattern, covers auth and basic query to extract nodes/edges, then .plot()",
+        "reference_answer": "graphistry.register(api=3, bolt={'uri':..., 'auth':...}) then graphistry.cypher('MATCH (a)-[r]->(b) RETURN a,r,b'). There is no from_neo4j() method.",
         "forbidden_concepts": [
           "Does not hardcode Neo4j credentials"
         ]
@@ -400,9 +400,8 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)graphistry\\.register",
-          "(?i)os\\.environ",
-          "(?i)os\\.getenv"
+          "(?i)register\\s*\\(",
+          "(?i)os\\.(environ|getenv)"
         ]
       },
       "oracle": {
@@ -496,19 +495,19 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)gfql\\s*\\(",
-          "(?i)g\\.gfql",
-          "(?i)e_forward\\s*\\("
+          "(?i)(e_forward|e_undirected|e_reverse)\\s*\\(",
+          "(?i)gfql\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Uses g.gfql() with chain-list syntax",
-          "Uses e_forward() with min_hops/max_hops or equivalent"
+          "Gives a GFQL chain-list bounded to 3 hops from the flagged fraud nodes",
+          "Uses an edge matcher (e_forward / e_undirected / e_reverse) with min_hops/max_hops or hops",
+          "Seeds on the flagged-fraud node predicate"
         ],
-        "reference_answer": "Shows g.gfql([n({'flagged': True}), e_forward(min_hops=1, max_hops=3), n()]) or equivalent chain-list pattern",
+        "reference_answer": "g.gfql([n({'fraud_flag': True}), e_undirected(min_hops=1, max_hops=3), n()]) -- e_forward is equally valid; output_min_hops/output_max_hops are real optional params.",
         "forbidden_concepts": [
           "Does not use deprecated hop() or chain() methods"
         ]
@@ -739,18 +738,18 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)umap\\s*\\(",
-          "(?i)featurize\\s*\\("
+          "(?i)umap\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Gives the UMAP/featurize workflow",
-          "Shows umap() or featurize().umap() call"
+          "Shows the UMAP workflow over node feature columns via g.umap(...)",
+          "Either g.umap(X=[...]) directly (umap auto-featurizes) or an explicit g.featurize(...).umap()",
+          "Visualizes the resulting clusters"
         ],
-        "reference_answer": "Shows g.umap() or g.featurize().umap(), then plots the resulting clusters."
+        "reference_answer": "g.umap(X=[feature columns]).plot(); featurize() is optional because umap() auto-featurizes given column names."
       }
     },
     {
