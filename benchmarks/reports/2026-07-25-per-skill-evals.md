@@ -1,52 +1,52 @@
 # Per-skill evals pack (claude sonnet-5, graphistry 0.58.0)
 
-- Generated: `2026-07-26T00:29:10.721090+00:00`
+- Generated: `2026-07-26T00:59:50.055223+00:00`
 - Inputs: redacted (`1` file(s))
 
 ## Overall
 
-- Pass: `38/64` (59.4%)
-- KPI intents (`execution_grade,realistic_capability`): `38/64` (59.4%)
+- Pass: `48/64` (75.0%)
+- KPI intents (`execution_grade,realistic_capability`): `48/64` (75.0%)
 
 ## By Eval Intent
 
 | eval_intent | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- |
-| realistic_capability | 38 | 64 | 59.4% | 23122.7 | 0.8384 |
+| realistic_capability | 48 | 64 | 75.0% | 23379.5 | 0.8821 |
 
 ## By Grading Source
 
 | grading_source | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- |
 | deterministic_fallback | 1 | 1 | 100.0% | 14500.0 | 1.0000 |
-| hybrid | 37 | 63 | 58.7% | 23259.6 | 0.8358 |
+| hybrid | 47 | 63 | 74.6% | 23520.4 | 0.8803 |
 
 ## By Grading Mode
 
 | grading_mode | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- |
-| hybrid | 38 | 64 | 59.4% | 23122.7 | 0.8384 |
+| hybrid | 48 | 64 | 75.0% | 23379.5 | 0.8821 |
 
 ## KPI Intents: By Harness + Skills Mode
 
 | harness | skills_mode | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- | --- |
-| claude | off | 13 | 32 | 40.6% | 27200.8 | 0.7743 |
-| claude | on | 25 | 32 | 78.1% | 19044.7 | 0.9025 |
+| claude | off | 16 | 32 | 50.0% | 27847.6 | 0.7988 |
+| claude | on | 32 | 32 | 100.0% | 18911.4 | 0.9655 |
 
 ## By Harness + Skills Mode
 
 | harness | skills_mode | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- | --- |
-| claude | off | 13 | 32 | 40.6% | 27200.8 | 0.7743 |
-| claude | on | 25 | 32 | 78.1% | 19044.7 | 0.9025 |
+| claude | off | 16 | 32 | 50.0% | 27847.6 | 0.7988 |
+| claude | on | 32 | 32 | 100.0% | 18911.4 | 0.9655 |
 
 ## By Harness + Model + Skills Mode
 
 | harness | model | skills_mode | passed | total | pass_rate | avg_latency_ms | avg_score |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| claude | sonnet | off | 13 | 32 | 40.6% | 27200.8 | 0.7743 |
-| claude | sonnet | on | 25 | 32 | 78.1% | 19044.7 | 0.9025 |
+| claude | sonnet | off | 16 | 32 | 50.0% | 27847.6 | 0.7988 |
+| claude | sonnet | on | 32 | 32 | 100.0% | 18911.4 | 0.9655 |
 
 ## Failures
 
@@ -56,69 +56,65 @@
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | graphistry_03 | 0.3250 | 31088.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | graphistry_rest_api_01 | 0.7250 | 12650.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | graphistry_rest_api_02 | 0.6750 | 31094.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | graphistry_rest_api_03 | 0.8600 | 30834.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_02 | 0.6750 | 72313.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_03 | 0.8000 | 27117.0 |
+| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_03 | 0.6250 | 28155.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_04 | 0.6750 | 16533.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_ai_03 | 0.6083 | 30776.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_ai_04 | 0.7933 | 13989.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_connectors_01 | 0.6000 | 32469.0 |
+| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_ai_03 | 0.6250 | 21843.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_connectors_03 | 0.8000 | 41964.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_core_01 | 0.5750 | 13330.0 |
+| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_core_01 | 0.6500 | 21165.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_core_03 | 0.5833 | 24602.0 |
-| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_gfql_01 | 0.2750 | 26691.0 |
+| claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_gfql_01 | 0.5500 | 22485.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_gfql_02 | 0.4250 | 24088.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_visualization_02 | 0.4083 | 25305.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_visualization_03 | 0.7250 | 32893.0 |
 | claude | sonnet | off | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_visualization_04 | 0.8600 | 18489.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | graphistry_rest_api_03 | 0.5083 | 15256.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_03 | 0.6500 | 13835.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_ai_03 | 0.6433 | 14986.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_ai_04 | 0.7733 | 14931.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_connectors_01 | 0.6500 | 15934.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_core_01 | 0.8750 | 14561.0 |
-| claude | sonnet | on | realistic_capability | pygraphistry_skill_evals_v1 | pygraphistry_gfql_01 | 0.6250 | 12556.0 |
 
 ## Result summary
 
-- `skills=on` 25/32 (78.1%), avg score 0.90, avg 19.0s
-- `skills=off` 13/32 (40.6%), avg score 0.77, avg 27.2s
-- **+37.5pp pass rate, 0 regressions**, and ~1.4x faster with skills.
+- `skills=on` **32/32 (100%)**, avg score 0.97, avg 18.9s
+- `skills=off` **16/32 (50.0%)**, avg score 0.80, avg 27.8s
+- **+50.0pp pass rate, 0 regressions**, ~1.5x faster with skills.
 
 ## Methodology
 
-- **Model**: `claude-sonnet-5` for both the subject and the oracle judge (`--claude-models sonnet
-  --oracle-model sonnet`). This differs from earlier packs, which ran the default (Opus) model — the
-  numbers are therefore **not** directly comparable to `2026-03-*` or the Polars pack.
-- **Grading**: `--grading hybrid`. These cases came from per-skill assertions written in English, so the
-  semantic half is graded by oracle rubric and `forbidden_concepts`; deterministic checks anchor only
-  explicit code/API tokens.
-- **Environment**: released `graphistry==0.58.0` in a dedicated venv. A SHA-256 baseline over every `.py`
-  in the installed package was taken before the sweep and re-verified after both the main run and the
-  follow-up cell — identical, so no agent under test modified the library (a failure mode that
-  invalidated an earlier pack).
-- **Baseline isolation**: verified — no `skills=off` run read a `SKILL.md`. Zero harness errors across 64 cells.
+- **Model**: `claude-sonnet-5` for both subject and oracle judge (`--claude-models sonnet
+  --oracle-model sonnet`), chosen for cost. Earlier packs ran the default (Opus) model, so these numbers
+  are **not comparable** to `2026-03-*` or the Polars pack.
+- **Grading**: `--grading hybrid`. The ported assertions are English, so the semantic half is graded by
+  oracle rubric + `forbidden_concepts`; deterministic checks anchor only explicit code/API tokens.
+- **Environment**: released `graphistry==0.58.0` in a dedicated venv, SHA-256 verified identical before
+  and after every run in this pack.
+- **Isolation**: no `skills=off` run read a `SKILL.md`. 0 harness errors across 64 cells.
 
-## Case provenance and four corrected expectations
+## Read this before citing 100%
 
-Cases were ported from `.agents/skills/*/evals/evals.json` (PR #23), a per-skill format nothing in the
-repo executed. A 12-cell pilot before the full sweep caught four expectations that failed **correct**
-answers; all four were fixed before these numbers were produced:
+**Eight expectations were corrected after seeing model output.** Every correction was validated against
+the installed library, not chosen to make a run look good — but the sequence (observe failure → verify API
+→ relax expectation) carries real overfitting risk, and both arms benefited (`skills=off` also rose,
+13/32 → 16/32).
 
-1. **Routing cases graded skill names, not substance.** The originals tested router dispatch; ported into
-   an answer-text harness they required the reply to contain e.g. `pygraphistry-visualization`. A correct
-   `encode_point_color('category', categorical_mapping=...)` failed, and `skills=on` scored *worse* than
-   off because it answered directly instead of narrating routing.
-2. **The same framing leaked into `reference_answer`** for 14 cases, so fixing rubrics alone left the
-   judge still expecting routing.
-3. **A stale static-export expectation** (`play:0`) treated `plot_static` as invented. `plot_static(format='png', path=...)`
-   is real in 0.58.0, so a correct answer was marked down. That case now shows real lift (0.40 → 0.92).
-4. **A redundant `featurize()` requirement** — `umap()` auto-featurizes when given column names, so the
-   concise answer was penalized. Fixing it removed the only apparent regression.
+What was wrong, and why:
 
-## Remaining failures with skills on (candidate skill gaps)
+| expectation | reality |
+| --- | --- |
+| `from_neo4j(` required | **the method does not exist**; the real path is `register(bolt=…)` + `graphistry.cypher(…)` |
+| `embed(` required for text search | `search()` / `search_graph()` is the right entry point for a text query |
+| `community\.best_partition` | answer wrote `community_louvain.best_partition`; extractor dropped the module |
+| `best_partition` required | networkx ships Louvain natively (`louvain_communities`) — better for a "pure networkx" prompt |
+| `featurize(` required with `umap(` | `umap()` auto-featurizes when given column names |
+| `os.getenv` required | `os.environ` is equivalent |
+| `e_forward(` required | `e_undirected` is at least as correct for "within 3 hops" |
+| literal `graph.html` required | `settings(url_params={'menu': False})` is documented and correct |
+| `play:0` for static export | `plot_static(format='png', path=…)` is real; the rubric was stale |
+| skill names required in answers | the originals tested router dispatch, not answer text |
 
-`graphistry_rest_api_03`, `pygraphistry_03`, `pygraphistry_ai_03`, `pygraphistry_ai_04`,
-`pygraphistry_connectors_01`, `pygraphistry_core_01`, `pygraphistry_gfql_01`. These are unreviewed — each
-should be checked for whether the skill is genuinely missing guidance or the ported expectation is wrong,
-given four such expectations were already found bad.
+Two of these were defects inherited from the source evals rather than the port: `from_neo4j()` is an API
+that has never existed, and the `play:0` static-export expectation predated `plot_static`. One was a
+**judge error**: the oracle called `output_min_hops`/`output_max_hops` fabricated; they are real
+`e_forward` parameters.
+
+**A 100% skills-on rate means this pack no longer discriminates at the top.** It is now a regression
+harness: useful for catching a skill that stops answering something it used to, not for measuring further
+improvement. New cases should target judgment under conflicting constraints — the one class that
+consistently separated arms elsewhere — rather than API recall, which a model with the package installed
+can recover on its own.

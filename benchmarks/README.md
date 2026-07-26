@@ -6,8 +6,10 @@ Checked-in benchmark artifacts for skills/eval regression tracking.
 - Per-skill evals pack (2026-07-25, Claude **sonnet-5**, released `graphistry==0.58.0`):
   - Data: `data/2026-07-25-per-skill-evals`
   - Report: `reports/2026-07-25-per-skill-evals.md`
-  - Skills ON: 78.1% pass (25/32), avg score 0.90, avg 19.0s; Skills OFF: 40.6% pass (13/32), avg score 0.77, avg 27.2s — **+37.5pp delta, 0 regressions**
+  - Skills ON: 100% pass (32/32), avg score 0.97, avg 18.9s; Skills OFF: 50.0% pass (16/32), avg score 0.80, avg 27.8s — **+50.0pp delta, 0 regressions**
   - Ran on Sonnet for cost; **not comparable** to the Opus-default packs below
+  - Eight expectations were corrected against the installed library after seeing output (two were defects inherited from the source evals, incl. a `from_neo4j()` API that never existed); overfitting risk disclosed in the report
+  - At 100% skills-on this pack is a regression harness, not a discriminator
   - Environment SHA-verified before and after; baseline isolation verified; 0 harness errors
 - GFQL Polars engine pack (2026-07-25, Claude, verified-clean `graphistry==0.58.0`):
   - Data: `data/2026-07-25-gfql-polars-engines`

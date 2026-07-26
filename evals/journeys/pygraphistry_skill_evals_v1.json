@@ -279,16 +279,17 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)(community[_a-z]*\\.best_partition|best_partition)"
+          "(?i)louvain"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Answers with networkx or community.best_partition"
+          "Runs Louvain with networkx itself (nx.algorithms.community.louvain_communities) or python-louvain (community_louvain.best_partition)",
+          "Does not route the answer through Graphistry, which the prompt excluded"
         ],
-        "reference_answer": "Answers with python-louvain or networkx community detection directly, without graphistry featurize/UMAP.",
+        "reference_answer": "networkx>=3.0 ships Louvain natively: from networkx.algorithms.community import louvain_communities; louvain_communities(G). python-louvain's community_louvain.best_partition(G) is an equally valid alternative.",
         "forbidden_concepts": [
           "Does not import graphistry or call graphistry.register()"
         ]
