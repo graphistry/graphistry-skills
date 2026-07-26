@@ -87,3 +87,44 @@ findings below.
   baseline substantively failed was `polars_parity_or_decline_no_fake_fallback` (oracle 0.55 vs 0.94) —
   it agreed to report pandas-executed work as `engine='polars'`. Integrity/judgment content
   differentiates; API-recall content does not, because the baseline reads the installed package.
+
+---
+
+## Cross-harness follow-up (2026-07-26): codex `gpt-5.6-terra`
+
+The pack's outstanding commitment was to re-run on `codex`. Done, on the expanded 12-case journey
+(`gpt-5.6-terra`, `model_reasoning_effort=medium`, hybrid grading, sonnet judge, released
+`graphistry==0.58.0`):
+
+- `skills=on` **6/12**, `skills=off` **5/12** — **+8.3pp**, 0 harness errors.
+
+**This is much weaker than the Claude result on the same journey, and the gap is the finding.** The
+failures were not phrasing: terra substituted `RuntimeError` where the skill states
+`NotImplementedError`, omitted the autofix warning, and skipped the collect-once host-to-device
+rationale — all facts the skill already contained, but buried in prose paragraphs.
+
+Converting three of those into scannable form (a bulleted parity contract, a strict/autofix table, an
+explicit H2D bullet) — changing no claim, only retrievability — moved two cases on re-run:
+`polars_gpu_executor_selection` 0.76 → **0.93 (pass)** and `polars_gpu_and_strict_analytics` to
+**0.92 (pass)**. Claude had tolerated the prose form; terra did not. **Skill guidance that only one model
+can extract is under-specified guidance.**
+
+Still failing with skills on under terra: `hypergraph_polars_engine_refusal`,
+`polars_auto_engine_regression`, `polars_conversion_validate_semantics`,
+`polars_gpu_availability_fallback_ownership`, `polars_parity_or_decline_no_fake_fallback`,
+`polars_strict_call_mode_benchmark_integrity`. Notably terra keeps writing `RuntimeError` for strict-mode
+declines even though the skill states `NotImplementedError` in both prose and its code example — a model
+behavior, not a documentation gap.
+
+**Not comparable to the Claude rows above**: different model (`gpt-5.6-terra` vs Claude default/sonnet)
+and a journey that grew from 7 to 12 cases. Treat these as a separate harness datapoint, not a delta
+against the Claude numbers.
+
+### Two harness bugs found while doing this
+1. **stdin hang (fixed)** — `codex exec` blocks on `"Reading additional input from stdin..."` whenever it
+   inherits a stdin that never reaches EOF, which is any background/non-tty caller. Cells burned their
+   full timeout and scored empty responses; the same cells complete in 19-26s with stdin closed.
+   `bin/harness/codex.sh` and `bin/harness/claude.sh` now redirect `< /dev/null`.
+2. **Never edit a harness script during a live sweep** — patching `codex.sh` mid-run corrupted the
+   in-flight invocation (bash reads scripts incrementally), producing one `Harness did not emit JSON
+   payload` row scored 0.16 despite a correct answer sitting in the raw log. That row was re-run.

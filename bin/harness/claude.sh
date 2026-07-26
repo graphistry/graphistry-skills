@@ -102,7 +102,9 @@ if [[ -n "$MODEL" ]]; then
   CLAUDE_CMD+=(--model "$MODEL")
 fi
 CLAUDE_CMD+=("$FINAL_PROMPT")
-(cd "$WORKDIR" && timeout "$TIMEOUT_S" "${CLAUDE_CMD[@]}") > "$RAW_OUT" 2>&1
+# stdin closed for the same reason as bin/harness/codex.sh: the prompt is an argument, and an
+# inherited stdin that never EOFs can hang the CLI for the full timeout.
+(cd "$WORKDIR" && timeout "$TIMEOUT_S" "${CLAUDE_CMD[@]}" < /dev/null) > "$RAW_OUT" 2>&1
 exit_code=$?
 set -e
 end_ms=$(date +%s%3N)

@@ -12,9 +12,24 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Evals / pygraphistry_skill_evals_v1**: 32 per-skill capability cases covering routing, auth/ETL, GFQL, visualization, AI, connectors, and REST — ported from the April 2026 skill-evals audit (originally `.agents/skills/*/evals/evals.json`, a parallel format nothing in the repo executed). The original semantic assertions became oracle `rubric` entries and `forbidden_concepts`; deterministic checks anchor only explicit code/API tokens, so run this journey with `--grading hybrid`.
 
 ### Changed
-- **Skills**: Description trigger phrases rewritten across the eight user-facing skills — quoted user phrasings, symbol triggers (`g.plot()`, `.gfql()`, `engine='polars'`), explicit dispatch targets, and proactive-suggestion cues. Original work by Thomas Cook (#23), rebased onto the v0.5.0 engine/index guidance.
+- **Skills / pygraphistry-gfql**: Made three buried facts scannable — the parity-or-`NotImplementedError` contract as a bulleted list (including "report the engine that actually executed"), strict-vs-autofix conversion as a table, and collect-once host-to-device (H2D) as an explicit bullet. No claim changed, only retrievability. This came out of the codex run below, where the model missed facts the skill already stated in prose.
+- **Evals / pygraphistry_gfql_polars_engines_v1**: Relaxed two over-specific deterministic checks that failed correct answers — `to_pandas()` required empty parens (an answer used `to_pandas(use_pyarrow_extension_array=True)`), and the auto-engine case required the literal word "auto" (an answer said "its default Pandas execution engine", which is the same claim).
+- **Skills**: Description trigger phrases rewritten across the eight user-facing skills — quoted user phrasings, symbol triggers (`g.plot()`, `.gfql()`, `engine='polars'`), explicit dispatch targets, and proactive-suggestion cues. Original work by Thomas Cook (#23), rebased onto the v0.5.0 engine/index guidance. Audit findings kept in `docs/skill-evals-audit-2026-04.md`.
+
+### Fixed
+- **Harness / codex.sh, claude.sh**: Close stdin on the CLI invocation (`< /dev/null`). `codex exec` blocks on `"Reading additional input from stdin..."` whenever it inherits a stdin that never reaches EOF — i.e. any background or non-tty caller — so cells burned their entire per-cell timeout and scored empty responses. The same cells complete in 19-26s with stdin closed. The prompt is passed as an argument, so neither CLI needs stdin.
+
+### Removed
+- **Skills / `*/evals/evals.json`**: Removed the per-skill eval format after porting its cases into the journey harness. It duplicated the journey system and had no runner, so those 32 cases had never executed.
+
+---
 
 ### Tests
+- **Cross-harness follow-up on the GFQL Polars pack (2026-07-26, `codex` `gpt-5.6-terra`, medium effort, hybrid grading, sonnet judge, released `graphistry==0.58.0`, 12 cases x skills on/off)**:
+  - `skills=on` **6/12**, `skills=off` **5/12** — **+8.3pp**, 0 harness errors.
+  - **Much weaker than the Claude result on the same journey, and that gap is the point.** Terra's misses were content, not phrasing: it wrote `RuntimeError` where the skill says `NotImplementedError`, omitted the autofix warning, and skipped the collect-once H2D rationale. Making those scannable moved two cases on re-run (`polars_gpu_executor_selection` 0.76 -> 0.93 pass). Skill guidance only one model can extract is under-specified guidance.
+  - **Not comparable** to the Claude rows in the same report: different model and a journey that grew from 7 to 12 cases.
+  - Six cases still fail with skills on under terra; terra keeps substituting `RuntimeError` for strict-mode declines despite the skill stating `NotImplementedError` in both prose and code — a model behavior, not a docs gap.
 - **Per-skill evals pack (2026-07-25, `claude-sonnet-5`, released `graphistry==0.58.0`, 32 cases x skills on/off, hybrid grading)**:
   - `skills=on`: **100% pass (32/32)**, avg score 0.97, avg `18.9s`
   - `skills=off`: **50.0% pass (16/32)**, avg score 0.80, avg `27.8s`
@@ -23,18 +38,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Eight expectations were corrected after seeing model output**, each validated against the installed library: `from_neo4j()` does not exist, `umap()` auto-featurizes, networkx ships Louvain natively, `plot_static` is real where the rubric expected `play:0`, `settings(url_params=...)` is the documented iframe path, and several regexes pinned one spelling of an equivalent answer. Both arms improved (`skills=off` 13/32 -> 16/32), and the overfitting risk is disclosed in the report.
   - At 100% skills-on the pack no longer discriminates at the top; it is kept as a regression harness.
   - Data: `benchmarks/data/2026-07-25-per-skill-evals`, report: `benchmarks/reports/2026-07-25-per-skill-evals.md`.
-
-### Removed
-- **Skills / `*/evals/evals.json`**: Removed the per-skill eval format after porting its cases into the journey harness. It duplicated the journey system and had no runner, so those 32 cases had never executed.
-
-### Added
-- **Skills / evals**: Added `evals/evals.json` to all 8 user-facing skills that were missing per-skill evals: `graphistry`, `pygraphistry`, `pygraphistry-ai`, `pygraphistry-connectors`, `pygraphistry-core`, `pygraphistry-gfql`, `pygraphistry-visualization`, `graphistry-rest-api`. Each file includes 3 positive test cases and 1 negative boundary case with assertions.
-
-### Changed
-- **Skills / descriptions**: Updated description frontmatter for all 8 user-facing skills above to include explicit quoted trigger phrases ("Use when asked to..."), secondary trigger patterns ("Also triggers on..."), and proactive suggest clauses - following skill-creator best practices to reduce undertriggering.
-- **Docs**: Added `docs/skill-evals-audit-2026-04.md` with full audit findings, priority matrix, and implementation plan.
-
----
 
 ## [0.5.0 - 2026-07-25]
 
