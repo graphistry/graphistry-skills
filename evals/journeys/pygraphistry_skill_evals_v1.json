@@ -211,20 +211,18 @@
           "EXAMPLE_PASSWORD_LITERAL"
         ],
         "regex": [
-          "(?i)umap\\s*\\(",
-          "(?i)featurize\\s*\\(",
-          "(?i)plot\\s*\\("
+          "(?i)umap\\s*\\("
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
         "rubric": [
-          "Uses .umap() or .featurize().umap()",
-          "Calls .plot() on the UMAP result",
-          "References feature columns or featurize()"
+          "Runs UMAP over the node feature columns via g.umap(...)",
+          "Accepts either g.umap(X=[...]) directly (umap auto-featurizes) or an explicit g.featurize(...).umap()",
+          "Plots or visualizes the resulting clusters"
         ],
-        "reference_answer": "Shows g.featurize(kind='nodes').umap() or g.umap(feature_columns=[...]) workflow, then g.plot() with UMAP-derived x/y positions"
+        "reference_answer": "g.umap(X=['transaction_count','avg_amount','days_active']).plot(); umap() auto-featurizes when given column names, so a separate featurize() call is optional."
       }
     },
     {

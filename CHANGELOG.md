@@ -14,6 +14,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - **Skills**: Description trigger phrases rewritten across the eight user-facing skills — quoted user phrasings, symbol triggers (`g.plot()`, `.gfql()`, `engine='polars'`), explicit dispatch targets, and proactive-suggestion cues. Original work by Thomas Cook (#23), rebased onto the v0.5.0 engine/index guidance.
 
+### Tests
+- **Per-skill evals pack (2026-07-25, `claude-sonnet-5`, released `graphistry==0.58.0`, 32 cases x skills on/off, hybrid grading)**:
+  - `skills=on`: **78.1% pass (25/32)**, avg score 0.90, avg `19.0s`
+  - `skills=off`: **40.6% pass (13/32)**, avg score 0.77, avg `27.2s`
+  - **Delta: +37.5pp, 0 regressions**, ~1.4x faster with skills. Baseline isolation verified; environment SHA-verified identical before and after.
+  - Run on Sonnet for cost (`--claude-models sonnet --oracle-model sonnet`), so **not comparable** to earlier packs which ran the default Opus model.
+  - Data: `benchmarks/data/2026-07-25-per-skill-evals`, report: `benchmarks/reports/2026-07-25-per-skill-evals.md`.
+  - A 12-cell pilot first caught four ported expectations that failed *correct* answers (skill-name routing checks, the same framing in `reference_answer`, a stale `play:0` static-export rubric where `plot_static` is real, and a redundant `featurize()` requirement). All four were fixed before the reported numbers were produced.
+  - Seven cases still fail with skills on and are flagged in the report as unreviewed candidate skill gaps.
+
 ### Removed
 - **Skills / `*/evals/evals.json`**: Removed the per-skill eval format after porting its cases into the journey harness. It duplicated the journey system and had no runner, so those 32 cases had never executed.
 
