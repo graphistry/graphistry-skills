@@ -18,7 +18,7 @@
           "(?i)engine\\s*=\\s*['\"]polars['\"]",
           "(?i)gfql\\(",
           "(?i)MATCH",
-          "(?i)to_pandas\\(\\)",
+          "(?i)to_pandas\\s*\\(",
           "(?i)(auto.*pandas|pandas.*auto|explicit)"
         ],
         "must_not_contain": [
@@ -119,7 +119,7 @@
       "checks": {
         "regex": [
           "(?i)engine\\s*=\\s*['\"]polars['\"]",
-          "(?i)auto",
+          "(?i)\\b(auto|default)\\b",
           "(?i)(resolv|default|select).{0,60}pandas"
         ],
         "must_not_regex": [

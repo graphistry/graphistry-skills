@@ -252,8 +252,11 @@ Three process-level settings live in `graphistry.compute.gfql.lazy`, each resolv
 
 Read the current value with `call_mode()`, `gpu_executor()`, `cpu_streaming()`; pass `None` to a setter to
 reset to env/default. `'polars'` and `'polars-gpu'` are one lazy engine with two collect targets, so the plan
-is built once and collected once — that transfer-once design is what makes GPU pay off, and it is why
-per-op eager collection is a GPU regression (repeated host-to-device copies).
+is built once and collected once. That transfer-once design is what makes GPU pay off:
+
+- **Collect-once avoids repeated host-to-device (H2D) transfers.** Per-op eager collection re-copies the
+  frame to the device on every operation, which benchmarked as a GPU *regression*.
+- The knobs resolve **Python override > env var > default**, read live per collect — not frozen at import.
 
 ### Physical indexes: seeded lookups
 
@@ -361,16 +364,26 @@ Below roughly a few milliseconds of work, engine choice is noise — indexing an
 
 ### Parity-or-decline: do not invent workarounds
 
-Traversal, filter, and row ops under a Polars engine are **parity-or-`NotImplementedError`** — the engine
-never silently falls back to pandas, because a hidden bridge would misreport pandas performance as Polars.
+Traversal, filter, and row ops under a Polars engine are **parity-or-`NotImplementedError`**:
+
+- The engine **never silently falls back** to pandas — a hidden bridge would misreport pandas performance as Polars.
+- An unsupported surface raises **`NotImplementedError`** (not `RuntimeError`, not a warning).
+- If you run a step on `engine='pandas'` instead, **report the engine that actually executed**. Labeling
+  pandas-executed work as `polars` in a dashboard or benchmark is the failure this contract exists to prevent.
 Surfaces that decline today include undirected `min_hops>1`, a direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
 multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, and exotic expressions
 (CASE/list/map/temporal). When one of these raises, the correct advice is `engine='pandas'` for that step —
 not a hand-rolled conversion presented as a Polars result.
 
-Conversion into an engine follows the repo-wide `validate`/`warn` convention: on a mixed-type object column
-that Arrow cannot represent, `validate='strict'` raises (`NotImplementedError` for polars) and `'autofix'`
-coerces the column to string and warns.
+Conversion into an engine follows the repo-wide `validate`/`warn` convention. On a mixed-type object column
+that Arrow cannot represent:
+
+| `validate` | behavior |
+| --- | --- |
+| `'strict'` | **raises an error** (`NotImplementedError` for polars); the column is left unchanged |
+| `'autofix'` | **coerces the column to string and emits a warning** — data is silently rewritten unless you read the warning |
+
+Use `'strict'` for any job that must never change data without telling you.
 
 ## Remote mode
 ```python

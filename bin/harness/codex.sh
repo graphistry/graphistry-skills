@@ -114,7 +114,11 @@ if [[ -n "$MODEL" ]]; then
   CODEX_CMD+=(-c "model_reasoning_effort=\"${REASONING_EFFORT}\"")
 fi
 CODEX_CMD+=("$FINAL_PROMPT")
-timeout "$TIMEOUT_S" "${CODEX_CMD[@]}" > "$RAW_OUT" 2>&1
+# stdin must be closed: codex blocks on "Reading additional input from stdin..." when it
+# inherits an open stdin that never reaches EOF (any non-tty/background caller). The prompt is
+# passed as an argument, so codex needs nothing on stdin. Without this a sweep silently burns
+# its full per-cell timeout and scores an empty response.
+timeout "$TIMEOUT_S" "${CODEX_CMD[@]}" < /dev/null > "$RAW_OUT" 2>&1
 exit_code=$?
 set -e
 end_ms=$(date +%s%3N)
