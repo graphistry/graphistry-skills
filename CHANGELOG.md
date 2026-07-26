@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+---
+
+## [0.5.2 - 2026-07-26]
+
 ### Changed
 - **Skills / pygraphistry-gfql**: Restructured from **431 to 301 lines** (-30%), moving detail into `references/gfql-engines.md` and `references/gfql-cypher.md` (170 lines). The repo's own April 2026 audit had asked for this at 232 lines ("keep SKILL.md under 200 lines"); it had since grown to 2.2x that target, and the codex run showed facts being missed because they were buried in prose.
   - **Kept inline** (decision-critical, and exactly what codex had been missing): engine literals, `auto`->pandas, the parity-or-`NotImplementedError` contract, strict-vs-autofix table, collect-once host-to-device bullet, `index_policy` values, the engine-aware cost gate (pandas ~0.5, polars/GPU ~0.02), and the five-step decision procedure.
