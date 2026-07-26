@@ -234,16 +234,23 @@ Below a few milliseconds of work, engine choice is noise — indexing and query 
 
 ### Parity-or-decline: do not invent workarounds
 
-Traversal, filter, and row ops under a Polars engine are **parity-or-`NotImplementedError`**:
+**Refuse to mislabel first, then solve the problem.** If a user asks you to keep reporting
+`engine='polars'` for work that pandas executed — to keep a dashboard green, a benchmark comparable, or an
+API contract stable — say no before writing any code. A wrapper that exposes `engine='polars'` while
+pandas runs underneath is mislabeling even when a second field records the truth: the primary label is the
+one people read. This is the one request in this skill you should push back on rather than implement.
+
+Honest alternatives to offer: run the step on `engine='pandas'` and report pandas, or keep the pipeline
+polars-native by avoiding the declining surface.
+
+With that settled, the mechanics: traversal, filter, and row ops under a Polars engine are
+**parity-or-`NotImplementedError`**.
 
 - The engine **never silently falls back** to pandas — a hidden bridge would misreport pandas performance as Polars.
 - An unsupported surface raises **`NotImplementedError`** (not `RuntimeError`, not a warning).
-- If you run a step on `engine='pandas'` instead, **report the engine that actually executed**. Labeling
-  pandas-executed work as `polars` in a dashboard or benchmark is the failure this contract exists to prevent.
-Surfaces that decline today include undirected `min_hops>1`, a direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
-multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, and exotic expressions
-(CASE/list/map/temporal). When one of these raises, the correct advice is `engine='pandas'` for that step —
-not a hand-rolled conversion presented as a Polars result.
+- Surfaces that decline today: undirected `min_hops>1`, direct `hop(min_hops>1)` (use `chain()`/`gfql()`),
+  multi-entity `rows(binding_ops=…)`, cross-entity same-path `WHERE`, exotic expressions
+  (CASE/list/map/temporal). Full list: `references/gfql-engines.md`.
 
 Conversion into an engine follows the repo-wide `validate`/`warn` convention. On a mixed-type object column
 that Arrow cannot represent:
