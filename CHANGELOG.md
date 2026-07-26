@@ -8,6 +8,32 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Evals / pygraphistry_skill_evals_v1**: 32 per-skill capability cases covering routing, auth/ETL, GFQL, visualization, AI, connectors, and REST — ported from the April 2026 skill-evals audit (originally `.agents/skills/*/evals/evals.json`, a parallel format nothing in the repo executed). The original semantic assertions became oracle `rubric` entries and `forbidden_concepts`; deterministic checks anchor only explicit code/API tokens, so run this journey with `--grading hybrid`.
+
+### Changed
+- **Skills**: Description trigger phrases rewritten across the eight user-facing skills — quoted user phrasings, symbol triggers (`g.plot()`, `.gfql()`, `engine='polars'`), explicit dispatch targets, and proactive-suggestion cues. Original work by Thomas Cook (#23), rebased onto the v0.5.0 engine/index guidance.
+
+### Tests
+- **Per-skill evals pack (2026-07-25, `claude-sonnet-5`, released `graphistry==0.58.0`, 32 cases x skills on/off, hybrid grading)**:
+  - `skills=on`: **100% pass (32/32)**, avg score 0.97, avg `18.9s`
+  - `skills=off`: **50.0% pass (16/32)**, avg score 0.80, avg `27.8s`
+  - **Delta: +50.0pp, 0 regressions**, ~1.5x faster with skills. Baseline isolation verified; environment SHA-verified identical before and after every run.
+  - Run on Sonnet for cost, so **not comparable** to earlier packs which used the default Opus model.
+  - **Eight expectations were corrected after seeing model output**, each validated against the installed library: `from_neo4j()` does not exist, `umap()` auto-featurizes, networkx ships Louvain natively, `plot_static` is real where the rubric expected `play:0`, `settings(url_params=...)` is the documented iframe path, and several regexes pinned one spelling of an equivalent answer. Both arms improved (`skills=off` 13/32 -> 16/32), and the overfitting risk is disclosed in the report.
+  - At 100% skills-on the pack no longer discriminates at the top; it is kept as a regression harness.
+  - Data: `benchmarks/data/2026-07-25-per-skill-evals`, report: `benchmarks/reports/2026-07-25-per-skill-evals.md`.
+
+### Removed
+- **Skills / `*/evals/evals.json`**: Removed the per-skill eval format after porting its cases into the journey harness. It duplicated the journey system and had no runner, so those 32 cases had never executed.
+
+### Added
+- **Skills / evals**: Added `evals/evals.json` to all 8 user-facing skills that were missing per-skill evals: `graphistry`, `pygraphistry`, `pygraphistry-ai`, `pygraphistry-connectors`, `pygraphistry-core`, `pygraphistry-gfql`, `pygraphistry-visualization`, `graphistry-rest-api`. Each file includes 3 positive test cases and 1 negative boundary case with assertions.
+
+### Changed
+- **Skills / descriptions**: Updated description frontmatter for all 8 user-facing skills above to include explicit quoted trigger phrases ("Use when asked to..."), secondary trigger patterns ("Also triggers on..."), and proactive suggest clauses - following skill-creator best practices to reduce undertriggering.
+- **Docs**: Added `docs/skill-evals-audit-2026-04.md` with full audit findings, priority matrix, and implementation plan.
+
 ---
 
 ## [0.5.0 - 2026-07-25]

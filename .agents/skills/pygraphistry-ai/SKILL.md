@@ -1,6 +1,12 @@
 ---
 name: pygraphistry-ai
-description: "Apply PyGraphistry graph ML/AI workflows such as UMAP, DBSCAN, embedding-based anomaly analysis, and fit/transform pipelines on nodes or edges. Use for feature-driven exploration, clustering, anomaly triage, and graph-AI notebook workflows."
+description: >
+  PyGraphistry graph ML/AI: UMAP, DBSCAN, embeddings, and anomaly detection workflows.
+  Use when asked to "run UMAP on my graph", "cluster nodes", "find anomalies in my network data",
+  "embed nodes", "fit-transform pipeline", "semantic search over graph nodes", or "graph AI".
+  Also triggers on "graphistry umap", "dbscan clusters", "node embeddings", "featurize",
+  or "anomaly triage". Proactively suggest when the user has node feature columns and asks
+  about outliers, clusters, or similarity without yet using UMAP or DBSCAN.
 ---
 
 # PyGraphistry AI
