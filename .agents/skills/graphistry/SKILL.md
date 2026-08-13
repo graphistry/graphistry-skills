@@ -6,7 +6,8 @@ description: >
   "graphistry plot", or any question mixing Python SDK and REST API concerns. Also triggers on
   "graphistry SDK vs API", "graphistry authentication", "how do I share a graphistry graph",
   "Graphistry Hub", or any ambiguous graphistry request before the interface is clear.
-  Routes to pygraphistry for Python SDK tasks, graphistry-rest-api for curl/REST tasks.
+  Routes to pygraphistry for Python SDK tasks, graphistry-rest-api for curl/REST tasks,
+  graphistry-mcp for driving a live viz session from an MCP client.
   Proactively suggest when the user mentions graph visualization or network analysis and
   has not yet chosen an interface.
 ---
@@ -18,6 +19,7 @@ Use this skill as the shared entrypoint across Graphistry interfaces.
 ## Route By Interface
 - Python SDK tasks (`import graphistry`, DataFrame shaping, `.plot()`, `.gfql()` including Cypher/Let/DAG, PyGraphistry notebooks): use `pygraphistry`.
 - REST API tasks (`curl`, `/api/v2/...`, JWT/Bearer auth, upload endpoints, `graph.html` URL params): use `graphistry-rest-api`.
+- MCP client tasks (driving a live viz session from an external agent, `POST /mcp`, GFQL as JSON, collections): use `graphistry-mcp`.
 - JavaScript/TypeScript SDK tasks (`@graphistry/*`, browser/frontend integrations): use `graphistry-js` if available.
 
 ## Mixed Requests
