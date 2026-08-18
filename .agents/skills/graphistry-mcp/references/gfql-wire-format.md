@@ -3,8 +3,8 @@
 Full JSON forms for `gfql_operations`. The decision-critical rules live in `SKILL.md`; this file
 holds the complete examples.
 
-`gfql_operations` is always a **JSON-encoded string**, never a nested object. Only five operation
-types are valid: `Node`, `Edge`, `Call`, `Let`, `Ref`.
+`gfql_operations` is always a **JSON-encoded string**, never a nested object. The operation types
+you need are `Node`, `Edge`, `Call`, `Let`, and `Ref`.
 
 ## Node
 
@@ -20,7 +20,20 @@ Threshold with a predicate object. The predicate goes inside `filter_dict`, keye
 [{"type": "Node", "filter_dict": {"event_count": {"type": "GT", "val": 10}}}]
 ```
 
-Predicate `type` values follow the GFQL comparison set (`GT`, `LT`, `GE`, `LE`, `EQ`, `NE`).
+Predicate `type` names are **case-sensitive** — `GT` works, `gt` fails with an opaque error — and
+the key carrying the operand differs by family:
+
+| Family | Types | Operand key |
+|---|---|---|
+| comparison | `GT` `LT` `GE` `LE` `EQ` `NE` | `val` |
+| range | `Between` | `lower`, `upper` |
+| set | `IsIn` | `options` |
+| string | `Contains` `Startswith` `Endswith` `Match` `Fullmatch` | `pat` |
+| null | `IsNA` `NotNA` `IsNull` `NotNull` | none |
+| shape | `IsNumeric` `IsAlpha` `Duplicated` and similar | none |
+
+The server normalizes casing and key names only for `filter_dict` on a top-level operation array.
+Inside `edge_match`, inside a `Let`, and anywhere in `create_collection`, write the exact form.
 
 An **empty** `Node` operation (`{"type": "Node"}`) accumulates both endpoints of a preceding
 `Edge` rather than filtering. Use it when the request names two node kinds joined by "and"/"or".
@@ -54,13 +67,20 @@ Every row-pipeline step is a `Call`. A bare `{"type": "rows"}`, `{"type": "group
 `rows` defaults to `table: "nodes"`. Set it to the table holding the columns you group by, or the
 query fails on a missing column.
 
-`aggregations` is a list of `[output_name, function]` pairs. `order_by` `keys` is a list of
-`[column, direction]` pairs.
+`aggregations` is a list of `[alias, function, column]` triples. Only `count` may be the
+2-element `[alias, "count"]`; every other function — `count_distinct`, `sum`, `min`, `max`, `avg`,
+`mean`, `collect`, `collect_distinct` — requires the column it aggregates, and `"*"` is rejected
+for them. Counting rows where the question asked for distinct values returns a plausible table
+answering a different question.
 
-Graph filters (`filter_nodes_by_dict`, `filter_edges_by_dict`) must precede `rows`. Placed after
-it they are ignored and the aggregation reports unfiltered counts.
+`order_by` `keys` is a list of `[column, direction]` pairs; the direction is mandatory and must be
+`asc` or `desc`.
 
-`where_rows` takes an `expr` string such as `"n > 10"`. A `filter_dict` argument matches nothing.
+Put graph filters (`filter_nodes_by_dict`, `filter_edges_by_dict`) before `rows`. After a `rows`
+on the edge table the filter is dropped and the aggregation reports unfiltered counts.
+
+`where_rows` accepts `expr` (a string like `"n > 10"`) and `filter_dict`. In `filter_dict` only
+exact stored values match, so a predicate object there matches nothing; use `expr` to compare.
 
 ## Let and Ref
 
@@ -81,11 +101,16 @@ When the request instead names two kinds joined by "and"/"or", use an `Edge` fol
 
 ## Cypher
 
-`query_graph` also accepts one whole read-only Cypher string in place of the operation list. One
-statement per call; no writes.
+`query_graph` accepts one whole read-only Cypher string in place of the operation list. One
+statement per call; no writes. `create_collection` does not — it takes JSON GFQL only.
 
 ## Output
 
 `output_type` selects what comes back: `shape` (default, counts only), `nodes`, `edges`, or `all`.
 Use `nodes` or `edges` to read actual values — `shape` on an aggregation returns the number of
 aggregation rows, not the values inside them, which is an easy way to misread a result.
+
+Rows are capped at 50 when the expression names columns and 20 when it does not, and are projected
+to the id column plus the columns the expression referenced. The reported count is the true total,
+so a group_by with more distinct values than the cap is truncated: a value list read from it cannot
+prove that some value is absent.
