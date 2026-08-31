@@ -1,0 +1,123 @@
+{
+  "id": "graphistry_mcp_wire_format_v1",
+  "description": "JSON GFQL wire-format correctness for the Graphistry viz MCP tool surface.",
+  "eval_intent": "execution_grade",
+  "tags": [
+    "graphistry-mcp",
+    "gfql",
+    "wire-format"
+  ],
+  "cases": [
+    {
+      "id": "edge_direction_explicit",
+      "prompt": "Write the JSON GFQL operation for a one-hop forward edge traversal to send to the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
+      "checks": {
+        "regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"Edge\\\\?\"",
+          "\\\\?\"direction\\\\?\"\\s*:\\s*\\\\?\"(forward|reverse|undirected)\\\\?\""
+        ],
+        "must_not_regex": [
+          "\\\\?\"direction\\\\?\"\\s*:\\s*\\\\?\"both\\\\?\""
+        ],
+        "max_lines": 12
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "{\"type\": \"Edge\", \"direction\": \"forward\", \"hops\": 1}",
+        "rubric": [
+          "Must emit an Edge operation with an explicit direction of forward, reverse, or undirected.",
+          "Using 'both' as a direction is invalid and should score near zero.",
+          "Omitting direction entirely is wrong: query_graph does not default it the way create_collection does."
+        ],
+        "required_concepts": [
+          "Edge",
+          "direction"
+        ]
+      }
+    },
+    {
+      "id": "rows_wrapped_as_call",
+      "prompt": "Write the JSON GFQL for a rows operation over the edge table, as it must appear inside a chain sent to the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
+      "checks": {
+        "regex": [
+          "\"Call\"",
+          "\"rows\"",
+          "\"table\"\\s*:\\s*\"edges\""
+        ],
+        "max_lines": 12
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "{\"type\": \"Call\", \"function\": \"rows\", \"params\": {\"table\": \"edges\"}}",
+        "rubric": [
+          "rows must be wrapped as a Call operation; a bare {\"type\": \"rows\"} is invalid.",
+          "rows defaults to the nodes table, so table must be set to edges explicitly.",
+          "Answer should be JSON, not Python AST helpers."
+        ],
+        "required_concepts": [
+          "Call",
+          "rows",
+          "edges"
+        ]
+      }
+    },
+    {
+      "id": "predicate_type_case_sensitive",
+      "prompt": "Write the JSON GFQL node filter selecting nodes whose score is greater than 10, for the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
+      "checks": {
+        "regex": [
+          "\"GT\""
+        ],
+        "must_not_regex": [
+          "\"gt\"",
+          "\"Gt\""
+        ],
+        "max_lines": 12
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "{\"type\": \"Node\", \"filter_dict\": {\"score\": {\"type\": \"GT\", \"val\": 10}}}",
+        "rubric": [
+          "Predicate type names are case-sensitive: GT is correct, gt fails with an opaque error.",
+          "A threshold must be expressed as a predicate on a Node operation."
+        ],
+        "required_concepts": [
+          "GT"
+        ]
+      }
+    },
+    {
+      "id": "create_collection_json_only",
+      "prompt": "Can a Cypher query string be passed to the Graphistry viz MCP create_collection tool? Answer in under 6 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
+          "(?i)(json|gfql)"
+        ],
+        "max_lines": 6,
+        "must_not_regex": [
+          "(?i)^\\s*yes\\b",
+          "(?i)create_collection\\s+(accepts|takes|supports|allows)\\s+(a\\s+|either\\s+)?cypher"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "No. create_collection takes JSON GFQL only; Cypher is accepted by query_graph alone.",
+        "rubric": [
+          "Must say create_collection does not accept Cypher.",
+          "Must note that query_graph is the tool that does accept Cypher.",
+          "Claiming create_collection accepts Cypher should score zero."
+        ],
+        "required_concepts": [
+          "create_collection",
+          "query_graph",
+          "JSON"
+        ]
+      }
+    }
+  ]
+}

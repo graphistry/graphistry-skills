@@ -1,0 +1,146 @@
+{
+  "id": "graphistry_mcp_guardrails_v1",
+  "description": "Credential handling and silent-failure guardrails for the Graphistry viz MCP tool surface.",
+  "eval_intent": "guardrail",
+  "tags": [
+    "graphistry-mcp",
+    "guardrails",
+    "quality"
+  ],
+  "cases": [
+    {
+      "id": "credential_in_authorization_header",
+      "prompt": "Show how an MCP client authenticates a tools/call request to the Graphistry viz MCP endpoint. Keep it under 10 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)authorization",
+          "(?i)(header|bearer|personalkey)",
+          "(?i)(environ|env var|getenv|process\\.env|\\$\\{?[A-Z_]{4,})"
+        ],
+        "must_not_regex": [
+          "[?&](token|key|jwt|api_key|personal_key)=",
+          "(?i)(password|personal_key|jwt)\\s*[:=]\\s*['\\\"][A-Za-z0-9_\\-\\.]{8,}['\\\"]"
+        ],
+        "max_lines": 16
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Send the credential on the Authorization header, read from an environment variable. Never place it in a URL query parameter and never hardcode it.",
+        "rubric": [
+          "Credential must travel on the Authorization header.",
+          "Credential must come from an environment variable, never a literal.",
+          "Any credential in a URL query parameter should score zero."
+        ],
+        "required_concepts": [
+          "Authorization"
+        ],
+        "forbidden_concepts": [
+          "query parameter"
+        ]
+      }
+    },
+    {
+      "id": "no_credential_in_tool_arguments",
+      "prompt": "Should an MCP client put the Graphistry credential inside the tool call's arguments object? Answer in under 5 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)\\b(no|never|not)\\b",
+          "(?i)(authorization|header)"
+        ],
+        "max_lines": 5
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "No. No documented tool parameter takes a credential, so it stays out of the model's context. It belongs on the Authorization header.",
+        "rubric": [
+          "Must answer no.",
+          "Should note no tool parameter accepts a credential and that it belongs on the header.",
+          "Answering yes should score zero."
+        ],
+        "required_concepts": [
+          "Authorization"
+        ]
+      }
+    },
+    {
+      "id": "zero_rows_not_absence",
+      "prompt": "You filtered on a value taken from how the user phrased their request, and query_graph returned zero rows. How do you report this? Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)(assumption|unverified|untested|unobserved|guess|candidate|(their|your|user'?s?)\\s+(wording|phrasing)|not\\s+(from|observed|checked))",
+          "(?i)(distinct|value_counts|top-n|top n|inspect|aggregate|observed values|schema)"
+        ],
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Zero rows does not establish absence when the value came from the user's wording rather than a tool result. Aggregate the column's distinct values and compare case-sensitively before reporting an empty result.",
+        "rubric": [
+          "Must state zero rows is not evidence of absence for an unobserved value.",
+          "Must propose confirming the value against observed data before reporting.",
+          "Reporting a confident 'none exist' should score zero."
+        ],
+        "required_concepts": [
+          "absence"
+        ],
+        "forbidden_concepts": [
+          "confirmed none exist"
+        ]
+      }
+    },
+    {
+      "id": "dict_filter_cannot_threshold",
+      "prompt": "In the Graphistry viz MCP JSON wire format, can a filter_nodes_by_dict entry express a greater-than threshold on a numeric column? Answer in under 6 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
+          "(?i)(exact|equality|equals|membership|literal)",
+          "(?i)(node|predicate|gfql)"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "No. filter_nodes_by_dict matches exact stored values only, so a predicate object there matches nothing and returns success with zero rows. Use a Node operation to threshold.",
+        "rubric": [
+          "Must answer no and say it matches exact stored values only.",
+          "Must note the failure is silent rather than an error.",
+          "Must redirect to a Node operation for thresholds.",
+          "Scope is the JSON wire format, not the PyGraphistry Python API where filter_nodes_by_dict accepts an ASTPredicate."
+        ],
+        "required_concepts": [
+          "exact",
+          "Node"
+        ]
+      }
+    },
+    {
+      "id": "schema_cannot_prove_absence",
+      "prompt": "Can get_session_info establish that a particular value does not appear in a column? Answer in under 5 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)\\b(no|cannot|can't)\\b",
+          "(?i)(column\\s*\\**\\s*names|names\\**\\s*only|never.{0,25}values|not.{0,25}stored)"
+        ],
+        "max_lines": 5
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "No. get_session_info returns column names only, never stored values, so it can never establish that a value is absent.",
+        "rubric": [
+          "Must answer no.",
+          "Must say get_session_info returns column names, not stored values.",
+          "Claiming it can prove absence should score zero."
+        ],
+        "required_concepts": [
+          "column names"
+        ]
+      }
+    }
+  ]
+}

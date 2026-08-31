@@ -1,0 +1,141 @@
+{
+  "id": "graphistry_mcp_session_model_v1",
+  "description": "Session discovery, ownership, and status triage for an MCP client driving a live Graphistry viz session.",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "graphistry-mcp",
+    "session",
+    "errors"
+  ],
+  "cases": [
+    {
+      "id": "client_cannot_create_session",
+      "prompt": "An MCP client must operate on a Graphistry visualization session. How does it obtain a session_id? Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)list_sessions",
+          "(?i)((cannot|can'?t|not|no|never)\\s+create|already open|user (has|have|already))"
+        ],
+        "must_not_regex": [
+          "(?i)sessions?/create"
+        ],
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "A client cannot create a session. A session exists because a user has the graph open in a browser; discover one with list_sessions, or use the session_id you were handed.",
+        "rubric": [
+          "Must state the client cannot create a session.",
+          "Must name list_sessions as the discovery path.",
+          "Inventing a session-creation tool should score zero."
+        ],
+        "required_concepts": [
+          "list_sessions"
+        ]
+      }
+    },
+    {
+      "id": "empty_list_sessions_not_absence",
+      "prompt": "list_sessions returns an empty array, but the user says their graph is open in the browser. What do you conclude and what do you do? Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)(session[_ ]?id|list_sessions|credential|identity|owner|host|process)"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?i)(no (live )?sessions?\\s+(exist|are\\s+open|is\\s+open)|the (session|graph) is (gone|dead|closed|expired))"
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Emptiness is not evidence of no session. list_sessions sees only sessions owned by the server process that received the request, so pass the session_id you were given rather than concluding the graph is gone.",
+        "rubric": [
+          "Must say an empty result is not evidence that no session exists.",
+          "Should attribute it to list_sessions seeing only its own process's sessions.",
+          "Concluding the session is gone should score near zero."
+        ],
+        "required_concepts": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "id": "status_410_triage",
+      "prompt": "A tools/call to the Graphistry viz MCP returns 410. What does it mean and do you retry? Answer in under 6 non-empty lines.",
+      "checks": {
+        "regex": [
+          "410",
+          "(?i)(owner unavailable|closed|no live owner|tab)",
+          "(?i)retry"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "410 Session owner unavailable: no live owner, typically a closed tab. It can also mean the owner lookup failed, so retry once before concluding the graph is gone.",
+        "rubric": [
+          "Must identify 410 as the owner being unavailable / tab closed.",
+          "Must say to retry once before concluding the session is gone.",
+          "Confusing it with the 404 expired-transport-session case should reduce score."
+        ],
+        "required_concepts": [
+          "410",
+          "retry"
+        ]
+      }
+    },
+    {
+      "id": "which_mcp_server",
+      "prompt": "A user has a graph open in their browser and asks an agent to recolor it. Which Graphistry MCP server should the agent talk to, and why? Answer in under 6 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)(viz|visuali[sz]ation)",
+          "(?i)(/mcp|session)"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "The viz MCP at https://<graphistry-host>/mcp, because the task starts from a graph the user already has open and is session-scoped. The PyGraphistry MCP is for building and uploading new visualizations.",
+        "rubric": [
+          "Must select the viz MCP endpoint, not the PyGraphistry MCP project.",
+          "Should justify it by the graph already being open / session-scoped work.",
+          "Selecting the PyGraphistry MCP should score zero."
+        ],
+        "required_concepts": [
+          "viz"
+        ]
+      }
+    },
+    {
+      "id": "filters_before_rows",
+      "prompt": "A GFQL chain filters the graph and then aggregates over the edge table with rows. What ordering does the chain require, and what goes wrong otherwise? Answer in under 6 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)(before|first|precede|ahead of)",
+          "(?i)rows",
+          "(?i)(filter|dropped|unfiltered)"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Both graph filters must come before rows. After a rows on the edge table a filter is dropped and the aggregation silently reports unfiltered counts.",
+        "rubric": [
+          "Must state filters go before rows.",
+          "Must note the failure is silent: unfiltered counts, not an error.",
+          "Claiming order does not matter should score zero."
+        ],
+        "required_concepts": [
+          "rows",
+          "before"
+        ]
+      }
+    }
+  ]
+}
