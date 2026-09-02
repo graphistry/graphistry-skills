@@ -141,6 +141,31 @@
           "column names"
         ]
       }
+    },
+    {
+      "id": "act_on_collection_refusal",
+      "prompt": "`create_collection` returned this error: \"That expression returns a table that no longer identifies graph nodes - it groups rows, projects columns away, or reads the edge table - so there is nothing to color. A collection needs an expression that selects the nodes themselves, such as a Node filter.\" What do you do next? Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|filter_dict",
+          "(?i)(rebuild|rewrite|replace|instead|new expression|change the|retry|re-run)"
+        ],
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Act on the repair the error names: replace the aggregating chain with an expression that selects the nodes themselves, typically a Node filter built from the values the aggregation returned, then create the collection from that.",
+        "rubric": [
+          "Must act on the refusal rather than reporting failure and stopping.",
+          "Must build an expression that selects nodes, typically a Node filter.",
+          "Reporting the failure without attempting the named repair should score near zero.",
+          "This differs from a refusal where the service could not evaluate the expression, which should be reported."
+        ],
+        "required_concepts": [
+          "Node"
+        ]
+      }
     }
   ]
 }

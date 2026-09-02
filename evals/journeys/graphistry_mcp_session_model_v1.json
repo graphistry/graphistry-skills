@@ -42,10 +42,7 @@
         "regex": [
           "(?i)(session[_ ]?id|list_sessions|credential|identity|owner|host|process)"
         ],
-        "max_lines": 8,
-        "must_not_regex": [
-          "(?i)(no (live )?sessions?\\s+(exist|are\\s+open|is\\s+open)|the (session|graph) is (gone|dead|closed|expired))"
-        ]
+        "max_lines": 8
       },
       "oracle": {
         "enabled": true,

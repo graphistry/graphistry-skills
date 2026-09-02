@@ -19,7 +19,7 @@ Use this skill as the shared entrypoint across Graphistry interfaces.
 ## Route By Interface
 - Python SDK tasks (`import graphistry`, DataFrame shaping, `.plot()`, `.gfql()` including Cypher/Let/DAG, PyGraphistry notebooks): use `pygraphistry`.
 - REST API tasks (`curl`, `/api/v2/...`, JWT/Bearer auth, upload endpoints, `graph.html` URL params): use `graphistry-rest-api`.
-- MCP client tasks (driving a live viz session from an external agent, `POST /mcp`, GFQL as JSON, collections): use `graphistry-mcp`.
+- MCP client tasks (driving a live viz session from an external agent, `POST /mcp`, GFQL as JSON, collections): use `graphistry-mcp` if available.
 - JavaScript/TypeScript SDK tasks (`@graphistry/*`, browser/frontend integrations): use `graphistry-js` if available.
 
 ## Mixed Requests

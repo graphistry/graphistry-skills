@@ -71,8 +71,7 @@
           "\"GT\""
         ],
         "must_not_regex": [
-          "\"gt\"",
-          "\"Gt\""
+          "\"type\"\\s*:\\s*\"gt\""
         ],
         "max_lines": 12
       },

@@ -67,6 +67,10 @@ Every row-pipeline step is a `Call`. A bare `{"type": "rows"}`, `{"type": "group
 `rows` defaults to `table: "nodes"`. Set it to the table holding the columns you group by, or the
 query fails on a missing column.
 
+This chain is a `query_graph` answer, not a collection. It aggregates away the node id, so
+`create_collection` refuses it — color the nodes with a separate `Node` filter built from the
+values it returns.
+
 `aggregations` is a list of `[alias, function, column]` triples. Only `count` may be the
 2-element `[alias, "count"]`; every other function — `count_distinct`, `sum`, `min`, `max`, `avg`,
 `mean`, `collect`, `collect_distinct` — requires the column it aggregates, and `"*"` is rejected

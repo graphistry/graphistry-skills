@@ -199,8 +199,14 @@ rather than rewriting the expression blindly.
   `{"type": "limit"}` is invalid. Wrap every one as a `Call`.
 - Predicate `type` names are case-sensitive: `GT` works, `gt` fails with an opaque error.
 - `create_collection` takes JSON GFQL only. Cypher is accepted by `query_graph` alone.
-- If a collection is refused because the service could not evaluate the expression, report the
-  failure. Do not reword the filter and retry — the expression was not the problem.
+- `create_collection` refuses an expression whose result stops identifying graph nodes — one that
+  groups rows, projects the id away, renames or drops it, or reads the edge table. Ordering by a
+  community column is refused separately, because that ranks by community id rather than size. Both
+  refusals name the repair: select the nodes themselves, usually a `Node` filter, or report the
+  sizes with `query_graph` instead. Act on it rather than reporting failure.
+- If a collection is refused because the service could **not evaluate** the expression, that is a
+  different case: report the failure. Do not reword the filter and retry — the expression was not
+  the problem.
 
 ## Workflow
 
@@ -216,8 +222,10 @@ rather than rewriting the expression blindly.
    first and compare case-sensitively — `Hashtag` will not match a search for `hashtag`.
 4. Validate the expression with `query_graph` before mutating.
 5. `create_collection` reusing that exact validated JSON unchanged, and report the match count it
-   returns. The count is not guaranteed — when the preflight cannot produce one the collection is
-   still applied and the reply says so. Report "applied, count unavailable" rather than inventing
+   returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates: a
+   chain that aggregates or leaves the node axis will pass `query_graph` and still be refused here.
+   When that happens the refusal names the repair — use it. The count is not guaranteed — when
+   the preflight cannot produce one the collection is still applied and the reply says so. Report "applied, count unavailable" rather than inventing
    a number or omitting the outcome.
 
 Stop and report a GFQL error rather than retrying with an invented operation name. A failed query
