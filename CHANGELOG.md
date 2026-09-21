@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Added
+- **Skills / graphistry-mcp**: New skill for driving a live Graphistry visualization session from an MCP client. Covers connecting over Streamable HTTP, personal-key and JWT auth, the session-ownership model, the nine-tool surface, GFQL as the JSON wire format, and the query shapes that return `success: true` with empty or wrong results.
+- **Skills / graphistry**: Route MCP client tasks to `graphistry-mcp`.
+
 ---
 
 ## [0.5.2 - 2026-07-26]

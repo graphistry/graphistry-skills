@@ -8,5 +8,9 @@
     "pygraphistry-ai",
     "pygraphistry-connectors",
     "graphistry-rest-api"
+  ],
+  "graphistry_mcp": [
+    "graphistry",
+    "graphistry-mcp"
   ]
 }

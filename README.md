@@ -10,6 +10,7 @@ Strong frontier models often already know core Graphistry/PyGraphistry patterns 
 
 - `graphistry`: umbrella router across interfaces (SDK + REST; JS-ready routing path).
 - `graphistry-rest-api`: REST specialist for auth, upload lifecycle, URL controls, sessions, and sharing safety.
+- `graphistry-mcp`: viz MCP specialist for driving a live visualization session from an external MCP client.
 - `pygraphistry`: Python SDK router.
 - `pygraphistry-core`: auth, shaping, and first plot workflows.
 - `pygraphistry-visualization`: bindings/encodings/layout/privacy/share patterns.
@@ -27,6 +28,7 @@ npx skills add graphistry/graphistry-skills \
   --agent claude-code \
   --skill graphistry \
   --skill graphistry-rest-api \
+  --skill graphistry-mcp \
   --skill pygraphistry \
   --skill pygraphistry-core \
   --skill pygraphistry-gfql \
