@@ -129,9 +129,10 @@ Mutate (these change what the user sees):
 | `reset_collections` | `session_id` | — |
 
 `query_graph` returns at most 50 rows, projected to the id column plus the columns the expression
-referenced. When the result holds none of those columns (a Cypher projection, an edge result), it
-returns every column, capped at 20 rows. The reported count is the true total. A value list read
-from a truncated result cannot prove that a value is absent.
+filters or groups on (an `order_by` or `edge_match` column it does not also filter is not kept).
+When the result holds none of those columns (a Cypher projection, an edge result), it returns every
+column, capped at 20 rows. The reported count is the true total. A value list read from a truncated
+result cannot prove that a value is absent.
 
 `create_collection` keeps at most 10 collections, evicting the oldest, replaces any existing
 collection of the same name, and returns a cached result for an identical call repeated within
@@ -191,8 +192,8 @@ produced by any of them is not evidence of a real zero.**
 These fail loudly. Most messages name the cause, so act on it rather than rewriting the expression
 blindly; the collection refusal below is the exception.
 
-- `rows` defaults to `table: "nodes"`. Grouping by an edge column without `{"table": "edges"}`
-  fails as a missing column.
+- `rows` needs the `table` whose columns you group by — `{"table": "edges"}` for edge columns.
+  Omitting `table`, or grouping an edge column under `nodes`, fails.
 - `Edge` requires `direction`, one of `forward`, `reverse`, `undirected`. `both` is invalid.
   `create_collection` fills in `undirected` when it is absent, so an expression that validated
   there can still fail in `query_graph` — set it explicitly.

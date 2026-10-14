@@ -33,8 +33,10 @@ differs by family:
 | null | `IsNA` `NotNA` `IsNull` `NotNull` | none |
 | shape | `IsNumeric` `IsAlpha` `Duplicated` and similar | none |
 
-The server normalizes casing and key names only for `filter_dict` on a top-level operation array.
-Inside `edge_match`, inside a `Let`, and anywhere in `create_collection`, write the exact form.
+The server normalizes predicate-name casing — and, for string predicates only, fills `pat` from
+`val`/`value`/`substring` — for `filter_dict` on a top-level operation array; no other operand key
+is corrected, so `value` is never accepted for `val`. Inside `edge_match`, inside a `Let`, and
+anywhere in `create_collection`, write the exact form.
 
 An **empty** `Node` operation (`{"type": "Node"}`) accumulates both endpoints of a preceding
 `Edge` rather than filtering. Use it when the request names two node kinds joined by "and"/"or".
@@ -115,8 +117,9 @@ statement per call; no writes. `create_collection` does not — it takes JSON GF
 Use `nodes` or `edges` to read actual values — `shape` on an aggregation returns the number of
 aggregation rows, not the values inside them, which is an easy way to misread a result.
 
-Rows are capped at 50 and projected to the id column plus the columns the expression referenced.
-When the result holds none of those columns (a Cypher projection, an edge result), every column
-comes back, capped at 20 rows. The reported count is the true total,
+Rows are capped at 50 and projected to the id column plus the columns the expression filters or
+groups on (an `order_by` or `edge_match` column it does not also filter is not kept). When the
+result holds none of those columns (a Cypher projection, an edge result), every column comes back,
+capped at 20 rows. The reported count is the true total,
 so a group_by with more distinct values than the cap is truncated: a value list read from it cannot
 prove that some value is absent.
