@@ -1,9 +1,10 @@
 # GFQL wire format
 
-Full JSON forms for `gfql_operations`. The decision-critical rules live in `SKILL.md`; this file
-holds the complete examples.
+The GFQL that the server's Cypher transpiles into, written as JSON. `SKILL.md` covers the Cypher
+entry point; read this only when Cypher cannot express a shape, when an error names a GFQL operation,
+or when you are unsure how a query is evaluated.
 
-`gfql_operations` is always a **JSON-encoded string**, never a nested object. The operation types
+JSON GFQL is passed as a **JSON-encoded string**, never a nested object. The operation types
 you need are `Node`, `Edge`, `Call`, `Let`, and `Ref`.
 
 ## Node
@@ -83,11 +84,14 @@ answering a different question.
 `order_by` `keys` is a list of `[column, direction]` pairs; the direction is mandatory and must be
 `asc` or `desc`.
 
-Put graph filters (`filter_nodes_by_dict`, `filter_edges_by_dict`) before `rows`. After a `rows`
-on the edge table the filter is dropped and the aggregation reports unfiltered counts.
+To color a ranked top-N, compute the metric, order, and limit, and pass the chain unchanged to
+`create_collection`. Replace `<N>` with the count the user asked for:
 
-`where_rows` accepts `expr` (a string like `"n > 10"`) and `filter_dict`. In `filter_dict` only
-exact stored values match, so a predicate object there matches nothing; use `expr` to compare.
+```json
+[{"type":"Call","function":"compute_igraph","params":{"alg":"pagerank"}},
+ {"type":"Call","function":"order_by","params":{"keys":[["pagerank","desc"]]}},
+ {"type":"Call","function":"limit","params":{"value":<N>}}]
+```
 
 ## Let and Ref
 
@@ -106,10 +110,45 @@ by transfers" wants accounts, not the transfers and their far side.
 When the request instead names two kinds joined by "and"/"or", use an `Edge` followed by an empty
 `Node` so both sides accumulate.
 
-## Cypher
+## Shapes that fail silently
 
-`query_graph` accepts one whole read-only Cypher string in place of the operation list. One
-statement per call; no writes. `create_collection` does not — it takes JSON GFQL only.
+These return `success: true` with wrong or empty results rather than erroring. **A zero-row answer
+produced by any of them is not evidence of a real zero.**
+
+- `filter_nodes_by_dict` / `filter_edges_by_dict` match exact stored values only. A predicate
+  object matches nothing — threshold with a `Node` operation instead.
+- Put both graph filters before `rows`. After a `rows` on the edge table a filter is dropped and
+  the aggregation reports unfiltered counts.
+- `where_rows` accepts `expr` (a string like `"n > 10"`) and `filter_dict`. In `filter_dict` only
+  exact stored values match, so a predicate object there matches nothing; use `expr` to compare.
+
+## Errors
+
+These fail loudly. Most messages name the cause, so act on it rather than rewriting the expression
+blindly.
+
+- `rows` needs the `table` whose columns you group by — `{"table": "edges"}` for edge columns.
+  Omitting `table`, or grouping an edge column under `nodes`, fails.
+- `Edge` requires `direction`, one of `forward`, `reverse`, `undirected`. `both` is invalid.
+  `create_collection` fills in `undirected` when it is absent, so an expression that validated
+  there can still fail in `query_graph` — set it explicitly.
+- A bare `{"type": "rows"}`, `{"type": "group_by"}`, `{"type": "order_by"}`, or
+  `{"type": "limit"}` is invalid. Wrap every one as a `Call`.
+- Predicate `type` names are case-sensitive: `GT` works. `gt` is corrected only in a top-level
+  `filter_dict` passed to `query_graph`; everywhere else it fails with an opaque error. Write
+  predicates in their exact form before validating.
+- `create_collection` refuses an expression whose result stops identifying graph nodes — one that
+  groups rows, projects the id away, renames or drops it, or reads the edge table. Ordering by a
+  community column is refused separately, because that ranks by community id rather than size. Both
+  refusals name the repair: select the nodes themselves, usually a `Node` filter, or report the
+  sizes with `query_graph` instead. Act on it rather than reporting failure.
+- A collection refused because the service could **not evaluate** the expression quotes the
+  service's message. A Mongo-style `$gt`, an invented predicate name, a wrong operand key, a
+  lowercase predicate name, or `val` on a string predicate land here with a terse message (`'type'`,
+  `'InList'`, `unexpected keyword argument 'values'`); check the expression against the predicate
+  table above, fix it, validate it with `query_graph`, and retry. A message that names nothing in
+  the expression, or a refusal that says the service returned an error before validating it, is a
+  service failure: report it and do not retry.
 
 ## Output
 
@@ -117,9 +156,9 @@ statement per call; no writes. `create_collection` does not — it takes JSON GF
 Use `nodes` or `edges` to read actual values — `shape` on an aggregation returns the number of
 aggregation rows, not the values inside them, which is an easy way to misread a result.
 
-Rows are capped at 50 and projected to the id column plus the columns the expression filters or
-groups on (an `order_by` or `edge_match` column it does not also filter is not kept). When the
-result holds none of those columns (a Cypher projection, an edge result), every column comes back,
-capped at 20 rows. The reported count is the true total,
+A JSON result's rows are capped at 50 and projected to the id column plus the columns the
+expression filters or groups on (an `order_by` or `edge_match` column it does not also filter is not
+kept). A Cypher result, or a JSON result holding none of those columns (an edge result), returns
+every column, capped at 20 rows. The reported count is the true total,
 so a group_by with more distinct values than the cap is truncated: a value list read from it cannot
 prove that some value is absent.
