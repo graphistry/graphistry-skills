@@ -128,9 +128,11 @@ Mutate (these change what the user sees):
 | `reorder_collections` | `session_id`, `order` | — |
 | `reset_collections` | `session_id` | — |
 
-`query_graph` returns at most 50 rows when the expression names columns and 20 when it does not,
-projected to the id column plus the columns the expression referenced; the reported count is the
-true total. A value list read from a truncated result cannot prove that a value is absent.
+`query_graph` returns at most 50 rows, projected to the id column plus the columns the expression
+filters or groups on (an `order_by` or `edge_match` column it does not also filter is not kept).
+When the result holds none of those columns (a Cypher projection, an edge result), it returns every
+column, capped at 20 rows. The reported count is the true total. A value list read from a truncated
+result cannot prove that a value is absent.
 
 `create_collection` keeps at most 10 collections, evicting the oldest, replaces any existing
 collection of the same name, and returns a cached result for an identical call repeated within
@@ -182,31 +184,36 @@ produced by any of them is not evidence of a real zero.**
   the aggregation reports unfiltered counts.
 - `where_rows` accepts `expr` (a string like `"n > 10"`) and `filter_dict`. In `filter_dict` only
   exact stored values match, so a predicate object there matches nothing; use `expr` to compare.
-- `get_session_info` returns column names only, never stored values, so it can never establish
-  that a value is absent.
+- `get_session_info` lists columns, not every stored value, so it can never establish that a
+  value is absent.
 
 ## Errors you will actually see
 
-These fail loudly with a specific message. Read it — it names the cause, so it is worth acting on
-rather than rewriting the expression blindly.
+These fail loudly. Most messages name the cause, so act on it rather than rewriting the expression
+blindly; the collection refusal below is the exception.
 
-- `rows` defaults to `table: "nodes"`. Grouping by an edge column without `{"table": "edges"}`
-  fails as a missing column.
+- `rows` needs the `table` whose columns you group by — `{"table": "edges"}` for edge columns.
+  Omitting `table`, or grouping an edge column under `nodes`, fails.
 - `Edge` requires `direction`, one of `forward`, `reverse`, `undirected`. `both` is invalid.
   `create_collection` fills in `undirected` when it is absent, so an expression that validated
   there can still fail in `query_graph` — set it explicitly.
 - A bare `{"type": "rows"}`, `{"type": "group_by"}`, `{"type": "order_by"}`, or
   `{"type": "limit"}` is invalid. Wrap every one as a `Call`.
-- Predicate `type` names are case-sensitive: `GT` works, `gt` fails with an opaque error.
+- Predicate `type` names are case-sensitive: `GT` works. `gt` is corrected only in a top-level
+  `filter_dict` passed to `query_graph`; everywhere else it fails with an opaque error. Write
+  predicates in their exact form before validating.
 - `create_collection` takes JSON GFQL only. Cypher is accepted by `query_graph` alone.
 - `create_collection` refuses an expression whose result stops identifying graph nodes — one that
   groups rows, projects the id away, renames or drops it, or reads the edge table. Ordering by a
   community column is refused separately, because that ranks by community id rather than size. Both
   refusals name the repair: select the nodes themselves, usually a `Node` filter, or report the
   sizes with `query_graph` instead. Act on it rather than reporting failure.
-- If a collection is refused because the service could **not evaluate** the expression, that is a
-  different case: report the failure. Do not reword the filter and retry — the expression was not
-  the problem.
+- A collection refused because the service could **not evaluate** the expression names no cause,
+  and its reply says not to rewrite and retry. Check the expression against the predicate table in
+  `references/gfql-wire-format.md` first: a Mongo-style `$gt`, an invented predicate name, a wrong
+  operand key, a lowercase predicate name, or `val` on a string predicate also land here, and those
+  are fixable. Fix the expression, validate it with `query_graph`, and retry. If an expression in
+  exact form is still refused, report the failure.
 
 ## Workflow
 
@@ -220,7 +227,8 @@ rather than rewriting the expression blindly.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
    unobserved candidates, never literals. Aggregate the distinct values of the relevant column
    first and compare case-sensitively — `Hashtag` will not match a search for `hashtag`.
-4. Validate the expression with `query_graph` before mutating.
+4. Validate the expression with `query_graph` before mutating. If a call returns an error, read it,
+   fix what it names, and call again; after three failed attempts, report the last error.
 5. `create_collection` reusing that exact validated JSON unchanged, and report the match count it
    returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates: a
    chain that aggregates or leaves the node axis will pass `query_graph` and still be refused here.
@@ -228,8 +236,8 @@ rather than rewriting the expression blindly.
    the preflight cannot produce one the collection is still applied and the reply says so. Report "applied, count unavailable" rather than inventing
    a number or omitting the outcome.
 
-Stop and report a GFQL error rather than retrying with an invented operation name. A failed query
-is not an inspection result.
+Never answer a GFQL error by retrying with an invented operation name; fix what the error names. A
+failed query is not an inspection result.
 
 Zero rows never establishes absence when any value in the expression came from the user's wording
 rather than from a tool result. Confirm every value was tool-observed before reporting an empty
