@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Development]
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
+### Changed
+- **Skills / graphistry-mcp**: Make Cypher the default query language. The skill states the supported openCypher subset (transpiled to GFQL), the errors the server returns, and when to retry or report; JSON GFQL, connection detail, and IP rules move to `references/`. Needs graphistry#3600.
+
 ### Fixed
 - **Skills / graphistry-mcp**: Fix and retry a GFQL error instead of stopping. The workflow now says to read an error, fix what it names, and call again, reporting after three failed attempts. A collection the service could not evaluate is no longer declared "not the problem": a malformed predicate such as `$gt`, an invented predicate name, a wrong operand key, a lowercase predicate name, or `val` on a string predicate also lands there and is fixable, even though that reply says not to retry. Corrected the row-cap rule (50 rows projected to the referenced columns; 20 rows of every column when the result holds none of them, such as a Cypher projection or an edge result), `get_session_info` (lists columns, not every stored value), and where a lowercase predicate name is corrected (only in a top-level `filter_dict` passed to `query_graph`).
 
