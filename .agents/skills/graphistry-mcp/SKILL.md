@@ -82,8 +82,10 @@ When a query fails, the tool returns the error from transpiling or from running 
 names the construct: `invalid-cypher-syntax`, `unsupported-cypher-query` with the clause, or
 `column-not-found` with the column. Other failures, such as a refused procedure or an algorithm
 error, carry their own message. Fix that construct and call again; after three failed attempts,
-report the last error. If the error means the request cannot be satisfied as asked (an unreadable
-or missing column, an unsupported operation), say plainly it cannot be done instead of retrying or
+report the last error. For `column-not-found`, recheck the schema and stored values for the right
+name and case. The request cannot be satisfied as asked only when the schema contradicts it or it
+needs a column the engine lists but cannot read (for example one computed only for rendering); then
+say plainly it cannot be done instead of retrying or
 substituting a different column; computing the same measure another way, such as degree through
 `CALL graphistry.degree()`, is not a substitution. Never answer an error by retrying with an
 invented operation name.
