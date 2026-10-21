@@ -8,7 +8,7 @@ description: "Drive a live Graphistry visualization session from any MCP client.
 ## Scope
 
 Use this skill to operate a **live Graphistry visualization session** from an MCP client: inspect
-its schema, run GFQL queries against it, and create colored collections the user sees update in
+its schema, run Cypher queries against it, and create colored collections the user sees update in
 their browser.
 
 ## Two servers share the name "graphistry mcp"
@@ -74,37 +74,44 @@ it unchanged — do not pass `null`.
 Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**
 (neo4j-style syntax and functions): the server transpiles it into
 [GFQL](https://github.com/graphistry/pygraphistry), Graphistry's open-source graph query
-language, and runs that. A query outside the subset fails with an error. Two comparisons fail
-silently instead, matching nothing: a date column against epoch milliseconds, and a number column
-against a quoted string (`n.score > '10'`).
+language, and runs that. A query outside the subset fails with an error. Three mistakes return
+wrong results without one:
 
-When a query fails, the tool returns the error from transpiling or from running the GFQL, and it
-names the construct: `invalid-cypher-syntax`, `unsupported-cypher-query` with the clause, or
-`column-not-found` with the column. Other failures, such as a refused procedure or an algorithm
-error, carry their own message. Fix that construct and call again; after three failed attempts,
-report the last error. For `column-not-found`, recheck the schema and stored values for the right
-name and case. The request cannot be satisfied as asked only when the schema contradicts it or it
-needs a column the engine lists but cannot read (for example one computed only for rendering); then
-say plainly it cannot be done instead of retrying or
-substituting a different column; computing the same measure another way, such as degree through
-`CALL graphistry.degree()`, is not a substitution. Never answer an error by retrying with an
-invented operation name.
+- A value of the wrong type for the column, from its type in `get_session_info`. A `date` column
+  takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
+  and a number column of epoch milliseconds an epoch number. A quoted number, or a date written
+  for a column of another type, matches nothing.
+- A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
+  use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
+- A pattern in `WHERE`, such as `WHERE (n)-[]->()`, under an aggregate. Count nodes that have a
+  pattern with `MATCH (n)-[]->() RETURN count(DISTINCT n)`.
+
+A failed query's error names its cause in brackets. Fix what it names and call again, at most three
+times, then report the last error. For `column-not-found`, fix the name from the columns the error
+lists; if the column the request needs is not there, including one `get_session_info` lists but the
+error does not, say plainly it cannot be done instead of using another column. Degree through
+`CALL graphistry.degree()` is the same measure, not a substitution. Never retry with an invented
+operation name.
+
+`<id_column>` below is the column on the `Node id column:` line of `get_session_info`; filtering
+another column by id matches nothing.
 
 ```cypher
+MATCH (n) RETURN count(DISTINCT n.kind) AS k
 MATCH (n) RETURN n.kind AS v, count(*) AS c ORDER BY c DESC LIMIT 20
 MATCH ()-[e]->() RETURN e.rel AS v, count(*) AS c ORDER BY c DESC LIMIT 20
-MATCH (n) WHERE n.score > 10 RETURN n.id AS id, n.score AS s ORDER BY s DESC LIMIT 10
-MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b.id AS id
+MATCH (n) WHERE n.score > 10 RETURN n.<id_column> AS id, n.score AS s ORDER BY s DESC LIMIT 10
+MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b.<id_column> AS id
 CALL graphistry.degree() YIELD nodeId, degree RETURN nodeId, degree ORDER BY degree DESC LIMIT 10
 CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank RETURN nodeId, pagerank ORDER BY pagerank DESC LIMIT 10
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
   RETURN community_multilevel AS community, count(*) AS size ORDER BY size DESC LIMIT 10
 ```
 
-Pass `output_type: "nodes"` to read rows; the default `shape` returns counts only. A Cypher result
-holds the columns you `RETURN`, capped at 20 rows, and the reported count is the true total, so a
-truncated value list cannot prove a value is absent. Return named properties (`RETURN n.id AS id`)
-rather than whole nodes, which return every column.
+Pass `output_type: "nodes"` to read rows; the default `shape` returns counts only. A result shows at
+most 20 rows, and a `LIMIT` also caps the reported count, so count values with `count(DISTINCT ...)`
+before listing them; a cut list cannot prove a value is absent. Return named properties
+(`RETURN n.<id_column> AS id`) rather than whole nodes, which return every column.
 
 ## Supported Cypher
 
@@ -112,43 +119,50 @@ rather than whole nodes, which return every column.
 |---|---|
 | `MATCH`, `WHERE`, `RETURN`, `WITH`, `ORDER BY`, `SKIP`, `LIMIT`, `DISTINCT` | writes: `CREATE`, `DELETE`, `SET`, `MERGE` |
 | `count`, `sum`, `avg`, `min`, `max`, `collect` | `ORDER BY` a column you did not return: return it, then order by its alias |
-| directed and undirected single-hop patterns, `[*1..3]` variable length | `RETURN n.id, count(r)` over `(n)-[r]-()`: `WITH n, count(r) AS d RETURN n.id AS id, d` |
-| `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial) | several disconnected `MATCH` patterns joined together: split into separate queries |
-| `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | a column whose name contains `.` or `-`: no quoting is supported; use a JSON `Node` filter |
+| directed and undirected single-hop patterns, `[*1..3]` variable length, `[*0..1]` to include the start node | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)` |
+| `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | |
+| a column name containing `.` or `-`, in backticks: ``n.`user.name` `` | |
 | `CALL graphistry.degree()`, `CALL graphistry.igraph.<algorithm>()` | `graphistry.nx.*` procedures are refused; use `graphistry.igraph.*` |
-| comparing a date column to an ISO string, `e.time >= '2023-12-09'` | comparing a date column to epoch milliseconds matches nothing, silently |
 | a label `(n:Hashtag)`, matched against the `type` column | a label with no `type` column fails with `column-not-found` `label__Hashtag` |
 | a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
-| an edge's properties: `RETURN a.id AS src, b.id AS dst, e.rel AS rel` | `RETURN e` returns the edge's attributes without its endpoints |
+| an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | `RETURN e` returns the edge's attributes without its endpoints |
 
 `community_multilevel` needs `{directed: false}`, and its community ids are relabeled on every run, so
 compute and filter a community in one query rather than reusing an id from an earlier one. The `degree`, `degree_in`, and `degree_out`
 columns `get_session_info` lists exist only for rendering and fail in a query; use
 `CALL graphistry.degree()`. Being listed is necessary but not sufficient. A misspelled or absent
-column fails with `column-not-found`.
+column fails with `column-not-found`. On a graph whose nodes have a `name` column, every
+`graphistry.igraph.*` call fails with `Vertex attribute conflict`; report that the algorithm cannot
+run instead of retrying.
 
 ## Coloring
 
-`create_collection` takes Cypher that returns one node alias whole:
+`create_collection` takes Cypher that returns one node alias whole. Cypher with `CALL`, `UNION`,
+aggregates, projections, or an endpoint returned without `DISTINCT` is refused as a collection, and
+the refusal names the repair; act on it rather than reporting failure.
 
 - the matched nodes themselves: `MATCH (n) WHERE n.score > 10 RETURN n`
 - one endpoint of a pattern, with `DISTINCT`: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
-- up to 20 ids a query returned: `MATCH (n) WHERE n.id IN ['a', 'b'] RETURN n` (a Cypher result shows
-  at most 20 rows, so a longer list is incomplete)
+- a node and its neighbors: `MATCH (a)-[*0..1]-(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`
+- up to about 200 nodes a `CALL` ranks or groups: collect their ids in one query, then color the list
 
-For the edges themselves, a neighborhood that includes its anchor, or a ranked top-N larger than
-20, use the JSON GFQL shape in `references/gfql-wire-format.md`: an `Edge` chain, an anchor `Node`
-then `Edge` then empty `Node`, or a `compute_igraph` ranking chain. Cypher with `CALL`, `UNION`,
-aggregates, projections, or an endpoint returned without `DISTINCT` is refused as a collection, and
-the refusal names the repair; act on it rather than reporting failure.
+```cypher
+CALL graphistry.degree() YIELD nodeId, degree
+  WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(nodeId) AS ids
+MATCH (n) WHERE n.<id_column> IN ['a', 'b'] RETURN n
+```
+
+Copy each id exactly as returned: a string stays quoted, a number unquoted. For a larger top N,
+color the JSON `compute_igraph` ranking chain; for a larger community, report its size. For the
+edges themselves, use a JSON `Edge` chain. Both are in `references/gfql-wire-format.md`.
 
 ## When to read the GFQL reference
 
 `references/gfql-wire-format.md` documents the GFQL that Cypher transpiles into, as JSON. Read it
-only when you need a shape the Cypher subset cannot express (the coloring shapes above, a dotted
-column name), when an error names a GFQL operation rather than a Cypher clause, or when you are
-unsure how a Cypher query will be evaluated. It also lists the JSON shapes that return wrong or
-empty results without erroring.
+only when you need a shape the Cypher subset cannot express (the coloring shapes above), when an
+error names a GFQL operation rather than a Cypher clause, or when you are unsure how a Cypher query
+will be evaluated. It also lists the JSON shapes that return wrong or empty results without
+erroring.
 
 ## Workflow
 
@@ -160,8 +174,9 @@ empty results without erroring.
    read; treat that as a failed inspection, not as a graph without columns. It lists columns, not
    every stored value, so it can never establish that a value is absent.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
-   unobserved candidates, never literals. Return the distinct values of the relevant column first
-   and match them exactly, or compare `toLower()` on both sides.
+   unobserved candidates, never literals. Count the distinct values of the relevant column with
+   `count(DISTINCT ...)`, then return them, and match them exactly or compare `toLower()` on both
+   sides.
 4. Validate with `query_graph` the exact expression you will pass to `create_collection` — the
    Cypher query, or the JSON shape when Coloring calls for one. Fix what any error names and call
    again.

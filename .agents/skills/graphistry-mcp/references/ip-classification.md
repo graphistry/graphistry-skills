@@ -13,4 +13,5 @@ exact stored representation; do not apply IPv4 rules to IPv6, host:port, URL, or
 without validating them. Use a positive pattern where supported, or `IN` only from an exhaustive
 value set. A limited/sample table cannot prove a complement; if the value set is truncated or the
 query cannot express the classification, report that limitation instead of claiming a complete
-collection.
+collection. Write a dot in a pattern as `[.]`, never `\.`, or use `STARTS WITH '10.'`; a backslash
+under `NOT` or `OR` silently changes the result.

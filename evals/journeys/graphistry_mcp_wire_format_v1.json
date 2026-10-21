@@ -89,32 +89,33 @@
       }
     },
     {
-      "id": "create_collection_json_only",
+      "id": "create_collection_cypher_node_alias",
       "prompt": "Can a Cypher query string be passed to the Graphistry viz MCP create_collection tool? Answer in under 6 non-empty lines.",
       "checks": {
         "regex": [
-          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
-          "(?i)(json|gfql)"
+          "(?i)\\b(yes|can|accepts|takes)\\b",
+          "(?i)RETURN\\s+(DISTINCT\\s+)?[a-z]\\w*\\b|whole node|node alias|matched nodes",
+          "(?i)\\b(CALL|aggregat\\w*|UNION)\\b"
         ],
         "max_lines": 6,
         "must_not_regex": [
-          "(?i)^\\s*yes\\b",
-          "(?i)create_collection\\s+(accepts|takes|supports|allows)\\s+(a\\s+|either\\s+)?cypher"
+          "(?i)^\\s*no\\b",
+          "(?i)json\\s+gfql\\s+only|only\\s+(accepts|takes)\\s+json"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "No. create_collection takes JSON GFQL only; Cypher is accepted by query_graph alone.",
+        "reference_answer": "Yes, when the query returns one node alias whole: MATCH (n) WHERE ... RETURN n, or RETURN DISTINCT b for one endpoint of a pattern. Cypher with CALL, UNION, aggregates, or projections is refused as a collection. Validate the same query with query_graph first.",
         "rubric": [
-          "Must say create_collection does not accept Cypher.",
-          "Must note that query_graph is the tool that does accept Cypher.",
-          "Claiming create_collection accepts Cypher should score zero."
+          "Must say create_collection accepts Cypher that returns the matched nodes whole, such as RETURN n or RETURN DISTINCT b.",
+          "Must say Cypher with CALL, UNION, aggregates, or projections is refused as a collection.",
+          "Saying create_collection takes JSON GFQL only should score zero."
         ],
         "required_concepts": [
           "create_collection",
-          "query_graph",
-          "JSON"
+          "RETURN",
+          "query_graph"
         ]
       }
     }
