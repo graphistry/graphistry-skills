@@ -85,11 +85,18 @@ answering a different question.
 `asc` or `desc`.
 
 To color a ranked top-N, compute the metric, order, and limit, and pass the chain unchanged to
-`create_collection`. Replace `<N>` with the count the user asked for:
+`create_collection`. Replace `<N>` with the count the user asked for. Use `compute_igraph` for an
+igraph algorithm and `get_degrees` for degree; `compute_igraph` has no degree algorithm:
 
 ```json
 [{"type":"Call","function":"compute_igraph","params":{"alg":"pagerank"}},
  {"type":"Call","function":"order_by","params":{"keys":[["pagerank","desc"]]}},
+ {"type":"Call","function":"limit","params":{"value":<N>}}]
+```
+
+```json
+[{"type":"Call","function":"get_degrees","params":{}},
+ {"type":"Call","function":"order_by","params":{"keys":[["degree","desc"]]}},
  {"type":"Call","function":"limit","params":{"value":<N>}}]
 ```
 

@@ -106,11 +106,12 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "Yes, when the query returns one node alias whole: MATCH (n) WHERE ... RETURN n, or RETURN DISTINCT b for one endpoint of a pattern. Cypher with CALL, UNION, aggregates, or projections is refused as a collection. Validate the same query with query_graph first.",
+        "reference_answer": "Yes, when the query returns one node alias whole: MATCH (n) WHERE ... RETURN n, or RETURN DISTINCT b for the endpoint of one directed relationship, MATCH (a)-[e]->(b). Cypher with CALL, UNION, aggregates, projections, or undirected, multi-hop, or variable-length patterns is refused as a collection. Validate the same query with query_graph first.",
         "rubric": [
-          "Must say create_collection accepts Cypher that returns the matched nodes whole, such as RETURN n or RETURN DISTINCT b.",
+          "Must say create_collection accepts Cypher that returns the matched nodes whole, such as RETURN n, or RETURN DISTINCT b for one directed relationship.",
           "Must say Cypher with CALL, UNION, aggregates, or projections is refused as a collection.",
-          "Saying create_collection takes JSON GFQL only should score zero."
+          "Saying create_collection takes JSON GFQL only should score zero.",
+          "Presenting RETURN DISTINCT b as a safe collection for any pattern, including undirected, multi-hop, or variable-length ones, should lose credit."
         ],
         "required_concepts": [
           "create_collection",

@@ -119,7 +119,8 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 |---|---|
 | `MATCH`, `WHERE`, `RETURN`, `WITH`, `ORDER BY`, `SKIP`, `LIMIT`, `DISTINCT` | writes: `CREATE`, `DELETE`, `SET`, `MERGE` |
 | `count`, `sum`, `avg`, `min`, `max`, `collect` | `ORDER BY` a column you did not return: return it, then order by its alias |
-| directed and undirected single-hop patterns, `[*1..3]` variable length, `[*0..1]` to include the start node | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)` |
+| one directed relationship per pattern, `(a)-[e]->(b)` or `(a)<-[e]-(b)` | undirected patterns, `[*0..n]`, `[*2..n]`, undirected variable length, and chains like `(a)-->(b)-->(c)` can return wrong rows without an error: go one directed hop per query, collect the ids, and start the next hop from `WHERE a.<id_column> IN [...]` |
+| two node-only patterns in one `MATCH (a), (b)` | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)`, with no relationship in it |
 | `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | |
 | a column name containing `.` or `-`, in backticks: ``n.`user.name` `` | |
 | `CALL graphistry.degree()`, `CALL graphistry.igraph.<algorithm>()` | `graphistry.nx.*` procedures are refused; use `graphistry.igraph.*` |
@@ -137,24 +138,32 @@ run instead of retrying.
 
 ## Coloring
 
-`create_collection` takes Cypher that returns one node alias whole. Cypher with `CALL`, `UNION`,
-aggregates, projections, or an endpoint returned without `DISTINCT` is refused as a collection, and
-the refusal names the repair; act on it rather than reporting failure.
+`create_collection` takes Cypher that returns one node alias whole, with at most one directed
+relationship. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is refused
+as a collection, and the refusal names the supported shapes; rewrite to one of them rather than
+reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one directed
+relationship.
 
 - the matched nodes themselves: `MATCH (n) WHERE n.score > 10 RETURN n`
-- one endpoint of a pattern, with `DISTINCT`: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
-- a node and its neighbors: `MATCH (a)-[*0..1]-(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`
-- up to about 200 nodes a `CALL` ranks or groups: collect their ids in one query, then color the list
+- one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
+- anything else, such as a node and its neighbors, a longer path, or up to about 200 nodes a `CALL`
+  ranks or groups: collect the ids with `query_graph`, one directed hop at a time, then color the list
 
 ```cypher
+MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
+MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
 CALL graphistry.degree() YIELD nodeId, degree
   WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(nodeId) AS ids
-MATCH (n) WHERE n.<id_column> IN ['a', 'b'] RETURN n
+MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
 ```
 
-Copy each id exactly as returned: a string stays quoted, a number unquoted. For a larger top N,
-color the JSON `compute_igraph` ranking chain; for a larger community, report its size. For the
-edges themselves, use a JSON `Edge` chain. Both are in `references/gfql-wire-format.md`.
+The first two collect a node's out- and in-neighbors; color them with the node itself. For more than
+about 200 neighbors, skip the id list: color the out-neighbors, `MATCH (a)-[e]->(b) WHERE a.<id_column>
+= 'x' RETURN DISTINCT b`, the in-neighbors with `(a)<-[e]-(b)`, and the node itself as separate
+collections with distinct names in the same color. Copy each id exactly as returned: a string stays quoted, a number unquoted. For a larger top N, color a JSON
+ranking chain: `get_degrees` for degree, `compute_igraph` for an igraph algorithm. For a larger
+community, report its size. For the edges themselves, use a JSON `Edge` chain. All three are in
+`references/gfql-wire-format.md`.
 
 ## When to read the GFQL reference
 
@@ -182,7 +191,7 @@ erroring.
    again.
 5. `create_collection` reusing that exact validated expression, and report the match count it
    returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates; when
-   it refuses, the refusal names the repair — use it. The count is not guaranteed — when the
+   it refuses, the refusal names the supported shapes — rewrite to one of them. The count is not guaranteed — when the
    preflight cannot produce one the collection is still applied and the reply says so. Report
    "applied, count unavailable" rather than inventing a number or omitting the outcome.
 
