@@ -64,7 +64,7 @@ collection of the same name, and returns a cached result for an identical call r
 30 seconds. `list_collections` reports only collections this MCP session created, never ones the
 user made in the browser, and it is emptied when the user's socket reconnects.
 
-`gfql_operations` is a string: one Cypher query, or JSON-encoded GFQL. `order` lists collection ids
+`gfql_operations` is a string holding one Cypher query. `order` lists collection ids
 top-to-bottom; the first renders on top. For a solid color pass a hex `node_color`; use `palette`
 only when a named palette is explicitly requested. On `update_collection`, omit a field to leave
 it unchanged — do not pass `null`.
@@ -74,8 +74,8 @@ it unchanged — do not pass `null`.
 Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**
 (neo4j-style syntax and functions): the server transpiles it into
 [GFQL](https://github.com/graphistry/pygraphistry), Graphistry's open-source graph query
-language, and runs that. A query outside the subset fails with an error. Three mistakes return
-wrong results without one:
+language, and runs that. Many unsupported queries fail with an error, but the pattern shapes under
+Supported Cypher return wrong rows without one, and so do three more mistakes:
 
 - A value of the wrong type for the column, from its type in `get_session_info`. A `date` column
   takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
@@ -119,14 +119,14 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 |---|---|
 | `MATCH`, `WHERE`, `RETURN`, `WITH`, `ORDER BY`, `SKIP`, `LIMIT`, `DISTINCT` | writes: `CREATE`, `DELETE`, `SET`, `MERGE` |
 | `count`, `sum`, `avg`, `min`, `max`, `collect` | `ORDER BY` a column you did not return: return it, then order by its alias |
-| one directed relationship per pattern, `(a)-[e]->(b)` or `(a)<-[e]-(b)` | undirected patterns, `[*0..n]`, `[*2..n]`, undirected variable length, and chains like `(a)-->(b)-->(c)` can return wrong rows without an error: go one directed hop per query, collect the ids, and start the next hop from `WHERE a.<id_column> IN [...]` |
+| at most one relationship per query, always directed, `(a)-[e]->(b)` or `(a)<-[e]-(b)`, counting every `MATCH` and `OPTIONAL MATCH` | undirected patterns, any variable length (`[*]`, `[*1..n]`, `[*0..n]`, `[*2..n]`), and a second relationship anywhere in the query, such as `(a)-->(b)-->(c)`, can return wrong rows without an error: go one directed hop per query, collect the ids, and start the next hop from `WHERE a.<id_column> IN [...]` |
 | two node-only patterns in one `MATCH (a), (b)` | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)`, with no relationship in it |
-| `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | |
+| `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | `toLower()` in a query with a relationship: match the exact stored value |
 | a column name containing `.` or `-`, in backticks: ``n.`user.name` `` | |
 | `CALL graphistry.degree()`, `CALL graphistry.igraph.<algorithm>()` | `graphistry.nx.*` procedures are refused; use `graphistry.igraph.*` |
 | a label `(n:Hashtag)`, matched against the `type` column | a label with no `type` column fails with `column-not-found` `label__Hashtag` |
 | a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
-| an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | `RETURN e` returns the edge's attributes without its endpoints |
+| an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | in `query_graph`, `RETURN e` returns the edge's attributes without its endpoints; in `create_collection` it colors the connections (Coloring) |
 
 `community_multilevel` needs `{directed: false}`, and its community ids are relabeled on every run, so
 compute and filter a community in one query rather than reusing an id from an earlier one. The `degree`, `degree_in`, and `degree_out`
@@ -138,15 +138,22 @@ run instead of retrying.
 
 ## Coloring
 
-`create_collection` takes Cypher that returns one node alias whole, with at most one directed
-relationship. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is refused
+`create_collection` takes Cypher that returns one node alias whole, or the relationship `e` of one
+directed hop whole, with at most one directed relationship. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is refused
 as a collection, and the refusal names the supported shapes; rewrite to one of them rather than
 reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one directed
 relationship.
 
 - the matched nodes themselves: `MATCH (n) WHERE n.score > 10 RETURN n`
 - one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
-- anything else, such as a node and its neighbors, a longer path, or up to about 200 nodes a `CALL`
+- the connections themselves, when the filtered value lives in an edge column and the request names
+  no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`. `ORDER BY`, `LIMIT`,
+  projections are refused for connections. In `WHERE`, use plain comparisons joined by `AND`, without
+  parentheses; `OR`, `NOT`, `toLower()`, arithmetic, and a filter after `WITH` are refused, and
+  `IN [...]` works only as the only condition. For several values with another condition, make one
+  collection per value in the same color; for either direction around a node, make two collections
+  (`->` and `<-`) with distinct names in the same color
+- anything else, such as a node and its neighbors, a longer path, or any number of nodes a `CALL`
   ranks or groups: collect the ids with `query_graph`, one directed hop at a time, then color the list
 
 ```cypher
@@ -158,20 +165,24 @@ MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
 ```
 
 The first two collect a node's out- and in-neighbors; color them with the node itself. For more than
-about 200 neighbors, skip the id list: color the out-neighbors, `MATCH (a)-[e]->(b) WHERE a.<id_column>
+about 2,000 neighbors, skip the id list: color the out-neighbors, `MATCH (a)-[e]->(b) WHERE a.<id_column>
 = 'x' RETURN DISTINCT b`, the in-neighbors with `(a)<-[e]-(b)`, and the node itself as separate
-collections with distinct names in the same color. Copy each id exactly as returned: a string stays quoted, a number unquoted. For a larger top N, color a JSON
-ranking chain: `get_degrees` for degree, `compute_igraph` for an igraph algorithm. For a larger
-community, report its size. For the edges themselves, use a JSON `Edge` chain. All three are in
-`references/gfql-wire-format.md`.
+collections with distinct names in the same color. Copy each id exactly as returned: a string stays
+quoted, a number unquoted. A top N of any size and a community are id lists too: rank or group and
+`collect()` in one query, then color `MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
 
-## When to read the GFQL reference
+```cypher
+CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
+  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(nodeId) AS ids
+CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
+  WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
+  RETURN c, size, ids ORDER BY size DESC
+```
 
-`references/gfql-wire-format.md` documents the GFQL that Cypher transpiles into, as JSON. Read it
-only when you need a shape the Cypher subset cannot express (the coloring shapes above), when an
-error names a GFQL operation rather than a Cypher clause, or when you are unsure how a Cypher query
-will be evaluated. It also lists the JSON shapes that return wrong or empty results without
-erroring.
+A query is limited to 64 KB (65,536 characters), about 1,500 to 5,000 ids depending on their
+length, and a session keeps at most 10 collections. Check the size first: split a longer list into
+a few collections with distinct names in the same color, and for a list too long for that, report
+its size instead of coloring it.
 
 ## Workflow
 
@@ -184,11 +195,11 @@ erroring.
    every stored value, so it can never establish that a value is absent.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
    unobserved candidates, never literals. Count the distinct values of the relevant column with
-   `count(DISTINCT ...)`, then return them, and match them exactly or compare `toLower()` on both
-   sides.
-4. Validate with `query_graph` the exact expression you will pass to `create_collection` — the
-   Cypher query, or the JSON shape when Coloring calls for one. Fix what any error names and call
-   again.
+   `count(DISTINCT ...)`, then return them, and match them exactly. Only in a node-only query,
+   `MATCH (n)`, compare `toLower()` on both sides; in a query with a relationship, use the exact
+   stored value.
+4. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
+   what any error names and call again.
 5. `create_collection` reusing that exact validated expression, and report the match count it
    returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates; when
    it refuses, the refusal names the supported shapes — rewrite to one of them. The count is not guaranteed — when the
@@ -223,7 +234,6 @@ stored IP values with `references/ip-classification.md`.
 ## References
 
 - `references/connection.md`: credentials, transport session, session ownership, status codes.
-- `references/gfql-wire-format.md`: the GFQL that Cypher transpiles into, as JSON, and its pitfalls.
 - `references/ip-classification.md`: external/internal IP rules.
 - Graphistry Hub docs: https://hub.graphistry.com/docs/
 - MCP specification: https://modelcontextprotocol.io/specification/
