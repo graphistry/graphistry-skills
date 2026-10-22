@@ -64,8 +64,8 @@ it unchanged — do not pass `null`.
 
 ## Query in Cypher
 
-Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**
-(neo4j-style syntax and functions): the server transpiles it into
+Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**:
+the server transpiles it into
 [GFQL](https://github.com/graphistry/pygraphistry), Graphistry's open-source graph query
 language, and runs that.
 
@@ -88,7 +88,9 @@ without one:
 - A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
   use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
 - A pattern in `WHERE`, such as `WHERE NOT (n)-[]->()`, under an aggregate; `collect()` is an
-  aggregate too. Count with `MATCH (n)-[]->() RETURN count(DISTINCT n)`, and collect through `WITH`:
+  aggregate too. Count nodes with a pattern with `MATCH (n)-[]->() RETURN count(DISTINCT n)`, and
+  nodes without one with `CALL graphistry.degree() YIELD nodeId, degree_out WITH nodeId, degree_out
+  WHERE degree_out = 0 RETURN count(*)`; collect through `WITH`:
   `MATCH (n) WHERE NOT (n)-[]->() WITH n.<id_column> AS id RETURN collect(id) AS ids`.
 
 A failed query's error names its cause in brackets. Fix what it names and call again, at most three
@@ -147,7 +149,7 @@ refused as a collection, and the refusal names the supported shapes; rewrite to 
 than reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one
 directed relationship.
 
-- the matched nodes themselves: `MATCH (n) WHERE n.score > 10 RETURN n`
+- the matched nodes: `MATCH (n) WHERE n.score > 10 RETURN n`
 - one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
 - the connections themselves, when the filtered value lives in an edge column and the request names
   no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`
@@ -186,9 +188,9 @@ node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DIS
 report its size instead of coloring it.
 
 A request colored as several collections (both directions, one per value, a split list) takes one
-`create_collection` call per part, although each reply says not to call again: give the parts
-distinct names and the same color, make every call, and report each part's count. For an id list,
-the match count should equal the number of ids; if it does not, re-check the list.
+`create_collection` call per part: give the parts distinct names and the same color, make every
+call, and report each part's count. For an id list, the match count should equal the number of
+ids; if it does not, re-check the list.
 
 ## Workflow
 
