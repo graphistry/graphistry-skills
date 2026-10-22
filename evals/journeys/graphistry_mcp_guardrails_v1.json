@@ -70,9 +70,12 @@
       "checks": {
         "regex": [
           "(?i)(assumption|unverified|untested|unobserved|guess|candidate|(their|your|user'?s?)\\s+(wording|phrasing)|not\\s+(from|observed|checked))",
-          "(?i)(distinct|value_counts|top-n|top n|inspect|aggregate|observed values|schema)"
+          "(?i)(distinct|value_counts|top-n|top n|inspect|aggregate|observed values|schema|stored values|count\\s*\\()"
         ],
-        "max_lines": 8
+        "max_lines": 8,
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
       },
       "oracle": {
         "enabled": true,
@@ -88,33 +91,6 @@
         ],
         "forbidden_concepts": [
           "confirmed none exist"
-        ]
-      }
-    },
-    {
-      "id": "dict_filter_cannot_threshold",
-      "prompt": "In the Graphistry viz MCP JSON wire format, can a filter_nodes_by_dict entry express a greater-than threshold on a numeric column? Answer in under 6 non-empty lines.",
-      "checks": {
-        "regex": [
-          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
-          "(?i)(exact|equality|equals|membership|literal)",
-          "(?i)(node|predicate|gfql)"
-        ],
-        "max_lines": 6
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "No. filter_nodes_by_dict matches exact stored values only, so a predicate object there matches nothing and returns success with zero rows. Use a Node operation to threshold.",
-        "rubric": [
-          "Must answer no and say it matches exact stored values only.",
-          "Must note the failure is silent rather than an error.",
-          "Must redirect to a Node operation for thresholds.",
-          "Scope is the JSON wire format, not the PyGraphistry Python API where filter_nodes_by_dict accepts an ASTPredicate."
-        ],
-        "required_concepts": [
-          "exact",
-          "Node"
         ]
       }
     },
@@ -144,26 +120,29 @@
     },
     {
       "id": "act_on_collection_refusal",
-      "prompt": "`create_collection` returned this error: \"That expression returns a table that no longer identifies graph nodes - it groups rows, projects columns away, or reads the edge table - so there is nothing to color. A collection needs an expression that selects the nodes themselves, such as a Node filter.\" What do you do next? Answer in under 8 non-empty lines.",
+      "prompt": "`create_collection` returned this error: \"That Cypher returns rows that no longer identify graph nodes, so there is nothing to color. Color a node filter, MATCH (n) WHERE ... RETURN n; one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN DISTINCT b; an id list, MATCH (n) WHERE n.<id> IN [...] RETURN n, built with collect() in query_graph; or the connections of one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN e. Report counts and groups with query_graph instead.\" What do you do next? Answer in under 8 non-empty lines.",
       "checks": {
         "regex": [
-          "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|filter_dict",
+          "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|MATCH\\s*\\([^)\\n]{0,200}\\)[^\\n]{0,400}?\\bRETURN\\s+(DISTINCT\\s+)?\\w+",
           "(?i)(rebuild|rewrite|replace|instead|new expression|change the|retry|re-run)"
         ],
-        "max_lines": 8
+        "max_lines": 8,
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "Act on the repair the error names: replace the aggregating chain with an expression that selects the nodes themselves, typically a Node filter built from the values the aggregation returned, then create the collection from that.",
+        "reference_answer": "Act on the repair the error names: replace the projecting or aggregating query with Cypher that returns the nodes whole (MATCH (n) WHERE ... RETURN n) or an id list built with collect() in query_graph, from the values the earlier query returned, validate it with query_graph, then create the collection from that.",
         "rubric": [
           "Must act on the refusal rather than reporting failure and stopping.",
-          "Must build an expression that selects nodes, typically a Node filter.",
+          "Must build Cypher that returns the nodes whole, or an id list built with collect().",
           "Reporting the failure without attempting the named repair should score near zero.",
-          "This differs from a refusal where the service could not evaluate the expression, which should be reported."
+          "This differs from a refusal where the service could not evaluate the query, which should be reported."
         ],
         "required_concepts": [
-          "Node"
+          "RETURN"
         ]
       }
     }

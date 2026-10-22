@@ -1,6 +1,6 @@
 {
   "id": "graphistry_mcp_wire_format_v1",
-  "description": "JSON GFQL wire-format correctness for the Graphistry viz MCP tool surface.",
+  "description": "Cypher query shapes for the Graphistry viz MCP tool surface.",
   "eval_intent": "execution_grade",
   "tags": [
     "graphistry-mcp",
@@ -9,112 +9,207 @@
   ],
   "cases": [
     {
-      "id": "edge_direction_explicit",
-      "prompt": "Write the JSON GFQL operation for a one-hop forward edge traversal to send to the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
+      "id": "create_collection_cypher_node_alias",
+      "prompt": "Can a Cypher query string be passed to the Graphistry viz MCP create_collection tool? Answer in under 6 non-empty lines, not counting code fences.",
       "checks": {
         "regex": [
-          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"Edge\\\\?\"",
-          "\\\\?\"direction\\\\?\"\\s*:\\s*\\\\?\"(forward|reverse|undirected)\\\\?\""
-        ],
-        "must_not_regex": [
-          "\\\\?\"direction\\\\?\"\\s*:\\s*\\\\?\"both\\\\?\""
-        ],
-        "max_lines": 12
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "{\"type\": \"Edge\", \"direction\": \"forward\", \"hops\": 1}",
-        "rubric": [
-          "Must emit an Edge operation with an explicit direction of forward, reverse, or undirected.",
-          "Using 'both' as a direction is invalid and should score near zero.",
-          "Omitting direction entirely is wrong: query_graph does not default it the way create_collection does."
-        ],
-        "required_concepts": [
-          "Edge",
-          "direction"
-        ]
-      }
-    },
-    {
-      "id": "rows_wrapped_as_call",
-      "prompt": "Write the JSON GFQL for a rows operation over the edge table, as it must appear inside a chain sent to the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
-      "checks": {
-        "regex": [
-          "\"Call\"",
-          "\"rows\"",
-          "\"table\"\\s*:\\s*\"edges\""
-        ],
-        "max_lines": 12
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "{\"type\": \"Call\", \"function\": \"rows\", \"params\": {\"table\": \"edges\"}}",
-        "rubric": [
-          "rows must be wrapped as a Call operation; a bare {\"type\": \"rows\"} is invalid.",
-          "rows defaults to the nodes table, so table must be set to edges explicitly.",
-          "Answer should be JSON, not Python AST helpers."
-        ],
-        "required_concepts": [
-          "Call",
-          "rows",
-          "edges"
-        ]
-      }
-    },
-    {
-      "id": "predicate_type_case_sensitive",
-      "prompt": "Write the JSON GFQL node filter selecting nodes whose score is greater than 10, for the Graphistry viz MCP query_graph tool. JSON only, under 12 non-empty lines.",
-      "checks": {
-        "regex": [
-          "\"GT\""
-        ],
-        "must_not_regex": [
-          "\"type\"\\s*:\\s*\"gt\""
-        ],
-        "max_lines": 12
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "{\"type\": \"Node\", \"filter_dict\": {\"score\": {\"type\": \"GT\", \"val\": 10}}}",
-        "rubric": [
-          "Predicate type names are case-sensitive: GT is correct, gt fails with an opaque error.",
-          "A threshold must be expressed as a predicate on a Node operation."
-        ],
-        "required_concepts": [
-          "GT"
-        ]
-      }
-    },
-    {
-      "id": "create_collection_json_only",
-      "prompt": "Can a Cypher query string be passed to the Graphistry viz MCP create_collection tool? Answer in under 6 non-empty lines.",
-      "checks": {
-        "regex": [
-          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
-          "(?i)(json|gfql)"
+          "(?i)\\b(yes|can|accepts|takes|only|some)\\b",
+          "(?i)RETURN\\s+(DISTINCT\\s+)?[a-z]\\w*\\b|whole node|node alias|matched nodes",
+          "(?i)\\b(CALL|aggregat\\w*|UNION)\\b"
         ],
         "max_lines": 6,
         "must_not_regex": [
-          "(?i)^\\s*yes\\b",
-          "(?i)create_collection\\s+(accepts|takes|supports|allows)\\s+(a\\s+|either\\s+)?cypher"
+          "(?i)^\\s*no\\b",
+          "(?i)json\\s+gfql\\s+only|only\\s+(accepts|takes)\\s+json",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\"",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b[^\\n]{0,400}?\\[[^\\]\\n]{0,100}\\*[^\\]\\n]{0,100}\\]",
+          "(?i)\\b(CALL|UNION|aggregat\\w*)\\b(?:(?!\\b(?:but|while|whereas|although|however|only|not|refused|rejected|unsupported)\\b)[^.;\\n]){0,60}\\b(are|is)\\s+(also\\s+)?(accepted|supported|allowed)"
         ]
       },
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "No. create_collection takes JSON GFQL only; Cypher is accepted by query_graph alone.",
+        "reference_answer": "Yes, when the query returns one node alias whole: MATCH (n) WHERE ... RETURN n, or RETURN DISTINCT b for the endpoint of one directed relationship, MATCH (a)-[e]->(b); or the relationship of one directed hop whole, RETURN e, which colors edges. Cypher with CALL, UNION, aggregates, projections, or undirected, multi-hop, or variable-length patterns is refused as a collection. Validate the same query with query_graph first.",
         "rubric": [
-          "Must say create_collection does not accept Cypher.",
-          "Must note that query_graph is the tool that does accept Cypher.",
-          "Claiming create_collection accepts Cypher should score zero."
+          "Must say create_collection accepts Cypher that returns the matched nodes whole, such as RETURN n, or RETURN DISTINCT b for one directed relationship.",
+          "Must say Cypher with CALL, UNION, aggregates, or projections is refused as a collection.",
+          "Saying create_collection takes JSON GFQL only should score zero.",
+          "Presenting RETURN DISTINCT b as a safe collection for any pattern, including undirected, multi-hop, or variable-length ones, should lose credit."
         ],
         "required_concepts": [
           "create_collection",
-          "query_graph",
-          "JSON"
+          "RETURN",
+          "query_graph"
+        ]
+      }
+    },
+    {
+      "id": "two_hops_one_directed_hop_per_query",
+      "prompt": "With the Graphistry viz MCP query_graph tool, how do you get the nodes two hops downstream of node 'x' (the nodes that x's direct targets point to)? Show the Cypher. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)collect\\s*\\(",
+          "(?i)\\bIN\\s*\\["
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}(?:->|<-|--)(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}(?:->|<-|--)",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}\\[[^\\]\\n]{0,100}\\*[^\\]\\n]{0,100}\\]",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}\\)\\s{0,5}-\\s{0,5}(?:\\[[^\\]\\n]{0,100}\\]\\s{0,5})?-\\s{0,5}\\(",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:(?!\\bRETURN\\b)[^\\n]){0,400}?(?:->|<-|--)(?:(?!\\bRETURN\\b)[^\\n]){0,400}\\n(?:(?:(?!\\bRETURN\\b)[^\\n]){0,400}\\n){0,3}(?:(?!\\bRETURN\\b)[^\\n]){0,200}?\\bMATCH\\b[^\\n]{0,400}?(?:->|<-|--)",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b[^\\n]{0,400}?(?:->|<-|--)[^\\n]{0,400}\\n[ \\t]{0,40}<?-{1,2}>?[ \\t]{0,5}[\\[(]",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b[^\\n]{0,400}?(?:->|<-|--)[^\\n]{0,400}?,[ \\t]*\\n[ \\t]{0,40}\\(",
+          "(?im)^[ \\t]{0,40}MATCH\\s*\\(\\s*\\w*\\s*\\)\\s*-[^\\n>]{0,100}->\\s*\\(\\s*(\\w+)\\s*\\)[^\\n]{0,200}?\\bWHERE\\s+\\1\\.`?\\w+`?\\s*=\\s*['\\\"]x['\\\"]",
+          "(?im)^[ \\t]{0,40}MATCH\\s*\\(\\s*(\\w+)\\s*\\)\\s*<-[^\\n]{0,200}?\\bWHERE\\s+\\1\\.`?\\w+`?\\s*=\\s*['\\\"]x['\\\"]",
+          "(?im)^[ \\t]{0,40}MATCH\\s*\\(\\s*\\w*\\s*\\)\\s*-[^\\n>]{0,100}->\\s*\\(\\s*(\\w+)\\s*\\)[^\\n]{0,200}?\\bWHERE\\s+\\1\\.`?\\w+`?\\s+IN\\s*\\[",
+          "(?im)^[ \\t]{0,40}MATCH\\s*\\(\\s*(\\w+)\\s*\\)\\s*<-[^\\n]{0,200}?\\bWHERE\\s+\\1\\.`?\\w+`?\\s+IN\\s*\\[",
+          "(?im)^[ \\t]{0,40}OPTIONAL[ \\t]+MATCH\\b[^\\n]{0,400}?(?:->|<-|--)",
+          "\\bIN\\s*\\[\\s*[A-Za-z_]\\w*\\s*\\]",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Go one directed hop per query: MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids, then MATCH (b)-[]->(c) WHERE b.<id_column> IN [<ids>] RETURN DISTINCT c.<id_column> AS id.",
+        "rubric": [
+          "Must split the path into one directed hop per query, carrying ids forward with collect() and IN [...]; the two queries may be in one code block or two.",
+          "A two-relationship pattern such as (a)-->(b)-->(c), a second MATCH in the same query, a variable-length pattern, or an undirected pattern should score zero.",
+          "Writing a hop right to left, such as MATCH (b)<-[]-(a) WHERE a.<id_column> = 'x', is the same directed hop and is fine."
+        ],
+        "required_concepts": [
+          "collect",
+          "IN"
+        ]
+      }
+    },
+    {
+      "id": "numeric_threshold_unquoted",
+      "prompt": "Write the Cypher for the Graphistry viz MCP query_graph tool that returns the nodes whose numeric score column is greater than 10. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)score`?\\s*>\\s*10\\b|\\b10\\s*<\\s*\\w+\\.`?score\\b",
+          "(?i)\\bRETURN\\s+(?:DISTINCT\\s+)?\\w+\\b(?!\\s*\\()"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?m)^[ \\t]{0,40}(?:(?:OPTIONAL[ \\t]+)?MATCH|WHERE|AND|OR)\\b[^\\n]{0,400}?(?:score`?\\s*>\\s*['\\\"]10|['\\\"]10['\\\"]\\s*<\\s*\\w+\\.`?score\\b)",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n) WHERE n.score > 10 RETURN n.<id_column> AS id, n.score AS score",
+        "rubric": [
+          "Must compare the number unquoted: n.score > 10.",
+          "Quoting the number ('10') matches nothing and should score zero.",
+          "Must return the matching nodes or their ids; returning only a count, or claiming that a limited result holds every match, should score zero."
+        ],
+        "required_concepts": [
+          "score"
+        ]
+      }
+    },
+    {
+      "id": "color_connections_return_e",
+      "prompt": "Write the Cypher to pass to the Graphistry viz MCP create_collection tool so it colors the connections (the edges themselves) whose rel column is 'mentions'. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?is)MATCH\\s*\\(\\w*\\)\\s*<?-\\s*\\[\\s*(\\w+)[^\\]\\n]{0,100}\\]\\s*->?\\s*\\(\\w*\\).{0,2000}?RETURN\\s+(DISTINCT\\s+)?\\1\\b(?!\\s*\\.)",
+          "(?i)rel\\s*=\\s*['\"]mentions['\"]"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}\\)\\s{0,5}-\\s{0,5}(?:\\[[^\\]\\n]{0,100}\\]\\s{0,5})?-\\s{0,5}\\(",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}<-\\s{0,5}(?:\\[[^\\]\\n]{0,100}\\]\\s{0,5})?->",
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}\\bRETURN\\s+(?:DISTINCT\\s+)?(?:[ab]\\b(?!\\s*\\.)|e\\b\\s*,)",
+          "(?m)^[ \\t]{0,40}RETURN\\s+(?:DISTINCT\\s+)?(?:[ab]|e\\s*,\\s*[\\w.]+(?:\\s+AS\\s+\\w+)?(?:\\s*,\\s*[\\w.]+(?:\\s+AS\\s+\\w+)?){0,10})[ \\t]*;?[ \\t]*$",
+          "(?i)\\bRETURN\\s+(?:DISTINCT\\s+)?e\\b(?!\\s*\\.)(?:\\s+AS\\s+\\w+)?\\s+(?:SKIP\\s+\\S+\\s+)?(?:ORDER\\s+BY|LIMIT)\\b",
+          "(?m)\\bWHERE[ \\t]+(?i:NOT[ \\t]+)?\\(?[ \\t]*(?:\\w+\\.|\\w+[ \\t]*\\()(?:(?!\\b(?i:RETURN)\\b)(?:[^\\n/'\"`]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\")){0,400}\\b(?i:OR)\\b|^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:(?!\\b(?i:RETURN)\\b)(?:[^\\n/'\"`]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\")){0,400}\\b(?i:WHERE)[ \\t]+(?i:NOT[ \\t]+)?\\(?[ \\t]*(?:\\w+\\.|\\w+[ \\t]*\\()(?:(?!\\b(?i:RETURN)\\b)(?:[^\\n/'\"`]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\")){0,400}\\b(?i:OR)\\b",
+          "(?im)^[ \\t]{0,40}RETURN\\s+(?:DISTINCT\\s+)?e\\b(?!\\s*\\.)[^\\n]{0,200}\\n[ \\t]{0,40}(?:ORDER\\s+BY|LIMIT)\\b",
+          "(?im)^[ \\t]{0,40}(?:MATCH\\b[^\\n]{0,400}?)?WHERE\\b[^\\n]{0,400}\\n[ \\t]{0,40}OR[ \\t]+(?:NOT[ \\t]+)?\\(?[ \\t]*(?:\\w+\\.|\\w+\\s*\\()",
+          "(?m)^[ \\t]{0,40}(?:MATCH|WHERE|WITH)\\b[^\\n]{0,400}?\\bRETURN\\s+(?:DISTINCT\\s+)?e\\s*,",
+          "(?i)\\bcreate_collection\\b[^.\\n]{0,40}\\b(?:cannot|can'?t|does\\s+not|doesn'?t|won'?t|is\\s+unable\\s+to)\\s+colou?r\\b|\\b(?:pass|use|send|run)\\s+(?:it|this|the\\s+query)\\s+(?:to|with|in)\\s+query_graph\\s+only\\b",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e",
+        "rubric": [
+          "Must return the relationship of one directed hop whole (RETURN e).",
+          "Returning an endpoint (RETURN b) colors nodes, not the connections, and should score zero.",
+          "create_collection takes the query in gfql_operations with node_color or palette, and node_color also colors the edges of an edge collection; validating the query with query_graph first is expected.",
+          "Saying create_collection cannot color edges, or to use the query with query_graph only, should score zero."
+        ],
+        "required_concepts": [
+          "RETURN e"
+        ]
+      }
+    },
+    {
+      "id": "top_n_pagerank_collect_in",
+      "prompt": "How do you color the top 100 nodes by PageRank with the Graphistry viz MCP tools? Show the Cypher. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)pagerank",
+          "(?i)collect\\s*\\(",
+          "(?i)\\bIN\\s*\\[",
+          "(?i)LIMIT\\s+100\\b"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?i)[\"']compute_igraph[\"']",
+          "(?im)\\bRETURN\\s+collect\\s*\\([^\\n]{0,300}?\\bLIMIT\\b|\\bRETURN\\s+collect\\s*\\([^\\n]{0,300}\\n[ \\t]{0,40}(?:SKIP\\b[^\\n]{0,40})?LIMIT\\b",
+          "(?i)\\bORDER\\s+BY\\s+[\\w.]*pagerank\\w*\\s+(?:ASC\\b|(?:DESC\\s+)?LIMIT\\s+(?!100\\b)\\d+\\s{1,20}RETURN\\s+collect\\s*\\()",
+          "(?im)^[ \\t]{0,40}(?:CALL\\b[^\\n]{0,300}?\\b)?RETURN\\s+(?:DISTINCT\\s+)?[\\w.]*nodeId\\b[^\\n]{0,200}?\\bLIMIT\\s+(?:100|[1-9]\\d{3,})\\b",
+          "(?i)\\b(?:this|that|the)\\s+same\\s+(?:query|cypher)\\b[^.\\n]{0,40}\\bcreate_collection\\b",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Rank and collect in one query_graph call: CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT 100 RETURN collect(nodeId) AS ids, then create_collection with MATCH (n) WHERE n.<id_column> IN [<ids>] RETURN n.",
+        "rubric": [
+          "Must collect the ranked ids into one row with collect() and color them with an IN [...] list.",
+          "Reading 100 rows from a 20-row result, or a JSON compute_igraph chain, should score zero."
+        ],
+        "required_concepts": [
+          "collect",
+          "IN"
+        ]
+      }
+    },
+    {
+      "id": "count_nodes_with_outgoing_edge",
+      "prompt": "Write the Cypher for the Graphistry viz MCP query_graph tool that counts the nodes with at least one outgoing edge. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?is)MATCH\\s*\\(\\s*(\\w+)\\s*\\)\\s*-\\s*(?:\\[[^\\]\\n]{0,100}\\]\\s*-|-)\\s*>\\s*\\((?!\\s*\\1\\s*\\))\\s*\\w*\\s*\\).{0,500}?count\\s*\\(\\s*DISTINCT\\s+\\1(?:\\.\\w+)?\\s*\\)|MATCH\\s*\\(\\s*(\\w*)\\s*\\)\\s*<\\s*-\\s*(?:\\[[^\\]\\n]{0,100}\\]\\s*-|-)\\s*\\((?!\\s*\\2\\s*\\))\\s*(\\w+)\\s*\\).{0,500}?count\\s*\\(\\s*DISTINCT\\s+\\3(?:\\.\\w+)?\\s*\\)|CALL\\s+graphistry\\.degree\\s*\\(\\s*\\).{0,300}?\\bWITH\\b.{0,300}?degree_out\\s*(?:>\\s*0|>=\\s*1)\\b.{0,300}?count\\s*\\(",
+          "(?i)count\\s*\\("
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^[ \\t]{0,40}(?:OPTIONAL[ \\t]+)?MATCH\\b(?:[^\\n/'\"]|'[^'\\n]{0,200}'|\"[^\"\\n]{0,200}\"){0,400}\\bWHERE\\s+(?:NOT\\s+)?\\(\\s*\\w+\\s*\\)\\s*-",
+          "(?im)^[ \\t]{0,40}OPTIONAL[ \\t]+MATCH\\b",
+          "(?im)^[ \\t]{0,40}(?:MATCH\\b[^\\n]{0,400}?)?WITH\\s+DISTINCT\\b[^\\n]{0,400}?\\bcount\\s*\\(|^[ \\t]{0,40}WITH\\s+DISTINCT\\b[^\\n]{0,400}\\n[ \\t]{0,40}RETURN\\b[^\\n]{0,200}?\\bcount\\s*\\(",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n)-[]->() RETURN count(DISTINCT n) AS k. Equivalent: CALL graphistry.degree() YIELD nodeId, degree_out WITH nodeId, degree_out WHERE degree_out > 0 RETURN count(*) AS k.",
+        "rubric": [
+          "Must count distinct source nodes of an outgoing edge: match the pattern in MATCH and count distinct nodes, or filter CALL graphistry.degree() on degree_out > 0 after WITH and count.",
+          "A pattern in WHERE under an aggregate, such as WHERE (n)-[]->() with count(*), returns a wrong count and should score zero.",
+          "Writing the pattern right to left, MATCH ()<-[]-(n) RETURN count(DISTINCT n), is the same count and is fine."
+        ],
+        "required_concepts": [
+          "count"
         ]
       }
     }

@@ -1,6 +1,6 @@
 ---
 name: graphistry-mcp
-description: "Drive a live Graphistry visualization session from any MCP client. Covers connecting to the viz MCP endpoint, personal-key and JWT auth, session ownership, the tool surface, and GFQL sent as JSON over the wire. Use when an external agent must query or recolor the graph a user is currently looking at."
+description: "Drive a live Graphistry visualization session from any MCP client. Covers connecting to the viz MCP endpoint, personal-key and JWT auth, session ownership, the tool surface, and the Cypher subset the server runs. Use when an external agent must query or recolor the graph a user is currently looking at."
 ---
 
 # Graphistry MCP
@@ -8,104 +8,26 @@ description: "Drive a live Graphistry visualization session from any MCP client.
 ## Scope
 
 Use this skill to operate a **live Graphistry visualization session** from an MCP client: inspect
-its schema, run GFQL queries against it, and create colored collections the user sees update in
+its schema, run Cypher queries against it, and create colored collections the user sees update in
 their browser.
 
-## Two servers share the name "graphistry mcp"
-
-Pick the right one before writing any code.
-
-| Server | Use it for |
-|---|---|
-| **Viz MCP** — `https://<graphistry-host>/mcp` | Reading and mutating the graph a user already has open. Session-scoped. **This skill.** |
-| **PyGraphistry MCP** — `github.com/graphistry/graphistry-mcp` | Building and uploading new visualizations from scratch. Hub-scoped, unrelated to this skill. |
-
-If the task starts from a graph the user is looking at, use the viz MCP. If it starts from a
-DataFrame or a file, use the PyGraphistry MCP or the `pygraphistry` skill.
+Needs a server whose `create_collection` accepts Cypher. On an older server `create_collection`
+fails with "requires JSON GFQL" and `get_session_info` has no `Node id column:` line.
 
 ## Connect
 
-Streamable HTTP at `POST /mcp`. `tools/call` carries a credential on the `Authorization` header;
-`initialize` and `tools/list` do not.
+Streamable HTTP at `POST /mcp`. Send the credential on `tools/call` as
+`Authorization: Bearer <key_id>:<key>` (a personal key, which does not expire; create one at
+`/users/personal/key/`) or `Authorization: Bearer <jwt>` (expires in about an hour). `initialize`
+returns an `Mcp-Session-Id` header; send it back as `mcp-session-id` on every request, and when the
+server answers `404` for it, reinitialize and retry.
 
-Two credentials work. Prefer a personal key: it does not expire, so a long-running agent will not
-start returning `401` partway through a conversation the way a JWT does.
-
-| Credential | Header | Expires |
-|---|---|---|
-| Personal key `key_id:key` | `Authorization: Bearer <key_id>:<key>` or `PersonalKey <key_id>:<key>` | no |
-| Viewer JWT | `Authorization: Bearer <jwt>` | yes, about an hour |
-
-Create a personal key on the Graphistry account page at `/users/personal/key/`. Both schemes are
-accepted for it because most MCP clients only expose a single "Bearer token" field.
-
-```bash
-curl -si https://<host>/mcp \
-  -H "Authorization: Bearer $GRAPHISTRY_PERSONAL_KEY" \
-  -H 'Content-Type: application/json' \
-  -H 'Accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{
-        "protocolVersion":"2024-11-05","capabilities":{},
-        "clientInfo":{"name":"my-agent","version":"1.0"}}}'
-```
-
-`initialize` returns an `Mcp-Session-Id` response header. Send it back as the `mcp-session-id`
-header on every subsequent request. This is the MCP transport session and is distinct from the
-Graphistry viz `session_id` the tools take. If it expires the server answers `404` — reinitialize
-and retry rather than treating the call as failed.
-
-The server currently reports protocol version `2024-11-05`.
-
-Client config for MCP-aware tools:
-
-```json
-{
-  "mcpServers": {
-    "graphistry": {
-      "type": "http",
-      "url": "https://<host>/mcp",
-      "headers": { "Authorization": "Bearer ${GRAPHISTRY_PERSONAL_KEY}" }
-    }
-  }
-}
-```
-
-## Session model
-
-Tools other than `list_sessions` require a `session_id` identifying a live viz session.
-
-- **A client cannot create a session.** A session exists because a user has the graph open in a
-  browser. Discover one with `list_sessions`.
-- **Pass the session you were given.** `list_sessions` returns bare ids with nothing to tell them
-  apart, so when a user has two graphs open an agent that discovers one instead of using the one it
-  was handed will silently answer about the wrong graph. A client that knows which graph is on
-  screen should supply `session_id` rather than discover it.
-- **Only the owner may mutate.** The credential's user must be the user whose browser holds that
-  session, or the collection tools return
-  `403 Forbidden: only the session owner may modify this session`. Reads may still succeed for a
-  non-owner who has access to the underlying dataset; without it they return
-  `403 Forbidden: caller cannot access this session`. `list_sessions` shows only the caller's own
-  sessions, so a shared service account will not see an end user's session.
-- **A closed tab means no session.** With no live owner the call returns
-  `410 Session owner unavailable`. A `410` can also mean the owner lookup itself failed, so retry
-  once before concluding the graph is gone.
-- **`list_sessions` can return `[]` while your session is alive.** It sees only the sessions owned
-  by the server process that happened to receive the request. Emptiness is not evidence of no
-  session — another reason to pass the `session_id` you were given.
-
-Other statuses a client must tell apart:
-
-| Status | Meaning | Retry? |
-|---|---|---|
-| `403 Talk2Graph is not enabled for this account` | credential is valid, the account lacks the entitlement | no — every `tools/call` will fail |
-| `503 Entitlement check unavailable` | the access check itself failed | yes |
-| `504 Tool call timeout` | the owning process did not answer in time | yes |
-| `400 Missing mcp-session-id` | the header was absent | send the header; this is not the 404 case |
-| `404 Unknown or expired mcp-session-id` | the transport session lapsed | reinitialize |
-
-The transport session expires after 5 minutes idle, sliding on each use, so a slow agent should
-expect a `404` and reinitialize rather than treat it as a failure. A revoked credential keeps
-working for up to 60 seconds because verification is cached.
+Tools other than `list_sessions` take a `session_id` for a graph a user has open in a browser; a
+client cannot create one. Pass the `session_id` you were given rather than discovering one:
+`list_sessions` returns bare ids and can be empty while the session is alive. Only the session's
+owner may change collections. A `410` means the owner's tab is gone or the lookup failed; retry once.
+Curl and client-config examples, every status code, and timeouts are in
+`references/connection.md`.
 
 ## Tool surface
 
@@ -128,127 +50,180 @@ Mutate (these change what the user sees):
 | `reorder_collections` | `session_id`, `order` | — |
 | `reset_collections` | `session_id` | — |
 
-`query_graph` returns at most 50 rows, projected to the id column plus the columns the expression
-filters or groups on (an `order_by` or `edge_match` column it does not also filter is not kept).
-When the result holds none of those columns (a Cypher projection, an edge result), it returns every
-column, capped at 20 rows. The reported count is the true total. A value list read from a truncated
-result cannot prove that a value is absent.
+`create_collection` keeps at most 10 collections, dropping the bottom one, replaces any collection
+of the same name, and returns a cached result for an identical call repeated within 30 seconds. Every
+change through these tools replaces the session's whole collection list, so collections the user
+made in the browser are removed. `list_collections` reports only collections these tools
+created, and it is emptied when the user's socket reconnects.
 
-`create_collection` keeps at most 10 collections, evicting the oldest, replaces any existing
-collection of the same name, and returns a cached result for an identical call repeated within
-30 seconds. `list_collections` reports only collections this MCP session created, never ones the
-user made in the browser, and it is emptied when the user's socket reconnects.
-
-`gfql_operations` is a **JSON-encoded string**, not a nested object. `order` lists collection ids
+`gfql_operations` is a string holding one Cypher query. Send Cypher only, never JSON, even when an
+error mentions JSON. `order` lists collection ids
 top-to-bottom; the first renders on top. For a solid color pass a hex `node_color`; use `palette`
 only when a named palette is explicitly requested. On `update_collection`, omit a field to leave
 it unchanged — do not pass `null`.
 
-## GFQL over the wire
+## Query in Cypher
 
-Sent as a JSON string. The operation types you need are `Node`, `Edge`, `Call`, `Let`, and `Ref`.
+Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**:
+the server transpiles it into
+[GFQL](https://github.com/graphistry/pygraphistry), Graphistry's open-source graph query
+language, and runs that.
 
-```json
-[{"type": "Node", "filter_dict": {"category": "Malware"}}]
+**At most one relationship per query, always directed:** `(a)-[e]->(b)` or `(a)<-[e]-(b)`,
+counting every `MATCH` and `OPTIONAL MATCH`. Undirected patterns, any variable length (`[*]`,
+`[*1..n]`), and a second relationship anywhere in the query, such as `(a)-->(b)-->(c)`, can return
+wrong rows without an error: go one directed hop per query, collect the ids, and start the next
+hop from `WHERE a.<id_column> IN [...]`.
+
+Most other unsupported queries fail with an error, but these mistakes also return wrong rows
+without one:
+
+- A value of the wrong type for the column, from its type in `get_session_info`. A `date` column
+  takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
+  and an epoch column an epoch number in its unit: check its range first, since seconds against
+  milliseconds match everything or nothing. A quoted number, or a date written for a column of
+  another type, matches nothing.
+- A whole-number id longer than 15 digits, which comes back rounded. Collect
+  `toString(n.<id_column>)` and filter with `WHERE toString(n.<id_column>) IN ['...']`.
+- A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
+  use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
+- A pattern in `WHERE`, such as `WHERE NOT (n)-[]->()`, under an aggregate; `collect()` is an
+  aggregate too. Count nodes with a pattern with `MATCH (n)-[]->() RETURN count(DISTINCT n)`, and
+  nodes without one with `CALL graphistry.degree() YIELD nodeId, degree_out WITH nodeId, degree_out
+  WHERE degree_out = 0 RETURN count(*)`; collect through `WITH`:
+  `MATCH (n) WHERE NOT (n)-[]->() WITH n.<id_column> AS id RETURN collect(id) AS ids`.
+
+A failed query's error names its cause in brackets. Fix what it names and call again, at most three
+times, then report the last error. For `column-not-found`, fix the name from the columns the error
+lists; if the column the request needs is not there, including one `get_session_info` lists but the
+error does not, say plainly it cannot be done instead of using another column. Degree through
+`CALL graphistry.degree()` is the same measure, not a substitution. Never retry with an invented
+operation name.
+
+`<id_column>` below is the column on the `Node id column:` line of `get_session_info`; filtering
+another column by id matches nothing.
+
+```cypher
+MATCH (n) RETURN count(DISTINCT n.kind) AS k
+MATCH (n) RETURN n.kind AS v, count(*) AS c ORDER BY c DESC LIMIT 20
+MATCH ()-[e]->() RETURN e.rel AS v, count(*) AS c ORDER BY c DESC LIMIT 20
+MATCH (n) WHERE n.score > 10 RETURN n.<id_column> AS id, n.score AS s ORDER BY s DESC LIMIT 10
+MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b.<id_column> AS id
+CALL graphistry.degree() YIELD nodeId, degree RETURN nodeId, degree ORDER BY degree DESC LIMIT 10
+CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank RETURN nodeId, pagerank ORDER BY pagerank DESC LIMIT 10
+CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
+  RETURN community_multilevel AS community, count(*) AS size ORDER BY size DESC LIMIT 10
 ```
 
-`Node` filters; a predicate object such as `{"type": "GT", "val": 10}` inside `filter_dict`
-thresholds. `Edge` traverses and returns its matched relationship subgraph — it does not project a
-single endpoint kind. Every row-pipeline step (`rows`, `group_by`, `order_by`, `limit`) is a
-`Call`. `Let` with a `Ref` isolates one endpoint kind and is passed as a **top-level object, never
-wrapped in an array**. `query_graph` also accepts one read-only Cypher string.
+Pass `output_type: "nodes"` to read rows; the default `shape` returns counts only. A result shows at
+most 20 rows, and a `LIMIT` also caps the reported count, so count values with `count(DISTINCT ...)`
+before listing them; a cut list cannot prove a value is absent. Return named properties
+(`RETURN n.<id_column> AS id`) rather than whole nodes, which return every column.
 
-Full JSON for each form, including the aggregation pipeline and the `Let`/`Ref` projection:
-`references/gfql-wire-format.md`.
+## Supported Cypher
 
-## Shapes that fail silently
+| Supported | Not supported, and what to write instead |
+|---|---|
+| `MATCH`, `WHERE`, `RETURN`, `WITH`, `ORDER BY`, `SKIP`, `LIMIT`, `DISTINCT` | writes: `CREATE`, `DELETE`, `SET`, `MERGE` |
+| `count`, `sum`, `avg`, `min`, `max`, `collect` | `ORDER BY` a column you did not return: return it, then order by its alias |
+| two node-only patterns in one `MATCH (a), (b)` | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)`, with no relationship in it |
+| `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | `toLower()` in a query with a relationship: match the exact stored value |
+| a column name containing `.` or `-`, in backticks: ``n.`user.name` `` | |
+| `CALL graphistry.degree()`, `CALL graphistry.igraph.<algorithm>()` | `graphistry.nx.*` procedures are refused; use `graphistry.igraph.*` |
+| a label `(n:Hashtag)`, matched against the `type` column | a label with no `type` column fails with `column-not-found` `label__Hashtag` |
+| a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
+| an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | in `query_graph`, `RETURN e` returns the edge's attributes without its endpoints; in `create_collection` it colors the connections (Coloring) |
 
-These return `success: true` with wrong or empty results rather than erroring. **A zero-row answer
-produced by any of them is not evidence of a real zero.**
+`community_multilevel` needs `{directed: false}`, and its community ids are relabeled on every run, so
+compute and filter a community in one query rather than reusing an id from an earlier one. The `degree`, `degree_in`, and `degree_out`
+columns `get_session_info` lists exist only for rendering and fail in a query; use
+`CALL graphistry.degree()`. On a graph whose nodes have a `name` column, every
+`graphistry.igraph.*` call fails with `Vertex attribute conflict`; report that the algorithm cannot
+run instead of retrying.
 
-- `filter_nodes_by_dict` / `filter_edges_by_dict` match exact stored values only. A predicate
-  object matches nothing — threshold with a `Node` operation instead.
-- "External/public IP" and "internal/private IP" are derived properties, not requirements for
-  a dedicated status column. Inspect the live schema and values for the actual IP column first.
-  Unless the dataset documents another policy, treat RFC1918 IPv4 (`10/8`, `172.16/12`,
-  `192.168/16`), loopback, link-local, unspecified, multicast, and shared CGNAT (`100.64/10`)
-  as non-external; apply analogous IPv6 ULA/link-local/loopback/unspecified/multicast rules.
-  Documentation/reserved examples such as `198.51.100.0/24` and `203.0.113.0/24` are not
-  RFC1918 internal addresses, so do not silently discard them unless the dataset explicitly
-  defines them as non-external fixtures. Match the exact stored representation; do not apply
-  IPv4 rules to IPv6, host:port, URL, or CIDR strings without validating them. Use a positive
-  GFQL pattern where supported, or `IsIn` only from an exhaustive value set. A limited/sample
-  table cannot prove a complement; if the value set is truncated or GFQL cannot express the
-  classification, report that limitation instead of claiming a complete collection.
-- Put both graph filters before `rows`. After a `rows` on the edge table a filter is dropped and
-  the aggregation reports unfiltered counts.
-- `where_rows` accepts `expr` (a string like `"n > 10"`) and `filter_dict`. In `filter_dict` only
-  exact stored values match, so a predicate object there matches nothing; use `expr` to compare.
-- `get_session_info` lists columns, not every stored value, so it can never establish that a
-  value is absent.
+## Coloring
 
-## Errors you will actually see
+`create_collection` takes Cypher that returns one node alias whole, or the relationship `e` of one
+directed hop whole. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is
+refused as a collection, and the refusal names the supported shapes; rewrite to one of them rather
+than reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one
+directed relationship.
 
-These fail loudly. Most messages name the cause, so act on it rather than rewriting the expression
-blindly; the collection refusal below is the exception.
+- the matched nodes: `MATCH (n) WHERE n.score > 10 RETURN n`
+- one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
+- the connections themselves, when the filtered value lives in an edge column and the request names
+  no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`
+  - `ORDER BY`, `LIMIT`, and projections are refused.
+  - In `WHERE`, use plain comparisons joined by `AND`, without parentheses. `OR`, `NOT`,
+    `toLower()`, arithmetic, and a filter after `WITH` are refused; `IN [...]` works only as the
+    only condition.
+  - For several values plus another condition, make one collection per value; for both directions
+    around a node, one `->` and one `<-` collection.
+- anything else, such as a node and its neighbors, a longer path, or nodes a `CALL` ranks or groups:
+  collect the ids with `query_graph`, one directed hop at a time, then color the list
 
-- `rows` needs the `table` whose columns you group by — `{"table": "edges"}` for edge columns.
-  Omitting `table`, or grouping an edge column under `nodes`, fails.
-- `Edge` requires `direction`, one of `forward`, `reverse`, `undirected`. `both` is invalid.
-  `create_collection` fills in `undirected` when it is absent, so an expression that validated
-  there can still fail in `query_graph` — set it explicitly.
-- A bare `{"type": "rows"}`, `{"type": "group_by"}`, `{"type": "order_by"}`, or
-  `{"type": "limit"}` is invalid. Wrap every one as a `Call`.
-- Predicate `type` names are case-sensitive: `GT` works. `gt` is corrected only in a top-level
-  `filter_dict` passed to `query_graph`; everywhere else it fails with an opaque error. Write
-  predicates in their exact form before validating.
-- `create_collection` takes JSON GFQL only. Cypher is accepted by `query_graph` alone.
-- `create_collection` refuses an expression whose result stops identifying graph nodes — one that
-  groups rows, projects the id away, renames or drops it, or reads the edge table. Ordering by a
-  community column is refused separately, because that ranks by community id rather than size. Both
-  refusals name the repair: select the nodes themselves, usually a `Node` filter, or report the
-  sizes with `query_graph` instead. Act on it rather than reporting failure.
-- A collection refused because the service could **not evaluate** the expression names no cause,
-  and its reply says not to rewrite and retry. Check the expression against the predicate table in
-  `references/gfql-wire-format.md` first: a Mongo-style `$gt`, an invented predicate name, a wrong
-  operand key, a lowercase predicate name, or `val` on a string predicate also land here, and those
-  are fixable. Fix the expression, validate it with `query_graph`, and retry. If an expression in
-  exact form is still refused, report the failure.
+```cypher
+MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
+MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
+CALL graphistry.degree() YIELD nodeId, degree
+  WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(nodeId) AS ids
+MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
+```
+
+The first two collect a node's out- and in-neighbors; color them with the node itself. Copy each id
+exactly as returned: a string stays quoted, a number unquoted. A top N and a community are id lists
+too: rank or group and `collect()` in one query, then color `MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
+
+```cypher
+CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
+  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(nodeId) AS ids
+CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
+  WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
+  ORDER BY size DESC LIMIT 1 RETURN size, ids
+```
+
+A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
+node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b` and its
+`<-` form instead. A session keeps at most 10 collections, so for a list too long for a few parts,
+report its size instead of coloring it.
+
+A request colored as several collections (both directions, one per value, a split list) takes one
+`create_collection` call per part: give the parts distinct names and the same color, make every
+call, and report each part's count. For an id list, the match count should equal the number of
+ids; if it does not, re-check the list.
 
 ## Workflow
 
-1. `list_sessions` to find the live session.
-2. `get_session_info` for the schema. Choose columns from the list it returns, most useful first.
-   If a line ends with `(+K more not listed)` the list is truncated and the count in parentheses is
-   the real total — a column's absence from the list is not evidence it does not exist, so ask
-   rather than invent a name. `unavailable (schema could not be read)` means the schema was never
-   read; treat that as a failed inspection, not as a graph without columns. Being listed is
-   necessary but not sufficient: some columns are computed for rendering and cannot be filtered.
+1. Use the `session_id` you were given; call `list_sessions` only when you have none.
+2. `get_session_info` for the schema; choose columns only from it. A line ending
+   `(+K more not listed)` is truncated, so a missing column is not evidence it does not exist: ask
+   rather than invent a name. `unavailable (schema could not be read)` is a failed inspection. It
+   lists columns, not stored values, so it never proves a value is absent.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
-   unobserved candidates, never literals. Aggregate the distinct values of the relevant column
-   first and compare case-sensitively — `Hashtag` will not match a search for `hashtag`.
-4. Validate the expression with `query_graph` before mutating. If a call returns an error, read it,
-   fix what it names, and call again; after three failed attempts, report the last error.
-5. `create_collection` reusing that exact validated JSON unchanged, and report the match count it
-   returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates: a
-   chain that aggregates or leaves the node axis will pass `query_graph` and still be refused here.
-   When that happens the refusal names the repair — use it. The count is not guaranteed — when
-   the preflight cannot produce one the collection is still applied and the reply says so. Report "applied, count unavailable" rather than inventing
-   a number or omitting the outcome.
+   unobserved candidates, never literals. Count the distinct values of the relevant column with
+   `count(DISTINCT ...)`, then return them, and match them exactly. Only in a node-only query,
+   `MATCH (n)`, compare `toLower()` on both sides; in a query with a relationship, use the exact
+   stored value.
+4. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
+   what any error names and call again.
+5. `create_collection` with that exact validated query, and report the match count it returns.
+   When the preflight cannot produce a count, the collection is still applied and the reply says
+   so: report "applied, count unavailable" rather than inventing a number.
 
-Never answer a GFQL error by retrying with an invented operation name; fix what the error names. A
-failed query is not an inspection result.
+A failed query is not an inspection result. Zero rows never establishes absence when any value in
+the query came from the user's wording rather than from a tool result. Confirm every value was
+tool-observed before reporting an empty result.
 
-Zero rows never establishes absence when any value in the expression came from the user's wording
-rather than from a tool result. Confirm every value was tool-observed before reporting an empty
-result.
+"External/public" and "internal/private" IP are derived properties, not columns; classify the
+stored IP values with `references/ip-classification.md`.
 
 ## Decision Rules
 
 - Use this skill when the graph is already open and the task is to query or recolor it.
 - Route to `pygraphistry-gfql` for GFQL written as Python AST objects (`n()`, `e_forward()`) or
-  for `g.gfql()` in a notebook. This skill covers the JSON wire format only.
-- Route to `pygraphistry` to build or upload a graph.
+  for `g.gfql()` in a notebook. This skill covers the MCP tools only.
+- Route to `pygraphistry`, or the separate PyGraphistry MCP (`github.com/graphistry/graphistry-mcp`),
+  to build or upload a graph.
 - Route to `graphistry-rest-api` for auth, upload, and dataset endpoints.
 
 ## Safety Rules
@@ -263,6 +238,8 @@ result.
 
 ## References
 
+- `references/connection.md`: credentials, transport session, session ownership, status codes.
+- `references/ip-classification.md`: external/internal IP rules.
 - Graphistry Hub docs: https://hub.graphistry.com/docs/
 - MCP specification: https://modelcontextprotocol.io/specification/
 - REST auth docs: https://hub.graphistry.com/docs/api/1/rest/auth/

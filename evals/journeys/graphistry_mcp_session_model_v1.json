@@ -107,32 +107,6 @@
           "viz"
         ]
       }
-    },
-    {
-      "id": "filters_before_rows",
-      "prompt": "A GFQL chain filters the graph and then aggregates over the edge table with rows. What ordering does the chain require, and what goes wrong otherwise? Answer in under 6 non-empty lines.",
-      "checks": {
-        "regex": [
-          "(?i)(before|first|precede|ahead of)",
-          "(?i)rows",
-          "(?i)(filter|dropped|unfiltered)"
-        ],
-        "max_lines": 6
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "Both graph filters must come before rows. After a rows on the edge table a filter is dropped and the aggregation silently reports unfiltered counts.",
-        "rubric": [
-          "Must state filters go before rows.",
-          "Must note the failure is silent: unfiltered counts, not an error.",
-          "Claiming order does not matter should score zero."
-        ],
-        "required_concepts": [
-          "rows",
-          "before"
-        ]
-      }
     }
   ]
 }
