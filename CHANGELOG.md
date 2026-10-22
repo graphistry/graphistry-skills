@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 <!-- Do Not Erase This Section - Used for tracking unreleased changes -->
 
 ### Changed
-- **Skills / graphistry-mcp**: Make the skill Cypher only. It states the supported openCypher subset (transpiled to GFQL), the errors the server returns, and when to retry or report; connection detail and IP rules move to `references/`, and the JSON GFQL reference and its evals are removed. Needs graphistry#3600 with its Cypher edge collections (graphistry#3617).
+- **Skills / graphistry-mcp**: Make the skill Cypher only. It states the supported openCypher subset (transpiled to GFQL), the errors the server returns, and when to retry or report; connection detail and IP rules move to `references/`, and the JSON GFQL reference is removed, with its evals removed or rewritten for Cypher. Needs a server whose `create_collection` accepts Cypher; on an older server `create_collection` fails with "requires JSON GFQL" and `get_session_info` has no `Node id column:` line.
 - **Skills / graphistry-mcp**: Add value-type rules for comparisons and workarounds for three pygraphistry 0.61.1 Cypher bugs (a backslash under `NOT`/`OR`, a pattern in `WHERE` with an aggregate, `igraph.*` on a graph with a `name` column). Traversals use at most one directed relationship per query and no variable length, since pygraphistry 0.61 can return wrong rows for undirected, multi-hop, and variable-length patterns; neighborhoods, longer paths, a top N of any size, and communities are collected with `collect()` and colored as an id list, and connections are colored with `RETURN e` on one directed hop. Queries by id use the column `get_session_info` names.
 
 ### Fixed
