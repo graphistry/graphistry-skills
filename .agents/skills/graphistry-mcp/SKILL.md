@@ -11,17 +11,8 @@ Use this skill to operate a **live Graphistry visualization session** from an MC
 its schema, run Cypher queries against it, and create colored collections the user sees update in
 their browser.
 
-## Two servers share the name "graphistry mcp"
-
-Pick the right one before writing any code.
-
-| Server | Use it for |
-|---|---|
-| **Viz MCP** — `https://<graphistry-host>/mcp` | Reading and mutating the graph a user already has open. Session-scoped. **This skill.** |
-| **PyGraphistry MCP** — `github.com/graphistry/graphistry-mcp` | Building and uploading new visualizations from scratch. Hub-scoped, unrelated to this skill. |
-
-If the task starts from a graph the user is looking at, use the viz MCP. If it starts from a
-DataFrame or a file, use the PyGraphistry MCP or the `pygraphistry` skill.
+Needs a server whose `create_collection` accepts Cypher. On an older server `create_collection`
+fails with "requires JSON GFQL" and `get_session_info` has no `Node id column:` line.
 
 ## Connect
 
@@ -59,12 +50,14 @@ Mutate (these change what the user sees):
 | `reorder_collections` | `session_id`, `order` | — |
 | `reset_collections` | `session_id` | — |
 
-`create_collection` keeps at most 10 collections, evicting the oldest, replaces any existing
-collection of the same name, and returns a cached result for an identical call repeated within
-30 seconds. `list_collections` reports only collections this MCP session created, never ones the
-user made in the browser, and it is emptied when the user's socket reconnects.
+`create_collection` keeps at most 10 collections, dropping the bottom one, replaces any collection
+of the same name, and returns a cached result for an identical call repeated within 30 seconds. Every
+change through these tools replaces the session's whole collection list, so collections the user
+made in the browser are removed. `list_collections` reports only collections these tools
+created, and it is emptied when the user's socket reconnects.
 
-`gfql_operations` is a string holding one Cypher query. `order` lists collection ids
+`gfql_operations` is a string holding one Cypher query. Send Cypher only, never JSON, even when an
+error mentions JSON. `order` lists collection ids
 top-to-bottom; the first renders on top. For a solid color pass a hex `node_color`; use `palette`
 only when a named palette is explicitly requested. On `update_collection`, omit a field to leave
 it unchanged — do not pass `null`.
@@ -74,17 +67,29 @@ it unchanged — do not pass `null`.
 Write every query as one read-only Cypher string. Graphistry runs a **subset of openCypher**
 (neo4j-style syntax and functions): the server transpiles it into
 [GFQL](https://github.com/graphistry/pygraphistry), Graphistry's open-source graph query
-language, and runs that. Many unsupported queries fail with an error, but the pattern shapes under
-Supported Cypher return wrong rows without one, and so do three more mistakes:
+language, and runs that.
+
+**At most one relationship per query, always directed:** `(a)-[e]->(b)` or `(a)<-[e]-(b)`,
+counting every `MATCH` and `OPTIONAL MATCH`. Undirected patterns, any variable length (`[*]`,
+`[*1..n]`), and a second relationship anywhere in the query, such as `(a)-->(b)-->(c)`, can return
+wrong rows without an error: go one directed hop per query, collect the ids, and start the next
+hop from `WHERE a.<id_column> IN [...]`.
+
+Most other unsupported queries fail with an error, but these mistakes also return wrong rows
+without one:
 
 - A value of the wrong type for the column, from its type in `get_session_info`. A `date` column
   takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
-  and a number column of epoch milliseconds an epoch number. A quoted number, or a date written
-  for a column of another type, matches nothing.
+  and an epoch column an epoch number in its unit: check its range first, since seconds against
+  milliseconds match everything or nothing. A quoted number, or a date written for a column of
+  another type, matches nothing.
+- A whole-number id longer than 15 digits, which comes back rounded. Collect
+  `toString(n.<id_column>)` and filter with `WHERE toString(n.<id_column>) IN ['...']`.
 - A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
   use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
-- A pattern in `WHERE`, such as `WHERE (n)-[]->()`, under an aggregate. Count nodes that have a
-  pattern with `MATCH (n)-[]->() RETURN count(DISTINCT n)`.
+- A pattern in `WHERE`, such as `WHERE NOT (n)-[]->()`, under an aggregate; `collect()` is an
+  aggregate too. Count with `MATCH (n)-[]->() RETURN count(DISTINCT n)`, and collect through `WITH`:
+  `MATCH (n) WHERE NOT (n)-[]->() WITH n.<id_column> AS id RETURN collect(id) AS ids`.
 
 A failed query's error names its cause in brackets. Fix what it names and call again, at most three
 times, then report the last error. For `column-not-found`, fix the name from the columns the error
@@ -119,7 +124,6 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 |---|---|
 | `MATCH`, `WHERE`, `RETURN`, `WITH`, `ORDER BY`, `SKIP`, `LIMIT`, `DISTINCT` | writes: `CREATE`, `DELETE`, `SET`, `MERGE` |
 | `count`, `sum`, `avg`, `min`, `max`, `collect` | `ORDER BY` a column you did not return: return it, then order by its alias |
-| at most one relationship per query, always directed, `(a)-[e]->(b)` or `(a)<-[e]-(b)`, counting every `MATCH` and `OPTIONAL MATCH` | undirected patterns, any variable length (`[*]`, `[*1..n]`, `[*0..n]`, `[*2..n]`), and a second relationship anywhere in the query, such as `(a)-->(b)-->(c)`, can return wrong rows without an error: go one directed hop per query, collect the ids, and start the next hop from `WHERE a.<id_column> IN [...]` |
 | two node-only patterns in one `MATCH (a), (b)` | a second `MATCH` that shares no alias with the first: write one `MATCH (a), (b)`, with no relationship in it |
 | `OPTIONAL MATCH`, `UNWIND`, `UNION` (partial), `IN [...]`, `IS NULL`, `CONTAINS`, `STARTS WITH`, `=~`, `toLower()` | `toLower()` in a query with a relationship: match the exact stored value |
 | a column name containing `.` or `-`, in backticks: ``n.`user.name` `` | |
@@ -131,30 +135,30 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 `community_multilevel` needs `{directed: false}`, and its community ids are relabeled on every run, so
 compute and filter a community in one query rather than reusing an id from an earlier one. The `degree`, `degree_in`, and `degree_out`
 columns `get_session_info` lists exist only for rendering and fail in a query; use
-`CALL graphistry.degree()`. Being listed is necessary but not sufficient. A misspelled or absent
-column fails with `column-not-found`. On a graph whose nodes have a `name` column, every
+`CALL graphistry.degree()`. On a graph whose nodes have a `name` column, every
 `graphistry.igraph.*` call fails with `Vertex attribute conflict`; report that the algorithm cannot
 run instead of retrying.
 
 ## Coloring
 
 `create_collection` takes Cypher that returns one node alias whole, or the relationship `e` of one
-directed hop whole, with at most one directed relationship. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is refused
-as a collection, and the refusal names the supported shapes; rewrite to one of them rather than
-reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one directed
-relationship.
+directed hop whole. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is
+refused as a collection, and the refusal names the supported shapes; rewrite to one of them rather
+than reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one
+directed relationship.
 
 - the matched nodes themselves: `MATCH (n) WHERE n.score > 10 RETURN n`
 - one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
 - the connections themselves, when the filtered value lives in an edge column and the request names
-  no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`. `ORDER BY`, `LIMIT`,
-  projections are refused for connections. In `WHERE`, use plain comparisons joined by `AND`, without
-  parentheses; `OR`, `NOT`, `toLower()`, arithmetic, and a filter after `WITH` are refused, and
-  `IN [...]` works only as the only condition. For several values with another condition, make one
-  collection per value in the same color; for either direction around a node, make two collections
-  (`->` and `<-`) with distinct names in the same color
-- anything else, such as a node and its neighbors, a longer path, or any number of nodes a `CALL`
-  ranks or groups: collect the ids with `query_graph`, one directed hop at a time, then color the list
+  no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`
+  - `ORDER BY`, `LIMIT`, and projections are refused.
+  - In `WHERE`, use plain comparisons joined by `AND`, without parentheses. `OR`, `NOT`,
+    `toLower()`, arithmetic, and a filter after `WITH` are refused; `IN [...]` works only as the
+    only condition.
+  - For several values plus another condition, make one collection per value; for both directions
+    around a node, one `->` and one `<-` collection.
+- anything else, such as a node and its neighbors, a longer path, or nodes a `CALL` ranks or groups:
+  collect the ids with `query_graph`, one directed hop at a time, then color the list
 
 ```cypher
 MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
@@ -164,35 +168,35 @@ CALL graphistry.degree() YIELD nodeId, degree
 MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
 ```
 
-The first two collect a node's out- and in-neighbors; color them with the node itself. For more than
-about 2,000 neighbors, skip the id list: color the out-neighbors, `MATCH (a)-[e]->(b) WHERE a.<id_column>
-= 'x' RETURN DISTINCT b`, the in-neighbors with `(a)<-[e]-(b)`, and the node itself as separate
-collections with distinct names in the same color. Copy each id exactly as returned: a string stays
-quoted, a number unquoted. A top N of any size and a community are id lists too: rank or group and
-`collect()` in one query, then color `MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
+The first two collect a node's out- and in-neighbors; color them with the node itself. Copy each id
+exactly as returned: a string stays quoted, a number unquoted. A top N and a community are id lists
+too: rank or group and `collect()` in one query, then color `MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
 
 ```cypher
 CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
   WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(nodeId) AS ids
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
   WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
-  RETURN c, size, ids ORDER BY size DESC
+  ORDER BY size DESC LIMIT 1 RETURN size, ids
 ```
 
-A query is limited to 64 KB (65,536 characters), about 1,500 to 5,000 ids depending on their
-length, and a session keeps at most 10 collections. Check the size first: split a longer list into
-a few collections with distinct names in the same color, and for a list too long for that, report
-its size instead of coloring it.
+A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
+node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b` and its
+`<-` form instead. A session keeps at most 10 collections, so for a list too long for a few parts,
+report its size instead of coloring it.
+
+A request colored as several collections (both directions, one per value, a split list) takes one
+`create_collection` call per part, although each reply says not to call again: give the parts
+distinct names and the same color, make every call, and report each part's count. For an id list,
+the match count should equal the number of ids; if it does not, re-check the list.
 
 ## Workflow
 
 1. Use the `session_id` you were given; call `list_sessions` only when you have none.
-2. `get_session_info` for the schema. Choose columns from the list it returns, most useful first.
-   If a line ends with `(+K more not listed)` the list is truncated and the count in parentheses is
-   the real total — a column's absence from the list is not evidence it does not exist, so ask
-   rather than invent a name. `unavailable (schema could not be read)` means the schema was never
-   read; treat that as a failed inspection, not as a graph without columns. It lists columns, not
-   every stored value, so it can never establish that a value is absent.
+2. `get_session_info` for the schema; choose columns only from it. A line ending
+   `(+K more not listed)` is truncated, so a missing column is not evidence it does not exist: ask
+   rather than invent a name. `unavailable (schema could not be read)` is a failed inspection. It
+   lists columns, not stored values, so it never proves a value is absent.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
    unobserved candidates, never literals. Count the distinct values of the relevant column with
    `count(DISTINCT ...)`, then return them, and match them exactly. Only in a node-only query,
@@ -200,11 +204,9 @@ its size instead of coloring it.
    stored value.
 4. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
    what any error names and call again.
-5. `create_collection` reusing that exact validated expression, and report the match count it
-   returns. `create_collection` accepts a narrower set of shapes than `query_graph` validates; when
-   it refuses, the refusal names the supported shapes — rewrite to one of them. The count is not guaranteed — when the
-   preflight cannot produce one the collection is still applied and the reply says so. Report
-   "applied, count unavailable" rather than inventing a number or omitting the outcome.
+5. `create_collection` with that exact validated query, and report the match count it returns.
+   When the preflight cannot produce a count, the collection is still applied and the reply says
+   so: report "applied, count unavailable" rather than inventing a number.
 
 A failed query is not an inspection result. Zero rows never establishes absence when any value in
 the query came from the user's wording rather than from a tool result. Confirm every value was
@@ -218,7 +220,8 @@ stored IP values with `references/ip-classification.md`.
 - Use this skill when the graph is already open and the task is to query or recolor it.
 - Route to `pygraphistry-gfql` for GFQL written as Python AST objects (`n()`, `e_forward()`) or
   for `g.gfql()` in a notebook. This skill covers the MCP tools only.
-- Route to `pygraphistry` to build or upload a graph.
+- Route to `pygraphistry`, or the separate PyGraphistry MCP (`github.com/graphistry/graphistry-mcp`),
+  to build or upload a graph.
 - Route to `graphistry-rest-api` for auth, upload, and dataset endpoints.
 
 ## Safety Rules
