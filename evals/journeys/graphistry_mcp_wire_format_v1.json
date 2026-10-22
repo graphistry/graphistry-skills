@@ -13,14 +13,17 @@
       "prompt": "Can a Cypher query string be passed to the Graphistry viz MCP create_collection tool? Answer in under 6 non-empty lines.",
       "checks": {
         "regex": [
-          "(?i)\\b(yes|can|accepts|takes)\\b",
+          "(?i)\\b(yes|can|accepts|takes|only|some)\\b",
           "(?i)RETURN\\s+(DISTINCT\\s+)?[a-z]\\w*\\b|whole node|node alias|matched nodes",
           "(?i)\\b(CALL|aggregat\\w*|UNION)\\b"
         ],
         "max_lines": 6,
         "must_not_regex": [
           "(?i)^\\s*no\\b",
-          "(?i)json\\s+gfql\\s+only|only\\s+(accepts|takes)\\s+json"
+          "(?i)json\\s+gfql\\s+only|only\\s+(accepts|takes)\\s+json",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\"",
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*\\[[^\\]]*\\*[^\\]]*\\]",
+          "(?i)\\b(CALL|UNION|aggregat\\w*)\\b[^.\\n]{0,60}\\b(are|is)\\s+(also\\s+)?(accepted|supported|allowed)"
         ]
       },
       "oracle": {
@@ -37,6 +40,146 @@
           "create_collection",
           "RETURN",
           "query_graph"
+        ]
+      }
+    },
+    {
+      "id": "two_hops_one_directed_hop_per_query",
+      "prompt": "With the Graphistry viz MCP query_graph tool, how do you get the nodes two hops downstream of node 'x' (the nodes that x's direct targets point to)? Show the Cypher. Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)collect\\s*\\(",
+          "(?i)\\bIN\\s*\\["
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*\\)\\s*-\\s*\\[[^\\]]*\\]\\s*->\\s*\\([^)]*\\)\\s*-\\s*\\[",
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*\\[[^\\]]*\\*[^\\]]*\\]",
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*\\)\\s*-\\s*\\[[^\\]]*\\]\\s*-\\s*\\(",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Go one directed hop per query: MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids, then MATCH (b)-[]->(c) WHERE b.<id_column> IN [<ids>] RETURN DISTINCT c.<id_column> AS id.",
+        "rubric": [
+          "Must split the path into one directed hop per query, carrying ids forward with collect() and IN [...].",
+          "A two-relationship pattern such as (a)-->(b)-->(c), a variable-length pattern, or an undirected pattern should score zero."
+        ],
+        "required_concepts": [
+          "collect",
+          "IN"
+        ]
+      }
+    },
+    {
+      "id": "numeric_threshold_unquoted",
+      "prompt": "Write the Cypher for the Graphistry viz MCP query_graph tool that returns the nodes whose numeric score column is greater than 10. Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)score\\s*>\\s*10\\b"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*score\\s*>\\s*['\"]10",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n) WHERE n.score > 10 RETURN n.<id_column> AS id, n.score AS score",
+        "rubric": [
+          "Must compare the number unquoted: n.score > 10.",
+          "Quoting the number ('10') matches nothing and should score zero."
+        ],
+        "required_concepts": [
+          "score"
+        ]
+      }
+    },
+    {
+      "id": "color_connections_return_e",
+      "prompt": "Write the Cypher to pass to the Graphistry viz MCP create_collection tool so it colors the connections (the edges themselves) whose rel column is 'mentions'. Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?s)(?i)MATCH\\s*\\(\\w*\\)\\s*-\\s*\\[\\s*(\\w+)[^\\]]*\\]\\s*->\\s*\\(\\w*\\).*?RETURN\\s+(DISTINCT\\s+)?\\1\\b",
+          "(?i)rel\\s*=\\s*['\"]mentions['\"]"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*\\)\\s*-\\s*\\[[^\\]]*\\]\\s*-\\s*\\(",
+          "(?im)^\\s*RETURN\\s+(DISTINCT\\s+)?[ab]\\b|(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*RETURN\\s+(DISTINCT\\s+)?[ab]\\b",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e",
+        "rubric": [
+          "Must return the relationship of one directed hop whole (RETURN e).",
+          "Returning an endpoint (RETURN b) colors nodes, not the connections, and should score zero."
+        ],
+        "required_concepts": [
+          "RETURN e"
+        ]
+      }
+    },
+    {
+      "id": "top_n_pagerank_collect_in",
+      "prompt": "How do you color the top 100 nodes by PageRank with the Graphistry viz MCP tools? Show the Cypher. Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)pagerank",
+          "(?i)collect\\s*\\(",
+          "(?i)\\bIN\\s*\\["
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?i)compute_igraph",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Rank and collect in one query_graph call: CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT 100 RETURN collect(nodeId) AS ids, then create_collection with MATCH (n) WHERE n.<id_column> IN [<ids>] RETURN n.",
+        "rubric": [
+          "Must collect the ranked ids into one row with collect() and color them with an IN [...] list.",
+          "Reading 100 rows from a 20-row result, or a JSON compute_igraph chain, should score zero."
+        ],
+        "required_concepts": [
+          "collect",
+          "IN"
+        ]
+      }
+    },
+    {
+      "id": "count_nodes_with_outgoing_edge",
+      "prompt": "Write the Cypher for the Graphistry viz MCP query_graph tool that counts the nodes with at least one outgoing edge. Answer in under 8 non-empty lines.",
+      "checks": {
+        "regex": [
+          "(?i)MATCH\\s*\\(\\s*\\w+\\s*\\)\\s*-\\s*\\[[^\\]]*\\]\\s*->\\s*\\(\\s*\\w*\\s*\\)",
+          "(?i)count\\s*\\(\\s*DISTINCT"
+        ],
+        "max_lines": 8,
+        "must_not_regex": [
+          "(?im)^\\s*(?:OPTIONAL\\s+)?MATCH\\b[^\\n]*WHERE\\s+(NOT\\s+)?\\(\\s*\\w+\\s*\\)\\s*-",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n)-[]->() RETURN count(DISTINCT n) AS k",
+        "rubric": [
+          "Must match the pattern in MATCH and count distinct nodes.",
+          "A pattern in WHERE under an aggregate, such as WHERE (n)-[]->() with count(*), returns a wrong count and should score zero."
+        ],
+        "required_concepts": [
+          "count"
         ]
       }
     }

@@ -70,9 +70,12 @@
       "checks": {
         "regex": [
           "(?i)(assumption|unverified|untested|unobserved|guess|candidate|(their|your|user'?s?)\\s+(wording|phrasing)|not\\s+(from|observed|checked))",
-          "(?i)(distinct|value_counts|top-n|top n|inspect|aggregate|observed values|schema)"
+          "(?i)(distinct|value_counts|top-n|top n|inspect|aggregate|observed values|schema|stored values|count\\s*\\()"
         ],
-        "max_lines": 8
+        "max_lines": 8,
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
       },
       "oracle": {
         "enabled": true,
@@ -120,10 +123,13 @@
       "prompt": "`create_collection` returned this error: \"That Cypher returns rows that no longer identify graph nodes, so there is nothing to color. Color a node filter, MATCH (n) WHERE ... RETURN n; one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN DISTINCT b; an id list, MATCH (n) WHERE n.<id> IN [...] RETURN n, built with collect() in query_graph; or the connections of one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN e. Report counts and groups with query_graph instead.\" What do you do next? Answer in under 8 non-empty lines.",
       "checks": {
         "regex": [
-          "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|filter_dict|MATCH\\s*\\([^)]*\\)[^\\n]*\\bRETURN\\s+(DISTINCT\\s+)?\\w+",
+          "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|MATCH\\s*\\([^)]*\\)[^\\n]*\\bRETURN\\s+(DISTINCT\\s+)?\\w+",
           "(?i)(rebuild|rewrite|replace|instead|new expression|change the|retry|re-run)"
         ],
-        "max_lines": 8
+        "max_lines": 8,
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match|\"GT\""
+        ]
       },
       "oracle": {
         "enabled": true,
