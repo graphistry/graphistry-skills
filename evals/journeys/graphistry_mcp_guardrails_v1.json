@@ -92,33 +92,6 @@
       }
     },
     {
-      "id": "dict_filter_cannot_threshold",
-      "prompt": "In the Graphistry viz MCP JSON wire format, can a filter_nodes_by_dict entry express a greater-than threshold on a numeric column? Answer in under 6 non-empty lines.",
-      "checks": {
-        "regex": [
-          "(?i)\\b(no|cannot|can'?t|does not|doesn'?t)\\b",
-          "(?i)(exact|equality|equals|membership|literal)",
-          "(?i)(node|predicate|gfql)"
-        ],
-        "max_lines": 6
-      },
-      "oracle": {
-        "enabled": true,
-        "min_score": 0.8,
-        "reference_answer": "No. filter_nodes_by_dict matches exact stored values only, so a predicate object there matches nothing and returns success with zero rows. Use a Node operation to threshold.",
-        "rubric": [
-          "Must answer no and say it matches exact stored values only.",
-          "Must note the failure is silent rather than an error.",
-          "Must redirect to a Node operation for thresholds.",
-          "Scope is the JSON wire format, not the PyGraphistry Python API where filter_nodes_by_dict accepts an ASTPredicate."
-        ],
-        "required_concepts": [
-          "exact",
-          "Node"
-        ]
-      }
-    },
-    {
       "id": "schema_cannot_prove_absence",
       "prompt": "Can get_session_info establish that a particular value does not appear in a column? Answer in under 5 non-empty lines.",
       "checks": {
@@ -144,7 +117,7 @@
     },
     {
       "id": "act_on_collection_refusal",
-      "prompt": "`create_collection` returned this error: \"That expression returns a table that no longer identifies graph nodes - it groups rows, projects columns away, or reads the edge table - so there is nothing to color. A collection needs an expression that selects the nodes themselves, such as a Node filter.\" What do you do next? Answer in under 8 non-empty lines.",
+      "prompt": "`create_collection` returned this error: \"That Cypher returns rows that no longer identify graph nodes, so there is nothing to color. Color a node filter, MATCH (n) WHERE ... RETURN n; one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN DISTINCT b; an id list, MATCH (n) WHERE n.<id> IN [...] RETURN n, built with collect() in query_graph; or the connections of one directed relationship, MATCH (a)-[e]->(b) WHERE ... RETURN e. Report counts and groups with query_graph instead.\" What do you do next? Answer in under 8 non-empty lines.",
       "checks": {
         "regex": [
           "(?i)node[\\s`*]*(filter|operation)|select\\w*[\\s`*]+(the\\s+)?node|return\\w*[\\s`*]+(graph\\s+)?node|node[\\s`*]+(id|identity)|filter_dict|MATCH\\s*\\([^)]*\\)[^\\n]*\\bRETURN\\s+(DISTINCT\\s+)?\\w+",
@@ -155,15 +128,15 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "Act on the repair the error names: replace the aggregating chain with an expression that selects the nodes themselves, typically a Node filter, or Cypher that returns the nodes whole (MATCH (n) WHERE ... RETURN n), built from the values the aggregation returned, then create the collection from that.",
+        "reference_answer": "Act on the repair the error names: replace the projecting or aggregating query with Cypher that returns the nodes whole (MATCH (n) WHERE ... RETURN n) or an id list built with collect() in query_graph, from the values the earlier query returned, validate it with query_graph, then create the collection from that.",
         "rubric": [
           "Must act on the refusal rather than reporting failure and stopping.",
-          "Must build an expression that selects nodes, such as a Node filter or Cypher that returns the nodes whole.",
+          "Must build Cypher that returns the nodes whole, or an id list built with collect().",
           "Reporting the failure without attempting the named repair should score near zero.",
-          "This differs from a refusal where the service could not evaluate the expression, which should be reported."
+          "This differs from a refusal where the service could not evaluate the query, which should be reported."
         ],
         "required_concepts": [
-          "Node"
+          "RETURN"
         ]
       }
     }
