@@ -82,9 +82,11 @@ without one:
   takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
   and an epoch column an epoch number in its unit: check its range first, since seconds against
   milliseconds match everything or nothing. A quoted number, or a date written for a column of
-  another type, matches nothing.
+  another type, matches nothing. A number stored as text (`string`) sorts as text: convert it,
+  `RETURN toFloat(n.rank) AS r ORDER BY r DESC`.
 - A whole-number id longer than 15 digits, which comes back rounded. Collect
-  `toString(n.<id_column>)` and filter with `WHERE toString(n.<id_column>) IN ['...']`.
+  `toString(n.<id_column>)`, or `toString(nodeId)` after a `CALL`, and filter with
+  `WHERE toString(n.<id_column>) IN ['...']`.
 - A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
   use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
 - A pattern in `WHERE`, such as `WHERE NOT (n)-[]->()`, under an aggregate; `collect()` is an
@@ -101,7 +103,9 @@ error does not, say plainly it cannot be done instead of using another column. D
 operation name.
 
 `<id_column>` below is the column on the `Node id column:` line of `get_session_info`; filtering
-another column by id matches nothing.
+another column by id matches nothing. A column named `id` that is not on that line can be a row
+number the server adds (0 to N-1), not an id. Copy each id exactly as returned: a string stays
+quoted, a number unquoted, and never strip a prefix or reshape an id to fit another column.
 
 ```cypher
 MATCH (n) RETURN count(DISTINCT n.kind) AS k
@@ -134,12 +138,12 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 | a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
 | an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | in `query_graph`, `RETURN e` returns the edge's attributes without its endpoints; in `create_collection` it colors the connections (Coloring) |
 
-`community_multilevel` needs `{directed: false}`, and its community ids are relabeled on every run, so
-compute and filter a community in one query rather than reusing an id from an earlier one. The `degree`, `degree_in`, and `degree_out`
+`community_multilevel` needs `{directed: false}`, and its community ids change on every run, so
+never reuse one from an earlier query. The `degree`, `degree_in`, and `degree_out`
 columns `get_session_info` lists exist only for rendering and fail in a query; use
-`CALL graphistry.degree()`. On a graph whose nodes have a `name` column, every
-`graphistry.igraph.*` call fails with `Vertex attribute conflict`; report that the algorithm cannot
-run instead of retrying.
+`CALL graphistry.degree()`. Run a `graphistry.igraph.*` call before judging it: only when it fails
+with `Vertex attribute conflict` (older servers, on a graph with a `name` node column) report that
+the algorithm cannot run, without retrying.
 
 ## Coloring
 
@@ -151,8 +155,11 @@ directed relationship.
 
 - the matched nodes: `MATCH (n) WHERE n.score > 10 RETURN n`
 - one endpoint of one directed relationship: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN DISTINCT b`
-- the connections themselves, when the filtered value lives in an edge column and the request names
-  no node kind: `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`
+- the connections themselves, when the request asks for connections, or the filtered value lives in
+  an edge column and the request names no node kind:
+  `MATCH (a)-[e]->(b) WHERE e.rel = 'mentions' RETURN e`. When connections are defined only by their
+  endpoints' kinds ("from accounts to hashtags"), filter `a` and `b` and add no edge-value filter,
+  which silently drops edges of other types.
   - `ORDER BY`, `LIMIT`, and projections are refused.
   - In `WHERE`, use plain comparisons joined by `AND`, without parentheses. `OR`, `NOT`,
     `toLower()`, arithmetic, and a filter after `WITH` are refused; `IN [...]` works only as the
@@ -170,9 +177,9 @@ CALL graphistry.degree() YIELD nodeId, degree
 MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
 ```
 
-The first two collect a node's out- and in-neighbors; color them with the node itself. Copy each id
-exactly as returned: a string stays quoted, a number unquoted. A top N and a community are id lists
-too: rank or group and `collect()` in one query, then color `MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
+The first two collect a node's out- and in-neighbors; color them with the node itself. A top N and
+a community are id lists too: rank or group and `collect()` in one query, then color
+`MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
 
 ```cypher
 CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
@@ -180,17 +187,24 @@ CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
   WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
   ORDER BY size DESC LIMIT 1 RETURN size, ids
+// the community containing node 'x'
+CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
+  WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
+// the highest-degree node in an id list
+CALL graphistry.degree() YIELD nodeId, degree
+  WITH nodeId, degree WHERE nodeId IN ['a', 'b'] ORDER BY degree DESC LIMIT 1 RETURN nodeId, degree
 ```
 
 A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
-node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b` and its
-`<-` form instead. A session keeps at most 10 collections, so for a list too long for a few parts,
-report its size instead of coloring it.
+node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`, its `<-`
+form, and the node itself instead. A session keeps at most 10 collections, so for a list too long
+for a few parts, report its size instead of coloring it.
 
 A request colored as several collections (both directions, one per value, a split list) takes one
 `create_collection` call per part: give the parts distinct names and the same color, make every
-call, and report each part's count. For an id list, the match count should equal the number of
-ids; if it does not, re-check the list.
+call, and report the distinct total, from the id list when there is one: parts can overlap, so their
+counts do not add up. For an id list, the match count should equal the number of ids; if it does
+not, re-check the list.
 
 ## Workflow
 
@@ -201,12 +215,17 @@ ids; if it does not, re-check the list.
    lists columns, not stored values, so it never proves a value is absent.
 3. **Inspect stored values before filtering on them.** Natural-language nouns from the user are
    unobserved candidates, never literals. Count the distinct values of the relevant column with
-   `count(DISTINCT ...)`, then return them, and match them exactly. Only in a node-only query,
-   `MATCH (n)`, compare `toLower()` on both sides; in a query with a relationship, use the exact
-   stored value.
-4. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
+   `count(DISTINCT ...)`, then return them, and match them exactly. Look up a named node or word
+   directly, since a top-20 list hides the rest. Only in a node-only query, `MATCH (n)`, compare
+   `toLower()` on both sides; for free text use `toLower(n.<column>) CONTAINS '<word>'`, which also
+   catches plurals. When a word can mean more than one stored set, say which one you counted.
+4. **Filter on every node kind the request names**, in every query, rankings included: "top 10
+   accounts by followers" needs the kind filter, because other kinds can carry the same column. When
+   the request names the kind of the result ("the hashtags X links to"), color those nodes,
+   `RETURN DISTINCT b` with a kind filter on `b`, not the connections.
+5. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
    what any error names and call again.
-5. `create_collection` with that exact validated query, and report the match count it returns.
+6. `create_collection` with that exact validated query, and report the match count it returns.
    When the preflight cannot produce a count, the collection is still applied and the reply says
    so: report "applied, count unavailable" rather than inventing a number.
 
