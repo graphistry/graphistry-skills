@@ -1,0 +1,226 @@
+{
+  "id": "graphistry_mcp_cypher_eval_v1",
+  "description": "Cases from a live Cypher eval of the viz MCP: id lists through the node id column, named node kinds, igraph on a name column, numbers stored as text, and ambiguous wording.",
+  "eval_intent": "realistic_capability",
+  "tags": [
+    "graphistry-mcp",
+    "cypher",
+    "live-eval"
+  ],
+  "cases": [
+    {
+      "id": "top_percent_pagerank_id_list",
+      "prompt": "A live Graphistry viz session (graph via the viz MCP) has 8,120 nodes. get_session_info shows `Node id column: computer` and also lists `id [integer, 0 to 8119]`. Color the top 20% of nodes by PageRank. Show the Cypher for query_graph and for create_collection. Answer in under 10 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)graphistry\\.igraph\\.pagerank",
+          "(?i)LIMIT\\s+162[46]\\b",
+          "(?i)collect\\s*\\(",
+          "(?i)(\\.`?computer`?|toString\\s*\\(\\s*\\w+\\.`?computer`?\\s*\\))\\s+IN\\s*\\["
+        ],
+        "must_not_regex": [
+          "(?im)^\\s*(?:MATCH|WHERE)\\b[^\\n]*\\b\\w+\\.`?id`?\\s+IN\\s*\\[",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 10
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT 1624 RETURN collect(nodeId) AS ids, then create_collection with MATCH (n) WHERE n.computer IN [...ids] RETURN n.",
+        "rubric": [
+          "Must rank with graphistry.igraph.pagerank and take 20% of 8,120 (1,624; 1,626 with ties is also correct).",
+          "Must collect the ids and color them through the node id column `computer`.",
+          "Coloring through the row-number `id` column should score zero."
+        ],
+        "required_concepts": [
+          "pagerank",
+          "computer"
+        ]
+      }
+    },
+    {
+      "id": "community_containing_node",
+      "prompt": "In a live Graphistry viz session (viz MCP, Cypher only; the node id column is `Vertex`), color the community that node 'acme_brand' belongs to. Show the Cypher. Answer in under 10 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)community_multilevel",
+          "(?i)['\"]acme_brand['\"]\\s+IN\\s+\\w+",
+          "(?i)(\\.`?Vertex`?|toString\\s*\\(\\s*\\w+\\.`?Vertex`?\\s*\\))\\s+IN\\s*\\["
+        ],
+        "must_not_regex": [
+          "(?im)^\\s*(?:WITH|WHERE|AND|CALL|MATCH)\\b[^\\n]*community_multilevel\\s*=\\s*\\d",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 10
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'acme_brand' IN ids RETURN size(ids) AS size, ids; then color MATCH (n) WHERE n.Vertex IN [...ids] RETURN n.",
+        "rubric": [
+          "Must compute and filter the community in one query, because community ids change on every run.",
+          "Reusing a community id from an earlier query should score zero."
+        ],
+        "required_concepts": [
+          "community_multilevel"
+        ]
+      }
+    },
+    {
+      "id": "named_result_kind_colors_nodes",
+      "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), node kinds are in the `type` column (values include 'account' and 'hashtag') and the node id column is `nid`. Color the hashtags that acme_news links to. Show the create_collection Cypher, with aliases `a`, `e` and `b`. Answer in under 6 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)RETURN\\s+DISTINCT\\s+b\\b",
+          "(?i)(b\\.`?type`?\\s*=\\s*['\"]hashtag['\"]|(?-i:\\(b:hashtag\\)))",
+          "(?i)a\\.`?nid`?\\s*=\\s*['\"]acme_news['\"]"
+        ],
+        "must_not_regex": [
+          "(?im)^\\s*(?:MATCH\\b[^\\n]*)?RETURN\\s+e\\s*$",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (a)-[e]->(b) WHERE a.nid = 'acme_news' AND b.type = 'hashtag' RETURN DISTINCT b",
+        "rubric": [
+          "Must color the hashtag nodes with RETURN DISTINCT b and a kind filter on b.",
+          "Coloring the connections (RETURN e) should score zero."
+        ],
+        "required_concepts": [
+          "DISTINCT"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_kind_connections_no_edge_filter",
+      "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), node kinds are in the `type` column ('account', 'hashtag', 'url', ...) and the edge column `edge` holds values such as 'has_hashtag' and 'has_mention'. Highlight the connections that go from account nodes to hashtag nodes. Show only the create_collection Cypher, with aliases `a`, `e` and `b`. Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)(a\\.`?type`?\\s*=\\s*['\"]account['\"]|(?-i:\\(a:account\\)))",
+          "(?i)(b\\.`?type`?\\s*=\\s*['\"]hashtag['\"]|(?-i:\\(b:hashtag\\)))",
+          "(?i)RETURN\\s+e\\b"
+        ],
+        "must_not_regex": [
+          "(?im)^[ \\t]*(?:(?:OPTIONAL\\s+)?MATCH|WHERE|AND)\\b[^\\n]*(?:\\be\\.`?edge`?\\s*(?:=|IN|<>)|-\\[\\s*\\w*\\s*:\\s*`?\\w)",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (a)-[e]->(b) WHERE a.type = 'account' AND b.type = 'hashtag' RETURN e",
+        "rubric": [
+          "Must filter both endpoints by kind and return e.",
+          "Adding an edge-value filter such as e.edge = 'has_hashtag' drops has_mention edges and should score zero."
+        ]
+      }
+    },
+    {
+      "id": "ranking_filters_named_kind",
+      "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), node kinds are in the `type` column ('account', 'url', 'domain', 'hashtag'), `followers` is an integer column on every node, and the node id column is `nid`. List the top 10 accounts by followers. Show the Cypher. Answer in under 6 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?im)^\\s*(?:MATCH|WHERE|AND)\\b[^\\n]*(\\.`?type`?\\s*=\\s*['\"]account['\"]|(?-i:\\(\\w+:account\\)))",
+          "(?i)\\.`?followers`?\\b[\\s\\S]{0,160}ORDER\\s+BY\\s+\\S+\\s+DESC",
+          "(?i)LIMIT\\s+10\\b"
+        ],
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n) WHERE n.type = 'account' RETURN n.nid AS id, n.followers AS followers ORDER BY followers DESC LIMIT 10",
+        "rubric": [
+          "Must filter type = 'account' in the ranking query itself.",
+          "A ranking over all node kinds should score zero, because url and domain nodes copy their poster's followers."
+        ]
+      }
+    },
+    {
+      "id": "igraph_runs_with_name_column",
+      "prompt": "A live Graphistry viz session (viz MCP, Cypher only) has a node `Name` column and no stored PageRank. The user asks for the 5 nodes with the highest PageRank. What do you run first? Answer in under 6 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)graphistry\\.igraph\\.pagerank",
+          "(?i)LIMIT\\s+5\\b"
+        ],
+        "must_not_regex": [
+          "(?im)(?:^|[.!?:;]\\s)(?!(?:[^.;\\n]|\\.(?=\\S))*\\b(if|unless|only|after|before|until|when|should|don'?t|doesn'?t|never|not mean|assume|older)\\b)(?:[^.;\\n]|\\.(?=\\S))*\\b(cannot|can'?t|unable to|not possible to|won'?t)\\s+(?:\\w+\\s+)?(run|compute|be computed)\\b|(?:^|[.!?:;]\\s)(?:[^.;\\n]|\\.(?=\\S))*\\b(is|are) unavailable\\b",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Run CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank RETURN nodeId, pagerank ORDER BY pagerank DESC LIMIT 5. Report that the algorithm cannot run only if the call fails with Vertex attribute conflict.",
+        "rubric": [
+          "Must run the igraph call rather than refusing up front.",
+          "Refusing because of the Name column before trying should score zero."
+        ],
+        "required_concepts": [
+          "pagerank"
+        ]
+      }
+    },
+    {
+      "id": "numeric_stored_as_text",
+      "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), get_session_info lists `PageRank [string, 64 distinct]` and `Node id column: Vertex`. List the 5 nodes with the highest stored PageRank. Show the Cypher. Answer in under 6 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?im)^\\s*(?:MATCH\\b[^\\n]*)?(?:RETURN|WITH)\\b[^\\n]*toFloat\\s*\\(\\s*\\w+\\.`?PageRank`?\\s*\\)",
+          "(?i)DESC",
+          "(?i)LIMIT\\s+5\\b"
+        ],
+        "must_not_regex": [
+          "(?im)^\\s*(?:MATCH|RETURN|WITH|ORDER)\\b[^\\n]*ORDER\\s+BY\\s+\\w+\\.`?PageRank`?\\s+DESC",
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 6
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "MATCH (n) RETURN n.Vertex AS v, toFloat(n.PageRank) AS p ORDER BY p DESC LIMIT 5",
+        "rubric": [
+          "Must convert the text column with toFloat before ordering.",
+          "Ordering the text values directly sorts '5.0' above '10.2' and should score zero."
+        ]
+      }
+    },
+    {
+      "id": "ambiguous_logins_states_reading",
+      "prompt": "In a live Graphistry viz session over authentication events (viz MCP, Cypher only), each edge is one auth event and the edge column `authentication_orientation` holds 'LogOn', 'LogOff' and 'TGS'. The user asks: how many logins did computer C586 receive? Answer in under 8 non-empty lines, not counting code fences.",
+      "checks": {
+        "regex": [
+          "(?i)(authentication_orientation|LogOn|every (auth(entication)? )?event|all (auth(entication)? |the )?events)",
+          "(?i)(all (auth(entication)?|the) events|every (auth(entication)? )?event|if you (mean|meant)|reading|interpret|count(ed|ing|s)? (only|just)|LogOn (events? )?only|only (the )?LogOn|logins?\\W{0,3}\\s*(=|means?\\b|as\\b)|\\bread\\b[^.\\n]{0,30}\\bas\\b|assum|treat(ed|ing)?\\b[^.\\n]{0,40}\\bas\\b|took\\b[^.\\n]{0,40}\\b(as|to mean)\\b|includ(e|es|ing) (LogOff|TGS))"
+        ],
+        "must_not_regex": [
+          "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
+        ],
+        "max_lines": 8
+      },
+      "oracle": {
+        "enabled": true,
+        "min_score": 0.8,
+        "reference_answer": "Either reading is acceptable, stated explicitly: count only LogOn events, MATCH (a)-[e]->(b) WHERE b.computer = 'C586' AND e.authentication_orientation = 'LogOn' RETURN count(e), or all auth events into C586; say which one was counted.",
+        "rubric": [
+          "Must state which reading of 'logins' it used (LogOn only, or all auth events).",
+          "A number with no stated reading should score at most half."
+        ],
+        "required_concepts": [
+          "LogOn"
+        ]
+      }
+    }
+  ]
+}
