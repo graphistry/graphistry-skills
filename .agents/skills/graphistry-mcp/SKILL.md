@@ -187,13 +187,13 @@ CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
   WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
   ORDER BY size DESC LIMIT 1 RETURN size, ids
-// the community containing node 'x'
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
   WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
-// the highest-degree node in an id list
 CALL graphistry.degree() YIELD nodeId, degree
   WITH nodeId, degree WHERE nodeId IN ['a', 'b'] ORDER BY degree DESC LIMIT 1 RETURN nodeId, degree
 ```
+
+The third finds the community containing node `x`; the fourth, the highest-degree node in an id list.
 
 A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
 node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`, its `<-`
