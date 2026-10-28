@@ -82,11 +82,23 @@ without one:
   takes an ISO string, `e.time >= '2023-12-09'`; a number column takes a number, `n.score > 10`,
   and an epoch column an epoch number in its unit: check its range first, since seconds against
   milliseconds match everything or nothing. A quoted number, or a date written for a column of
-  another type, matches nothing. A number stored as text (`string`) sorts as text: convert it,
-  `RETURN toFloat(n.rank) AS r ORDER BY r DESC`.
-- A whole-number id longer than 15 digits, which comes back rounded. Collect
-  `toString(n.<id_column>)`, or `toString(nodeId)` after a `CALL`, and filter with
-  `WHERE toString(n.<id_column>) IN ['...']`.
+  another type, matches nothing.
+- A number stored as text (`string` in `get_session_info`), which sorts and compares as text.
+  Convert it with `toFloat()` after dropping blanks, for sorting and for comparisons:
+  `MATCH (n) WHERE n.rank IS NOT NULL AND n.rank <> '' WITH n.<id_column> AS id, toFloat(n.rank) AS r
+  WHERE r IS NOT NULL RETURN id, r ORDER BY r DESC`, or
+  `... WITH n WHERE toFloat(n.rank) > 5 RETURN n`.
+  A null sorts first and an empty string fails the conversion, as does any other word such as
+  `n/a`: exclude it by value.
+- An id compared across types. An id from the user or from another query's list can be text while
+  the id column holds numbers, or the reverse, and a whole-number id longer than 15 digits comes
+  back rounded. Compare ids as text on both sides: collect `toString(n.<id_column>)`, or
+  `toString(nodeId)` after a `CALL`, and filter with `WHERE toString(n.<id_column>) IN ['...']` or
+  `WHERE toString(nodeId) IN ['...']`.
+- A ranking that keeps only the top row, such as the highest degree or the largest community, which
+  silently drops anything tied with it. Group by the score so ties stay together,
+  `WITH degree, collect(toString(nodeId)) AS ids ORDER BY degree DESC LIMIT 3 RETURN degree, ids`.
+  For a top N, say when the rows at the cutoff tie.
 - A backslash in a string literal, which `NOT` or `OR` reads twice. Write a regex dot as `[.]`, or
   use `STARTS WITH` or `CONTAINS`: `NOT n.ip =~ '10[.].*'`.
 - A pattern in `WHERE`, such as `WHERE NOT (n)-[]->()`, under an aggregate; `collect()` is an
@@ -104,8 +116,8 @@ operation name.
 
 `<id_column>` below is the column on the `Node id column:` line of `get_session_info`; filtering
 another column by id matches nothing. A column named `id` that is not on that line can be a row
-number the server adds (0 to N-1), not an id. Copy each id exactly as returned: a string stays
-quoted, a number unquoted, and never strip a prefix or reshape an id to fit another column.
+number the server adds (0 to N-1), not an id. Copy each id exactly as returned, and never strip a
+prefix or reshape an id to fit another column.
 
 ```cypher
 MATCH (n) RETURN count(DISTINCT n.kind) AS k
@@ -170,41 +182,45 @@ directed relationship.
   collect the ids with `query_graph`, one directed hop at a time, then color the list
 
 ```cypher
-MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
-MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
+MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT toString(b.<id_column>)) AS ids
+MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT toString(b.<id_column>)) AS ids
 CALL graphistry.degree() YIELD nodeId, degree
-  WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(nodeId) AS ids
-MATCH (n) WHERE n.<id_column> IN ['x', 'a', 'b'] RETURN n
+  WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(toString(nodeId)) AS ids
+MATCH (n) WHERE toString(n.<id_column>) IN ['x', 'a', 'b'] RETURN n
 ```
 
 The first two collect a node's out- and in-neighbors; color them with the node itself. A top N and
 a community are id lists too: rank or group and `collect()` in one query, then color
-`MATCH (n) WHERE n.<id_column> IN [...] RETURN n`:
+`MATCH (n) WHERE toString(n.<id_column>) IN [...] RETURN n`. Every recipe here returns text ids, so
+that one coloring form fits them all:
 
 ```cypher
 CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
-  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(nodeId) AS ids
+  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(toString(nodeId)) AS ids
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
-  WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
-  ORDER BY size DESC LIMIT 1 RETURN size, ids
+  WITH community_multilevel AS c, collect(toString(nodeId)) AS ids, count(*) AS size
+  ORDER BY size DESC LIMIT 3 RETURN size, ids
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
-  WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
-CALL graphistry.degree() YIELD nodeId, degree
-  WITH nodeId, degree WHERE nodeId IN ['a', 'b'] ORDER BY degree DESC LIMIT 1 RETURN nodeId, degree
+  WITH community_multilevel AS c, collect(toString(nodeId)) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
+CALL graphistry.degree() YIELD nodeId, degree WITH nodeId, degree WHERE toString(nodeId) IN ['a', 'b']
+  WITH degree, collect(toString(nodeId)) AS ids ORDER BY degree DESC LIMIT 3 RETURN degree, ids
 ```
 
-The third finds the community containing node `x`; the fourth, the highest-degree node in an id list.
+The second returns the three largest communities, so a tie for the largest shows. The third finds
+the community containing node `x`; the fourth groups an id list by degree, with every node tied at
+a degree in one row.
 
 A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
 node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`, its `<-`
-form, and the node itself instead. A session keeps at most 10 collections, so for a list too long
-for a few parts, report its size instead of coloring it.
+form, and the node itself, `MATCH (n) WHERE n.<id_column> = 'x' RETURN n`, instead. A session keeps
+at most 10 collections, so for a list too long for a few parts, report its size instead of coloring
+it.
 
 A request colored as several collections (both directions, one per value, a split list) takes one
 `create_collection` call per part: give the parts distinct names and the same color, make every
-call, and report the distinct total, from the id list when there is one: parts can overlap, so their
-counts do not add up. For an id list, the match count should equal the number of ids; if it does
-not, re-check the list.
+call, and report the distinct total from the id lists (their union): parts can overlap, so their
+counts do not add up. With no id list, report each part's count and say the parts can overlap. For
+an id list, the match count should equal the number of ids; if it does not, re-check the list.
 
 ## Workflow
 
@@ -217,12 +233,17 @@ not, re-check the list.
    unobserved candidates, never literals. Count the distinct values of the relevant column with
    `count(DISTINCT ...)`, then return them, and match them exactly. Look up a named node or word
    directly, since a top-20 list hides the rest. Only in a node-only query, `MATCH (n)`, compare
-   `toLower()` on both sides; for free text use `toLower(n.<column>) CONTAINS '<word>'`, which also
-   catches plurals. When a word can mean more than one stored set, say which one you counted.
+   `toLower()` on both sides; for free text use `toLower(n.<column>) CONTAINS toLower('<word>')`,
+   which matches inside longer words (`cat` in `catalog`) and misses irregular forms (`city`,
+   `cities`), so check the matches. When a word can mean more than one stored set, say which one you
+   counted.
 4. **Filter on every node kind the request names**, in every query, rankings included: "top 10
-   accounts by followers" needs the kind filter, because other kinds can carry the same column. When
-   the request names the kind of the result ("the hashtags X links to"), color those nodes,
-   `RETURN DISTINCT b` with a kind filter on `b`, not the connections.
+   accounts by followers" needs the kind filter, because other kinds can carry the same column.
+   After a `CALL`, which no `MATCH` can follow, collect the kind's ids first, `MATCH (n) WHERE
+   n.<kind_column> = '<kind>' RETURN collect(toString(n.<id_column>)) AS ids`, then rank them with
+   `WHERE toString(nodeId) IN [...]`. When the request names the kind of the result ("the hashtags X
+   links to"), color those nodes, `RETURN DISTINCT b` with a kind filter on `b`, not the
+   connections.
 5. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
    what any error names and call again.
 6. `create_collection` with that exact validated query, and report the match count it returns.
