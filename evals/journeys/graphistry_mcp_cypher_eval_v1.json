@@ -189,7 +189,7 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "MATCH (n) WHERE n.PageRank IS NOT NULL AND n.PageRank <> '' WITH n.Vertex AS v, toFloat(n.PageRank) AS p WHERE p IS NOT NULL RETURN v, p ORDER BY p DESC LIMIT 5",
+        "reference_answer": "MATCH (n) WHERE n.PageRank IS NOT NULL AND n.PageRank <> '' WITH n.Vertex AS v, toFloat(n.PageRank) AS p RETURN v, p ORDER BY p DESC LIMIT 5",
         "rubric": [
           "Must convert the text column with toFloat before ordering.",
           "Ordering the text values directly sorts '5.0' above '10.2' and should score zero."
@@ -198,7 +198,7 @@
     },
     {
       "id": "ambiguous_logins_states_reading",
-      "prompt": "In a live Graphistry viz session over authentication events (viz MCP, Cypher only), each edge is one auth event and the edge column `authentication_orientation` holds 'LogOn', 'LogOff' and 'TGS'. The user asks: how many logins did computer C586 receive? Answer in under 8 non-empty lines, not counting code fences.",
+      "prompt": "In a live Graphistry viz session over authentication events (viz MCP, Cypher only), each edge is one auth event and the edge column `authentication_orientation` holds 'LogOn', 'LogOff', 'TGS', 'TGT', 'AuthMap', 'ScreenLock' and 'ScreenUnlock', and is empty on some events. The user asks: how many logins did computer C586 receive? Answer in under 8 non-empty lines, not counting code fences.",
       "checks": {
         "regex": [
           "(?i)(authentication_orientation|LogOn|every (auth(entication)? )?event|all (auth(entication)? |the )?events)",

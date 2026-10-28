@@ -86,10 +86,9 @@ without one:
 - A number stored as text (`string` in `get_session_info`), which sorts and compares as text.
   Convert it with `toFloat()` after dropping blanks, for sorting and for comparisons:
   `MATCH (n) WHERE n.rank IS NOT NULL AND n.rank <> '' WITH n.<id_column> AS id, toFloat(n.rank) AS r
-  WHERE r IS NOT NULL RETURN id, r ORDER BY r DESC`, or
-  `... WITH n WHERE toFloat(n.rank) > 5 RETURN n`.
-  A null sorts first and an empty string fails the conversion, as does any other word such as
-  `n/a`: exclude it by value.
+  RETURN id, r ORDER BY r DESC`, or `... WITH n WHERE toFloat(n.rank) > 5 RETURN n`.
+  A null sorts first, and an empty string or any other word such as `n/a` fails the conversion
+  rather than becoming null: exclude each one by value first.
 - An id compared across types. An id from the user or from another query's list can be text while
   the id column holds numbers, or the reverse, and a whole-number id longer than 15 digits comes
   back rounded. Compare ids as text on both sides: collect `toString(n.<id_column>)`, or
@@ -112,7 +111,9 @@ times, then report the last error. For `column-not-found`, fix the name from the
 lists; if the column the request needs is not there, including one `get_session_info` lists but the
 error does not, say plainly it cannot be done instead of using another column. Degree through
 `CALL graphistry.degree()` is the same measure, not a substitution. Never retry with an invented
-operation name.
+operation name. A `Fatal CUDA error` (such as `cudaErrorIllegalAddress`) or a cuDF load error is a
+transient server fault, not a query error: repeat the same call once, even when the message says
+not to retry, and report it only if it fails again.
 
 `<id_column>` below is the column on the `Node id column:` line of `get_session_info`; filtering
 another column by id matches nothing. A column named `id` that is not on that line can be a row
@@ -150,8 +151,9 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 | a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
 | an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | in `query_graph`, `RETURN e` returns the edge's attributes without its endpoints; in `create_collection` it colors the connections (Coloring) |
 
-`community_multilevel` needs `{directed: false}`, and its community ids change on every run, so
-never reuse one from an earlier query. The `degree`, `degree_in`, and `degree_out`
+`community_multilevel` needs `{directed: false}`, and every run can relabel the communities and
+move nodes between them, so compute and filter in one query, color the ids that query returned,
+and never reuse a community id from an earlier query. The `degree`, `degree_in`, and `degree_out`
 columns `get_session_info` lists exist only for rendering and fail in a query; use
 `CALL graphistry.degree()`. Run a `graphistry.igraph.*` call before judging it: only when it fails
 with `Vertex attribute conflict` (older servers, on a graph with a `name` node column) report that
