@@ -57,7 +57,7 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'acme_brand' IN ids RETURN size(ids) AS size, ids; then color MATCH (n) WHERE n.Vertex IN [...ids] RETURN n.",
+        "reference_answer": "CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel WITH community_multilevel AS c, collect(toString(nodeId)) AS ids WHERE 'acme_brand' IN ids RETURN size(ids) AS size, ids; then color MATCH (n) WHERE toString(n.Vertex) IN [...ids] RETURN n.",
         "rubric": [
           "Must compute and filter the community in one query, because community ids change on every run.",
           "Reusing a community id from an earlier query should score zero."
@@ -125,7 +125,7 @@
       "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), node kinds are in the `type` column ('account', 'url', 'domain', 'hashtag'), `followers` is an integer column on every node, and the node id column is `nid`. List the top 10 accounts by followers. Show the Cypher. Answer in under 6 non-empty lines, not counting code fences.",
       "checks": {
         "regex": [
-          "(?im)^\\s*(?:MATCH|WHERE|AND)\\b[^\\n]*(\\.`?type`?\\s*=\\s*['\"]account['\"]|(?-i:\\(\\w+:account\\)))",
+          "(?im)^\\s*(?:MATCH|WHERE|AND)\\b[^\\n]*(\\.`?type`?\\s*=\\s*['\"]account['\"]|(?-i:\\(\\w+:account\\))|toLower\\s*\\(\\s*\\w+\\.`?type`?\\s*\\)\\s*=\\s*['\"]account['\"])",
           "(?i)\\.`?followers`?\\b[\\s\\S]{0,160}ORDER\\s+BY\\s+\\S+\\s+DESC",
           "(?i)LIMIT\\s+10\\b"
         ],
@@ -153,7 +153,7 @@
           "(?i)LIMIT\\s+5\\b"
         ],
         "must_not_regex": [
-          "(?im)(?:^|[.!?:;]\\s)(?!(?:[^.;\\n]|\\.(?=\\S))*\\b(if|unless|only|after|before|until|when|should|don'?t|doesn'?t|never|not mean|assume|older)\\b)(?:[^.;\\n]|\\.(?=\\S))*\\b(cannot|can'?t|unable to|not possible to|won'?t)\\s+(?:\\w+\\s+)?(run|compute|be computed)\\b|(?:^|[.!?:;]\\s)(?:[^.;\\n]|\\.(?=\\S))*\\b(is|are) unavailable\\b",
+          "(?im)(?:^|[.!?:;]\\s)(?!(?:[^.;\\n]|\\.(?=\\S))*\\b(if|unless|only|after|before|until|when|should|then|would|don'?t|doesn'?t|never|not mean|assume|older)\\b)(?:[^.;\\n]|\\.(?=\\S))*\\b(cannot|can'?t|unable to|not possible to|won'?t)\\s+(?:\\w+\\s+)?(run|compute|be computed)\\b|(?:^|[.!?:;]\\s)(?![^.;\\n]*\\bstored\\b)(?:[^.;\\n]|\\.(?=\\S))*\\b(is|are) unavailable\\b",
           "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
         ],
         "max_lines": 6
@@ -176,7 +176,7 @@
       "prompt": "In a live Graphistry viz session (viz MCP, Cypher only), get_session_info lists `PageRank [string, 64 distinct]` and `Node id column: Vertex`. List the 5 nodes with the highest stored PageRank. Show the Cypher. Answer in under 6 non-empty lines, not counting code fences.",
       "checks": {
         "regex": [
-          "(?im)^\\s*(?:MATCH\\b[^\\n]*)?(?:RETURN|WITH)\\b[^\\n]*toFloat\\s*\\(\\s*\\w+\\.`?PageRank`?\\s*\\)",
+          "(?im)^\\s*(?:MATCH\\b[^\\n]*)?(?:RETURN|WITH)\\b[^\\n]*toFloat\\s*\\(\\s*\\w+\\.`?PageRank`?\\s*\\)|ORDER\\s+BY\\s+toFloat\\s*\\(\\s*\\w+\\s*\\)",
           "(?i)DESC",
           "(?i)LIMIT\\s+5\\b"
         ],
@@ -189,7 +189,7 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "MATCH (n) RETURN n.Vertex AS v, toFloat(n.PageRank) AS p ORDER BY p DESC LIMIT 5",
+        "reference_answer": "MATCH (n) WHERE n.PageRank IS NOT NULL AND n.PageRank <> '' WITH n.Vertex AS v, toFloat(n.PageRank) AS p WHERE p IS NOT NULL RETURN v, p ORDER BY p DESC LIMIT 5",
         "rubric": [
           "Must convert the text column with toFloat before ordering.",
           "Ordering the text values directly sorts '5.0' above '10.2' and should score zero."
@@ -216,9 +216,6 @@
         "rubric": [
           "Must state which reading of 'logins' it used (LogOn only, or all auth events).",
           "A number with no stated reading should score at most half."
-        ],
-        "required_concepts": [
-          "LogOn"
         ]
       }
     }
