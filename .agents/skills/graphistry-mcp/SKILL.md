@@ -12,7 +12,9 @@ its schema, run Cypher queries against it, and create colored collections the us
 their browser.
 
 Needs a server whose `create_collection` accepts Cypher. On an older server `create_collection`
-fails with "requires JSON GFQL" and `get_session_info` has no `Node id column:` line.
+fails with "requires JSON GFQL" and `get_session_info` has no `Node id column:` line. A server whose
+`create_collection` description does not mention queries that return node ids colors those through
+an id list instead (Coloring).
 
 ## Connect
 
@@ -73,7 +75,8 @@ language, and runs that.
 counting every `MATCH` and `OPTIONAL MATCH`. Undirected patterns, any variable length (`[*]`,
 `[*1..n]`), and a second relationship anywhere in the query, such as `(a)-->(b)-->(c)`, can return
 wrong rows without an error: go one directed hop per query, collect the ids, and start the next
-hop from `WHERE a.<id_column> IN [...]`.
+hop from `WHERE toString(a.<id_column>) IN [...]`. `query_graph` adds a warning to its reply when a
+query uses one of these shapes; that reply is not an answer until checked one hop at a time.
 
 Most other unsupported queries fail with an error, but these mistakes also return wrong rows
 without one:
@@ -91,9 +94,10 @@ without one:
   rather than becoming null: exclude each one by value first.
 - An id compared across types. An id from the user or from another query's list can be text while
   the id column holds numbers, or the reverse, and a whole-number id longer than 15 digits comes
-  back rounded. Compare ids as text on both sides: collect `toString(n.<id_column>)`, or
-  `toString(nodeId)` after a `CALL`, and filter with `WHERE toString(n.<id_column>) IN ['...']` or
-  `WHERE toString(nodeId) IN ['...']`.
+  back rounded. Compare ids as text on both sides: filter with
+  `WHERE toString(n.<id_column>) IN ['...']` or `WHERE toString(nodeId) IN ['...']`, and in a query
+  you only read, collect `toString(n.<id_column>)`, or `toString(nodeId)` after a `CALL`. A query
+  you color returns ids as stored (Coloring).
 - A ranking that keeps only the top row, such as the highest degree or the largest community, which
   silently drops anything tied with it. Group by the score so ties stay together,
   `WITH degree, collect(toString(nodeId)) AS ids ORDER BY degree DESC LIMIT 3 RETURN degree, ids`.
@@ -161,8 +165,8 @@ the algorithm cannot run, without retrying.
 
 ## Coloring
 
-`create_collection` takes Cypher that returns one node alias whole, or the relationship `e` of one
-directed hop whole. Cypher with `CALL`, `UNION`, aggregates, projections, or any other pattern is
+`create_collection` takes Cypher that returns one node alias whole, the relationship `e` of one
+directed hop whole, or node ids. Other projections, aggregates, `UNION`, and longer patterns are
 refused as a collection, and the refusal names the supported shapes; rewrite to one of them rather
 than reporting failure. Adding `DISTINCT` to a returned endpoint is the repair only for one
 directed relationship.
@@ -180,37 +184,43 @@ directed relationship.
     only condition.
   - For several values plus another condition, make one collection per value; for both directions
     around a node, one `->` and one `<-` collection.
-- anything else, such as a node and its neighbors, a longer path, or nodes a `CALL` ranks or groups:
-  collect the ids with `query_graph`, one directed hop at a time, then color the list
+- node ids, including after a `CALL`: a column named `nodeId` or `<id_column>`, or `collect()` lists
+  with one list per row. The server runs the query once more and colors every id it returns, not
+  only the 20 rows `query_graph` shows, up to 50,000. Return the ids as stored, `nodeId` or
+  `n.<id_column>`, never `toString()` of them: the server matches them against the id column as
+  stored, so a number id turned into text matches nothing, and it refuses a query whose ids match no
+  node. Filtering with `toString()` is fine; only the returned ids must be as stored.
+
+A node and its neighbors, a top N, and a community are id queries: validate the query with
+`query_graph`, then pass the same query to `create_collection`.
 
 ```cypher
-MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT toString(b.<id_column>)) AS ids
-MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT toString(b.<id_column>)) AS ids
-CALL graphistry.degree() YIELD nodeId, degree
-  WITH nodeId, degree ORDER BY degree DESC LIMIT 50 RETURN collect(toString(nodeId)) AS ids
-MATCH (n) WHERE toString(n.<id_column>) IN ['x', 'a', 'b'] RETURN n
-```
-
-The first two collect a node's out- and in-neighbors; color them with the node itself. A top N and
-a community are id lists too: rank or group and `collect()` in one query, then color
-`MATCH (n) WHERE toString(n.<id_column>) IN [...] RETURN n`. Every recipe here returns text ids, so
-that one coloring form fits them all:
-
-```cypher
+MATCH (a)-[]->(b) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
+MATCH (b)-[]->(a) WHERE a.<id_column> = 'x' RETURN collect(DISTINCT b.<id_column>) AS ids
 CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank
-  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(toString(nodeId)) AS ids
+  WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT <N> RETURN collect(nodeId) AS ids
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
-  WITH community_multilevel AS c, collect(toString(nodeId)) AS ids, count(*) AS size
+  WITH community_multilevel AS c, collect(nodeId) AS ids, count(*) AS size
   ORDER BY size DESC LIMIT 3 RETURN size, ids
 CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel
-  WITH community_multilevel AS c, collect(toString(nodeId)) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
+  WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'x' IN ids RETURN size(ids) AS size, ids
 CALL graphistry.degree() YIELD nodeId, degree WITH nodeId, degree WHERE toString(nodeId) IN ['a', 'b']
-  WITH degree, collect(toString(nodeId)) AS ids ORDER BY degree DESC LIMIT 3 RETURN degree, ids
+  WITH degree, collect(nodeId) AS ids ORDER BY degree DESC LIMIT 3 RETURN degree, ids
 ```
 
-The second returns the three largest communities, so a tie for the largest shows. The third finds
-the community containing node `x`; the fourth groups an id list by degree, with every node tied at
-a degree in one row.
+The first two collect a node's out- and in-neighbors; color them with the node itself,
+`MATCH (n) WHERE n.<id_column> = 'x' RETURN n`. The fourth returns the three largest communities,
+so a tie for the largest shows, and the last groups an id list by degree, with every node tied at
+a degree in one row: read those two, since some servers refuse a result with several rows of ids.
+To color the largest community, color the same query with `LIMIT 1` once the sizes show no tie,
+or the community containing one of its members. The fifth finds the community containing node
+`x`: write `x` as stored, quoted for a text id and bare for a number, since `'42' IN ids` never
+matches the number 42. To read ids rather than color them, the same queries may collect
+`toString()` of them.
+
+On a server whose `create_collection` does not take node ids (its description does not mention
+them, or it refuses `CALL`), color an id list instead: collect `toString()` ids with `query_graph`,
+then color `MATCH (n) WHERE toString(n.<id_column>) IN ['x', 'a', 'b'] RETURN n`.
 
 A query is limited to 64 KB. If an `IN` list would pass about 60,000 characters, split it; for a
 node's neighbors, color `MATCH (a)-[e]->(b) WHERE a.<id_column> = 'x' RETURN DISTINCT b`, its `<-`
@@ -222,7 +232,8 @@ A request colored as several collections (both directions, one per value, a spli
 `create_collection` call per part: give the parts distinct names and the same color, make every
 call, and report the distinct total from the id lists (their union): parts can overlap, so their
 counts do not add up. With no id list, report each part's count and say the parts can overlap. For
-an id list, the match count should equal the number of ids; if it does not, re-check the list.
+ids, the match count should equal the number of ids; when the reply says fewer ids name a node,
+re-check how the query returns them.
 
 ## Workflow
 
@@ -243,12 +254,15 @@ an id list, the match count should equal the number of ids; if it does not, re-c
    accounts by followers" needs the kind filter, because other kinds can carry the same column.
    After a `CALL`, which no `MATCH` can follow, collect the kind's ids first, `MATCH (n) WHERE
    n.<kind_column> = '<kind>' RETURN collect(toString(n.<id_column>)) AS ids`, then rank them with
-   `WHERE toString(nodeId) IN [...]`. When the request names the kind of the result ("the hashtags X
+   `WHERE toString(nodeId) IN [...]`, returning `nodeId` as stored when you will color the ranking.
+   When the request names the kind of the result ("the hashtags X
    links to"), color those nodes, `RETURN DISTINCT b` with a kind filter on `b`, not the
    connections.
 5. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
    what any error names and call again.
 6. `create_collection` with that exact validated query, and report the match count it returns.
+   When the request asks who, which, or for a top N, also name the items, from the validated
+   query's result or from the ids the `create_collection` reply lists.
    When the preflight cannot produce a count, the collection is still applied and the reply says
    so: report "applied, count unavailable" rather than inventing a number.
 

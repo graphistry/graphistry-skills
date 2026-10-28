@@ -16,10 +16,11 @@
           "(?i)graphistry\\.igraph\\.pagerank",
           "(?i)LIMIT\\s+162[46]\\b",
           "(?i)collect\\s*\\(",
-          "(?i)(\\.`?computer`?|toString\\s*\\(\\s*\\w+\\.`?computer`?\\s*\\))\\s+IN\\s*\\["
+          "(?is)(\\.`?computer`?|toString\\s*\\(\\s*\\w+\\.`?computer`?\\s*\\))\\s+IN\\s*\\[|create_collection.{0,400}?collect\\s*\\(\\s*nodeId\\s*\\)|collect\\s*\\(\\s*nodeId\\s*\\).{0,400}?create_collection"
         ],
         "must_not_regex": [
           "(?im)^\\s*(?:MATCH|WHERE)\\b[^\\n]*\\b\\w+\\.`?id`?\\s+IN\\s*\\[",
+          "(?im)create_collection[^\\n]*\\b\\w+\\.`?id`?\\s+IN\\s*\\[",
           "\\\\?\"type\\\\?\"\\s*:\\s*\\\\?\"(Node|Edge|Call|Let|Ref)\\\\?\"|filter_dict|edge_match"
         ],
         "max_lines": 10
@@ -27,15 +28,14 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT 1624 RETURN collect(nodeId) AS ids, then create_collection with MATCH (n) WHERE n.computer IN [...ids] RETURN n.",
+        "reference_answer": "CALL graphistry.igraph.pagerank() YIELD nodeId, pagerank WITH nodeId, pagerank ORDER BY pagerank DESC LIMIT 1624 RETURN collect(nodeId) AS ids, validated with query_graph, then the same query to create_collection, which colors every id it returns. On a server whose create_collection does not take node ids, create_collection with MATCH (n) WHERE toString(n.computer) IN [...ids] RETURN n.",
         "rubric": [
           "Must rank with graphistry.igraph.pagerank and take 20% of 8,120 (1,624; 1,626 with ties is also correct).",
-          "Must collect the ids and color them through the node id column `computer`.",
-          "Coloring through the row-number `id` column should score zero."
+          "Must color the collected ids: by passing the collecting query, returning nodeId as stored, to create_collection, or by an id list on the node id column `computer`.",
+          "Coloring through the row-number `id` column, or only the 20 rows query_graph shows, should score zero."
         ],
         "required_concepts": [
-          "pagerank",
-          "computer"
+          "pagerank"
         ]
       }
     },
@@ -46,7 +46,7 @@
         "regex": [
           "(?i)community_multilevel",
           "(?i)['\"]acme_brand['\"]\\s+IN\\s+\\w+",
-          "(?i)(\\.`?Vertex`?|toString\\s*\\(\\s*\\w+\\.`?Vertex`?\\s*\\))\\s+IN\\s*\\["
+          "(?is)(\\.`?Vertex`?|toString\\s*\\(\\s*\\w+\\.`?Vertex`?\\s*\\))\\s+IN\\s*\\[|create_collection.{0,400}?collect\\s*\\(\\s*nodeId\\s*\\)|collect\\s*\\(\\s*nodeId\\s*\\).{0,400}?create_collection"
         ],
         "must_not_regex": [
           "(?im)^\\s*(?:WITH|WHERE|AND|CALL|MATCH)\\b[^\\n]*community_multilevel\\s*=\\s*\\d",
@@ -57,7 +57,7 @@
       "oracle": {
         "enabled": true,
         "min_score": 0.8,
-        "reference_answer": "CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel WITH community_multilevel AS c, collect(toString(nodeId)) AS ids WHERE 'acme_brand' IN ids RETURN size(ids) AS size, ids; then color MATCH (n) WHERE toString(n.Vertex) IN [...ids] RETURN n.",
+        "reference_answer": "CALL graphistry.igraph.community_multilevel({directed: false}) YIELD nodeId, community_multilevel WITH community_multilevel AS c, collect(nodeId) AS ids WHERE 'acme_brand' IN ids RETURN size(ids) AS size, ids, validated with query_graph, then the same query to create_collection. On a server whose create_collection does not take node ids, collect toString(nodeId) and color MATCH (n) WHERE toString(n.Vertex) IN [...ids] RETURN n.",
         "rubric": [
           "Must compute and filter the community in one query, because community ids change on every run.",
           "Reusing a community id from an earlier query should score zero."
