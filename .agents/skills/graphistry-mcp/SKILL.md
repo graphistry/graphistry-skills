@@ -143,12 +143,22 @@ an algorithm with node columns, write it as a column in one query:
 GRAPH g = GRAPH { CALL graphistry.degree.write() }
 GRAPH h = GRAPH { USE g CALL graphistry.igraph.community_multilevel.write({directed: false}) }
 USE h MATCH (n) WITH n.community_multilevel AS c, toString(n.<id_column>) AS id, n.degree AS d ORDER BY d DESC
-WITH c, head(collect(id)) AS top, max(d) AS top_degree, count(*) AS size
-RETURN c, size, top, top_degree ORDER BY size DESC LIMIT 5
+WITH c, head(collect(id)) AS top, max(d) AS top_degree, collect(d) AS ds, count(*) AS size
+RETURN c, size, top, top_degree, size([x IN ds WHERE x = top_degree]) AS tied
+  ORDER BY size DESC LIMIT 5
 ```
 
-Keep `count(*) AS size` and `ORDER BY size DESC`: sorting by degree picks the wrong clusters. To rank a column instead of degree, sort on `coalesce(n.<column>, -1)`, where -1 means no value: nulls
-sort first, and a `WHERE` would shrink `size`. Say when the top value ties. Read this query; do not color it.
+Keep `count(*) AS size` and `ORDER BY size DESC`: sorting by degree picks the wrong clusters. `tied`
+above 1 means that many members share the top value: say so. To rank a column instead of degree, use
+it as `d`, converting a number stored as text with
+`toFloat(CASE WHEN n.<column> =~ '-?[0-9]+([.][0-9]+)?([eE][-+]?[0-9]+)?' THEN n.<column> END)`,
+which turns blanks and words into null, and take
+`head(collect(CASE WHEN d IS NOT NULL THEN id END)) AS top`; a null `top` means the group has no
+value. Do not filter with `WHERE`, which shrinks `size`. Read this query; do not color it. For N
+communities use `LIMIT N`. When the request covers more communities than a limit can name, such as
+every community or all above a size, drop the `LIMIT`: the reported count is then the number of
+communities in that run, so say how many exist and which ones you did not answer, from that same
+result, since another run renumbers them.
 
 Pass `output_type: "nodes"` to read rows; the default `shape` returns counts only. A result shows at
 most 20 rows, and a `LIMIT` also caps the reported count, so count values with `count(DISTINCT ...)`
@@ -169,18 +179,19 @@ before listing them; a cut list cannot prove a value is absent. Return named pro
 | a relationship type `[e:MENTIONS]`, matched against the edge `type` column | a relationship type with no edge `type` column fails with `column-not-found` |
 | an edge's properties: `RETURN a.<id_column> AS src, b.<id_column> AS dst, e.rel AS rel` | in `query_graph`, `RETURN e` returns the edge's attributes without its endpoints; in `create_collection` it colors the connections (Coloring) |
 
-`community_multilevel` needs `{directed: false}`, and every run can relabel the communities and
-move nodes between them, so compute and filter in one query, color the ids that query returned,
-and never reuse a community id from an earlier query; the server refuses a filter on a literal
-community id. The `degree`, `degree_in`, and `degree_out` columns `get_session_info` lists exist
-only for rendering and fail in a query; use `CALL graphistry.degree()`. Run a `graphistry.igraph.*` call before judging it: only when it fails
-with `Vertex attribute conflict` (older servers, on a graph with a `name` node column) report that
-the algorithm cannot run, without retrying.
+`community_multilevel` needs `{directed: false}`, and every run can relabel the communities and move
+nodes between them, so compute and filter in one query, color the ids that query returned, and never
+reuse a community id from an earlier query; the server refuses a filter on a literal community id.
+The `degree`, `degree_in`, and `degree_out` columns `get_session_info` lists exist only for
+rendering and fail in a query; use `CALL graphistry.degree()`. Run a `graphistry.igraph.*` call
+before judging it: only when it fails with `Vertex attribute conflict` (older servers, on a graph
+with a `name` node column) report that the algorithm cannot run, without retrying.
 
 ## Coloring
 
-Call `create_collection` only when the request asks to color, highlight, select, or show: a question
-only reads.
+Call `create_collection` only when the request asks to color, highlight, or select part of the graph
+(nodes or connections), or to show it on the graph. A question only reads, including "show me" a
+list or an answer.
 
 `create_collection` takes Cypher that returns one node alias whole, the relationship `e` of one
 directed hop whole, or node ids. Other projections, aggregates, `UNION`, and longer patterns are
@@ -277,7 +288,8 @@ re-check how the query returns them.
    connections.
 5. Validate with `query_graph` the exact Cypher query you will pass to `create_collection`. Fix
    what any error names and call again.
-6. `create_collection` with that exact validated query, and report the match count it returns.
+6. When the request asks to change the view (Coloring), `create_collection` with that exact
+   validated query, and report the match count it returns.
    When the request asks who, which, or for a top N, also name the items, from the validated
    query's result or from the ids the `create_collection` reply lists.
    When the preflight cannot produce a count, the collection is still applied and the reply says
