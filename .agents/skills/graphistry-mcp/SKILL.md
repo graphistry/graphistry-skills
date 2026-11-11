@@ -151,14 +151,26 @@ RETURN c, size, top, top_degree, size([x IN ds WHERE x = top_degree]) AS tied
 Keep `count(*) AS size` and `ORDER BY size DESC`: sorting by degree picks the wrong clusters. `tied`
 above 1 means that many members share the top value: say so. To rank a column instead of degree, use
 it as `d`, converting a number stored as text with
-`toFloat(CASE WHEN n.<column> =~ '-?[0-9]+([.][0-9]+)?([eE][-+]?[0-9]+)?' THEN n.<column> END)`,
+`toFloat(CASE WHEN n.<column> =~ '[-+]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][-+]?[0-9]+)?' THEN n.<column> END)`,
 which turns blanks and words into null, and take
-`head(collect(CASE WHEN d IS NOT NULL THEN id END)) AS top`; a null `top` means the group has no
-value. Do not filter with `WHERE`, which shrinks `size`. Read this query; do not color it. For N
-communities use `LIMIT N`. When the request covers more communities than a limit can name, such as
-every community or all above a size, drop the `LIMIT`: the reported count is then the number of
-communities in that run, so say how many exist and which ones you did not answer, from that same
-result, since another run renumbers them.
+`head(collect(CASE WHEN d IS NOT NULL THEN id END)) AS top`. To rank one node kind, put the kind test
+in `d`, `CASE WHEN n.<kind_column> = '<kind>' THEN n.<column> END AS d`, so other kinds become null
+and `top` skips them. A null `top` means no member of the group has a value that reads as a number,
+or none is of that kind: check the raw values before saying the group has none. A value with spaces
+around it (`' 70'`) does not convert; if the raw values show any, say those were not ranked. Do not
+filter with `WHERE` before the grouping, which shrinks `size`. Read this query; do not color it.
+
+For N communities use `LIMIT N`. When the request covers more communities than a limit can name,
+such as every community or all above a size, end the query in one row instead of the `RETURN`, since
+a reply shows at most 20 rows and another run renumbers the communities:
+
+```cypher
+WITH c, size, top, top_degree, size([x IN ds WHERE x = top_degree]) AS tied ORDER BY size DESC
+RETURN count(*) AS communities, collect(size) AS sizes, collect(top) AS tops, collect(tied) AS tieds
+```
+
+Add `WHERE size >= <n>` after `AS tied` for all above a size. If a reply still shows only 20 rows,
+answer from those and the reply's count, say which you did not answer, and do not run it again.
 
 Pass `output_type: "nodes"` to read rows; the default `shape` returns counts only. A result shows at
 most 20 rows, and a `LIMIT` also caps the reported count, so count values with `count(DISTINCT ...)`
@@ -283,6 +295,8 @@ re-check how the query returns them.
    After a `CALL`, which no `MATCH` can follow, collect the kind's ids first, `MATCH (n) WHERE
    n.<kind_column> = '<kind>' RETURN collect(toString(n.<id_column>)) AS ids`, then rank them with
    `WHERE toString(nodeId) IN [...]`, returning `nodeId` as stored when you will color the ranking.
+   Inside a community ranking, put the kind test in `d` instead (Query in Cypher), so community sizes stay
+   whole.
    When the request names the kind of the result ("the hashtags X
    links to"), color those nodes, `RETURN DISTINCT b` with a kind filter on `b`, not the
    connections.
